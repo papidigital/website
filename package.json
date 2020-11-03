@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build-task:scss-compile": "node-sass-chokidar --source-map true scss/ -o css",
-    "build-task:bootstrap-scss-compile": "node-sass-chokidar --source-map true node_modules/bootstrap/scss/ -o css",
-    "build-task:autoprefixer": "postcss node_modules/bootstrap/css/*.css css/*.css --use autoprefixer -d css",
+    "build-task:scss-compile": "node-sass-chokidar --source-map true scss/ -o assets/css",
+    "build-task:bootstrap-scss-compile": "node-sass-chokidar --source-map true node_modules/bootstrap/scss/ -o assets/css",
+    "build-task:autoprefixer": "postcss node_modules/bootstrap/css/*.css assets/css/*.css --use autoprefixer -d css",
     "sass:build": "npm-run-all -p build-task:*",
     "sass:watch": "chokidar 'scss/**/*.scss' -c 'npm run sass:build'",
     "dev": "npm-run-all -p sass:*"

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="fd35833c-3f2e-4b6a-b711-55ce51b19c21" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/assets/case-studies/keep-me-certified-logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/case-studies/keep-me-certified-logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/case-studies/la-startup-logo.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/case-studies/la-startup-logo.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/case-studies/tooth-fairy-logo.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/case-studies/tooth-fairy-logo.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/case-studies/tucker-gunleather-logo.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/case-studies/tucker-gunleather-logo.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/distribution-icon/distribution-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/distribution-icon/distribution-icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/distribution-icon/distribution-icon@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/distribution-icon/distribution-icon@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/facebook-icon/facebook-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/facebook-icon/facebook-icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/facebook-icon/facebook-icon@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/facebook-icon/facebook-icon@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/hero-mobile.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/hero-mobile.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/instagram-icon/instagram-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/instagram-icon/instagram-icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/instagram-icon/instagram-icon@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/instagram-icon/instagram-icon@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/papi-at-desk/papi-at-desk.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/papi-at-desk/papi-at-desk.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/papi-at-desk/papi-at-desk@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/papi-at-desk/papi-at-desk@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/papi-logo/papi-logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/papi-logo/papi-logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/papi-logo/papi-logo@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/papi-logo/papi-logo@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/phone-icon/phone-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/phone-icon/phone-icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/phone-icon/phone-icon@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/phone-icon/phone-icon@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/play-button-icon/play-button-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/play-button-icon/play-button-icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/play-button-icon/play-button-icon@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/play-button-icon/play-button-icon@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/podcast-cover-placeholder.webp" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/podcast-cover-placeholder.webp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/podcast/podcast-cover-art.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/podcast/podcast-cover-art.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/production-icon/production-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/production-icon/production-icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/production-icon/production-icon@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/production-icon/production-icon@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/services/distribution/distribution-blogging.svg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/services/distribution/distribution-blogging.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/services/distribution/distribution-email-marketing.svg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/services/distribution/distribution-email-marketing.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/services/distribution/distribution-google-words.svg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/services/distribution/distribution-google-words.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/services/distribution/distribution-organic-social-media.svg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/services/distribution/distribution-organic-social-media.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/services/distribution/distribution-paid-social-media.svg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/services/distribution/distribution-paid-social-media.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/services/distribution/distribution-search-engine-optimization.svg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/services/distribution/distribution-search-engine-optimization.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/services/production/production-ads.svg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/services/production/production-ads.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/services/production/production-brand.svg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/services/production/production-brand.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/services/production/production-content-social-media.svg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/services/production/production-content-social-media.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/services/production/production-website.svg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/services/production/production-website.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/services/strategy/strategy-brand.svg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/services/strategy/strategy-brand.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/services/strategy/strategy-discovery.svg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/services/strategy/strategy-discovery.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/services/strategy/strategy-distribution-plan.svg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/services/strategy/strategy-distribution-plan.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/services/strategy/strategy-funnels-and-content.svg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/services/strategy/strategy-funnels-and-content.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/services/strategy/strategy-message-development.svg" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/services/strategy/strategy-message-development.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/strategy-icon/strategy-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/strategy-icon/strategy-icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/strategy-icon/strategy-icon@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/strategy-icon/strategy-icon@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/twitter-icon/twitter-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/twitter-icon/twitter-icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/twitter-icon/twitter-icon@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/twitter-icon/twitter-icon@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/videos/growth-hacking-video-placeholder.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/videos/growth-hacking-video-placeholder.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/videos/growth-hacking-video.mp4" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/videos/growth-hacking-video.mp4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/videos/papi-digital-hero-video.mp4" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/videos/papi-digital-hero-video.mp4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/youtube-icon/youtube-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/youtube-icon/youtube-icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/youtube-icon/youtube-icon@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/youtube-icon/youtube-icon@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/css/bootstrap-grid.css" beforeDir="false" afterPath="$PROJECT_DIR$/assets/css/bootstrap-grid.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/css/bootstrap-reboot.css" beforeDir="false" afterPath="$PROJECT_DIR$/assets/css/bootstrap-reboot.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/css/bootstrap.css" beforeDir="false" afterPath="$PROJECT_DIR$/assets/css/bootstrap.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/css/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/assets/css/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/distribution.html" beforeDir="false" afterPath="$PROJECT_DIR$/distribution.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/bootstrap.bundle.js" beforeDir="false" afterPath="$PROJECT_DIR$/assets/js/bootstrap.bundle.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/bootstrap.bundle.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/assets/js/bootstrap.bundle.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/bootstrap.bundle.min.js" beforeDir="false" afterPath="$PROJECT_DIR$/assets/js/bootstrap.bundle.min.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/bootstrap.bundle.min.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/assets/js/bootstrap.bundle.min.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/bootstrap.js" beforeDir="false" afterPath="$PROJECT_DIR$/assets/js/bootstrap.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/bootstrap.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/assets/js/bootstrap.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/bootstrap.min.js" beforeDir="false" afterPath="$PROJECT_DIR$/assets/js/bootstrap.min.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/bootstrap.min.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/assets/js/bootstrap.min.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/podcast.html" beforeDir="false" afterPath="$PROJECT_DIR$/podcast.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/production.html" beforeDir="false" afterPath="$PROJECT_DIR$/production.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scss/_index.scss" beforeDir="false" afterPath="$PROJECT_DIR$/scss/_index.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/strategy.html" beforeDir="false" afterPath="$PROJECT_DIR$/strategy.html" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1jlQcBjtL0O6jmpA54XLwvGjaQX" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="yarn" />
+    <property name="options.lastSelected" value="Configurable.PHP" />
+    <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/assets/images" />
+      <recent name="$PROJECT_DIR$/assets" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="fd35833c-3f2e-4b6a-b711-55ce51b19c21" name="Default Changelist" comment="" />
+      <created>1604376275728</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1604376275728</updated>
+      <workItem from="1604376276838" duration="5072000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="221" y="100" key="SettingsEditor" timestamp="1604382628335">
+      <screen x="0" y="23" width="1440" height="877" />
+    </state>
+    <state x="221" y="100" key="SettingsEditor/0.23.1440.877@0.23.1440.877" timestamp="1604382628335" />
+  </component>
+</project>

@@ -196,7 +196,7 @@ body, html {
        object-fit: cover; }
 
 .hero-mobile {
-  background-image: url("../assets/hero-mobile.jpg");
+  background-image: url("../images/hero-mobile.jpg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: 50% 50%;

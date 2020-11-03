@@ -18,7 +18,7 @@
                     services
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="strategy.html">strategy</a>
+                    <a class="dropdown-item {% if this.page.id == 'strategy' %}active{% endif %}" href="{{ 'strategy'|page }}">strategy</a>
                     <a class="dropdown-item" href="production.html">production</a>
                     <a class="dropdown-item" href="distribution.html">distribution</a>
                 </div>

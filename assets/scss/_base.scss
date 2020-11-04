@@ -1,6 +1,6 @@
-@import "../node_modules/bootstrap/scss/functions";
-@import "../node_modules/bootstrap/scss/variables";
-@import "../node_modules/bootstrap/scss/mixins";
+@import "../../node_modules/bootstrap/scss/functions";
+@import "../../node_modules/bootstrap/scss/variables";
+@import "../../node_modules/bootstrap/scss/mixins";
 
 $primaryColor: #CA3D3D;
 $papiGreyColor: #F2F2F2;
@@ -22,14 +22,15 @@ body, html {
   height: 100%;
 }
 
-.navbar {
-  a {
-    color: #000 !important;
-  }
+.navbar-light .navbar-nav .nav-link {
+  color: black;
 
-  a:hover {
-    color: $primaryColor !important;
+  &:hover {
+    color: $primaryColor;
   }
+}
+
+.navbar {
 
   .nav-link {
     text-transform: uppercase;
@@ -37,6 +38,14 @@ body, html {
 
   .dropdown-item {
     text-transform: uppercase;
+
+    &.active {
+      background-color: $primaryColor;
+
+      a:hover {
+        color: white;
+      }
+    }
   }
 
   .phone {

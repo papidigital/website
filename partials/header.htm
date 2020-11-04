@@ -7,14 +7,16 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav" >
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="#about-us">about</a>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ 'home'|page }}#about-us">about</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#our-process">process</a>
+                <a class="nav-link" href="{{ 'home'|page }}#our-process">process</a>
             </li>
-            <li class="nav-item active dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <li class="nav-item dropdown">
+                <a class="nav-link {% if this.page.id == 'strategy' or this.page.id == 'production' or this.page.id == 'distribution' %}active{% endif %} dropdown-toggle"
+                   href="#" id="navbarDropdown"
+                   role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     services
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">

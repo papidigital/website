@@ -28,6 +28,10 @@ body, html {
   &:hover {
     color: $primaryColor;
   }
+
+  &.active {
+    color: $primaryColor;
+  }
 }
 
 .navbar {

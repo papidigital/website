@@ -3,12 +3,25 @@
   <component name="ChangeListManager">
     <list default="true" id="fd35833c-3f2e-4b6a-b711-55ce51b19c21" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/css/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/assets/css/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/services/distribution/distribution-blogging.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/services/distribution/distribution-email-marketing.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/services/distribution/distribution-google-words.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/services/distribution/distribution-organic-social-media.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/services/distribution/distribution-paid-social-media.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/services/distribution/distribution-search-engine-optimization.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/services/production/production-ads.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/services/production/production-brand.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/services/production/production-content-social-media.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/services/production/production-website.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/services/strategy/strategy-brand.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/services/strategy/strategy-discovery.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/services/strategy/strategy-distribution-plan.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/services/strategy/strategy-funnels-and-content.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/services/strategy/strategy-message-development.svg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/scss/_base.scss" beforeDir="false" afterPath="$PROJECT_DIR$/assets/scss/_base.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/scss/_services.scss" beforeDir="false" afterPath="$PROJECT_DIR$/assets/scss/_services.scss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/css/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/css/main.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/home.htm" beforeDir="false" afterPath="$PROJECT_DIR$/pages/home.htm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/strategy.htm" beforeDir="false" afterPath="$PROJECT_DIR$/pages/strategy.htm" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/partials/header.htm" beforeDir="false" afterPath="$PROJECT_DIR$/partials/header.htm" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -49,6 +62,7 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/assets/images/services" />
       <recent name="$PROJECT_DIR$/assets" />
       <recent name="$PROJECT_DIR$/assets/images" />
     </key>
@@ -61,7 +75,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1604376275728</updated>
-      <workItem from="1604376276838" duration="10744000" />
+      <workItem from="1604376276838" duration="12265000" />
     </task>
     <servers />
   </component>

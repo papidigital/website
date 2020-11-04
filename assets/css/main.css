@@ -16,6 +16,8 @@ body, html {
 
 .navbar .dropdown-item {
   text-transform: uppercase; }
+  .navbar .dropdown-item:active {
+    background-color: #CA3D3D; }
   .navbar .dropdown-item.active {
     background-color: #CA3D3D; }
     .navbar .dropdown-item.active a:hover {
@@ -112,6 +114,8 @@ body, html {
 
 .navbar .dropdown-item {
   text-transform: uppercase; }
+  .navbar .dropdown-item:active {
+    background-color: #CA3D3D; }
   .navbar .dropdown-item.active {
     background-color: #CA3D3D; }
     .navbar .dropdown-item.active a:hover {
@@ -329,6 +333,8 @@ body, html {
 
 .navbar .dropdown-item {
   text-transform: uppercase; }
+  .navbar .dropdown-item:active {
+    background-color: #CA3D3D; }
   .navbar .dropdown-item.active {
     background-color: #CA3D3D; }
     .navbar .dropdown-item.active a:hover {
@@ -449,6 +455,8 @@ body, html {
 
 .navbar .dropdown-item {
   text-transform: uppercase; }
+  .navbar .dropdown-item:active {
+    background-color: #CA3D3D; }
   .navbar .dropdown-item.active {
     background-color: #CA3D3D; }
     .navbar .dropdown-item.active a:hover {

@@ -39,6 +39,10 @@ body, html {
   .dropdown-item {
     text-transform: uppercase;
 
+    &:active {
+      background-color: $primaryColor;
+    }
+
     &.active {
       background-color: $primaryColor;
 

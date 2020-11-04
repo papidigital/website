@@ -3,6 +3,13 @@
 ## Deployment using Docker
 TODO
 
+## SCSS / CSS Compilation
+This project uses `npm` to compile SCSS files to CSS and watch changes.
+
+To use this functionality, run `npm run dev` in the terminal.
+
+Check the `package.json` file for more configuration.
+
 ## Theming/Templating
 
 ### OctoberCMS Themes

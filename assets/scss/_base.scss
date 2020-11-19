@@ -22,6 +22,10 @@ body, html {
   height: 100%;
 }
 
+a {
+  color: $primaryColor
+}
+
 .navbar-light .navbar-nav .nav-link {
   color: black;
 

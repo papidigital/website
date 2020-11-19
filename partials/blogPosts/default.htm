@@ -1,40 +1,39 @@
 {% set posts = blogPosts.posts %}
+{% partial 'services-title' %}
 
-<ul class="post-list">
+<div class="row container-xl post-list-container">
     {% for post in posts %}
-    <li>
-        <h3><a href="{{ post.url }}">{{ post.title }}</a></h3>
-
+    <article class="col-md-6 post-list-article">
         {% if post.featured_images.count %}
-        <div id="post-list-featured-images-top">
+        <div class="post-list-article-featured-image" id="post-list-featured-images-top">
             {% for image in post.featured_images|slice(0, 1) %}
-            <a href="{{ image.path }}">
-                <img data-src="{{ image.filename }}" src="{{ image.path }}" alt="{{ image.description != null ? image.description : image.filename }}" title="{{ image.title != null ? image.title : post.title }}">
+            <a href="{{ post.url }}">
+                <img class="img-fluid" data-src="{{ image.filename }}" src="{{ image.path }}" alt="{{ image.description != null ? image.description : image.filename }}" title="{{ image.title != null ? image.title : post.title }}">
             </a>
             {% endfor %}
         </div>
+        <h2 class="post-list-article-title"><a href="{{ post.url }}">{{ post.title }}</a></h2>
         {% endif %}
-        <p class="info">
-            {% if post.categories.count %}
-            {% set categoryLinks = post.categories | map(c => "<a href=\"#{c.url}\">#{c.name}</a>") | join(', ') %}
+        <p class="post-list-article-date">
+            {{ post.published_at | date('F jS, Y') | trans }}
 
-            {{ 'rainlab.blog::lang.post.posted_byline' | trans({
-            date: post.published_at | date('rainlab.blog::lang.post.date_format' | trans),
-            categories: categoryLinks
-            }) }}
+            <span class=\"date-separator\">|</span>
+            {% if post.categories.count %}
+            {% set categoryLinks = post.categories | map(c => "<a href=\"#{c.url}\">#{c.name}</a>") | join("<span class=\"separator\">, </span>") %}
+
+            {{ categoryLinks | trans }}
+
             {% else %}
-            {{ 'rainlab.blog::lang.post.posted_byline_no_categories' | trans({
-            date: post.published_at | date('rainlab.blog::lang.post.date_format' | trans)
-            }) }}
+            Uncategorized
             {% endif %}
         </p>
-
-        <p class="excerpt">{{ post.summary | raw }}</p>
-    </li>
+        <p class="post-list-article-excerpt">{{ post.excerpt | raw }}</p>
+        <a class="post-list-article-btn btn-outline" href="{{ post.url }}">Read this post</a>
+    </article>
     {% else %}
-    <li class="no-data">{{ blogPosts.noPostsMessage }}</li>
+    <div class="no-data">{{ blogPosts.noPostsMessage }}</div>
     {% endfor %}
-</ul>
+</div>
 
 {% if posts.lastPage > 1 %}
 <ul class="pagination">

@@ -1,0 +1,14 @@
+@import "base";
+
+.post-list-container {
+  margin: 2rem auto 0;
+  height: 100%;
+
+  .post-list-article {
+    margin-bottom: 2rem;
+
+    .post-list-article-featured-image {
+      margin-bottom: 0.5rem;
+    }
+  }
+}

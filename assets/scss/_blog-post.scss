@@ -1,0 +1,7 @@
+@import "base";
+
+// we need this so we don't display the post component's title.
+// there might be a better way to do this...
+h2:first-of-type {
+  display: none;
+}

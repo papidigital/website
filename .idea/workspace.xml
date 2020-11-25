@@ -4,11 +4,9 @@
     <list default="true" id="fd35833c-3f2e-4b6a-b711-55ce51b19c21" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/css/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/assets/css/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/scss/_base.scss" beforeDir="false" afterPath="$PROJECT_DIR$/assets/scss/_base.scss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/scss/_blog-post.scss" beforeDir="false" afterPath="$PROJECT_DIR$/assets/scss/_blog-post.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/blog-page.htm" beforeDir="false" afterPath="$PROJECT_DIR$/pages/blog-page.htm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/partials/blogPost/default.htm" beforeDir="false" afterPath="$PROJECT_DIR$/partials/blogPost/default.htm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/partials/blogPosts/default.htm" beforeDir="false" afterPath="$PROJECT_DIR$/partials/blogPosts/default.htm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/partials/header.htm" beforeDir="false" afterPath="$PROJECT_DIR$/partials/header.htm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/layouts/default.htm" beforeDir="false" afterPath="$PROJECT_DIR$/layouts/default.htm" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,7 +78,7 @@
       <option name="presentableId" value="Default" />
       <updated>1604376275728</updated>
       <workItem from="1604376276838" duration="32689000" />
-      <workItem from="1606341342414" duration="198000" />
+      <workItem from="1606341342414" duration="1460000" />
     </task>
     <servers />
   </component>
@@ -121,10 +119,10 @@
     </state>
     <state x="221" y="100" key="SettingsEditor/0.23.1440.877@0.23.1440.877" timestamp="1604382628335" />
     <state x="393" y="147" key="SettingsEditor/0.23.2560.1417@0.23.2560.1417" timestamp="1605632011320" />
-    <state x="684" y="330" width="1192" height="1093" key="search.everywhere.popup" timestamp="1605633417807">
+    <state x="684" y="330" width="1192" height="1093" key="search.everywhere.popup" timestamp="1606342975784">
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state x="385" y="213" width="670" height="676" key="search.everywhere.popup/0.23.1440.877@0.23.1440.877" timestamp="1604465549941" />
-    <state x="684" y="330" width="1192" height="1093" key="search.everywhere.popup/0.23.2560.1417@0.23.2560.1417" timestamp="1605633417807" />
+    <state x="684" y="330" width="1192" height="1093" key="search.everywhere.popup/0.23.2560.1417@0.23.2560.1417" timestamp="1606342975784" />
   </component>
 </project>

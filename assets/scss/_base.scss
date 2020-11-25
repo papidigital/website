@@ -10,6 +10,7 @@ $placeholderCol1Color: red;
 $placeholderCol2Color: green;
 $pageBackgroundColor: #FFF;
 $mainFontFamily: 'Rubik', sans-serif;
+$articleBodyFontFamily: 'Castoro', serif;
 $font-weight-medium: 500;
 
 body {
@@ -39,6 +40,9 @@ a {
 }
 
 .navbar {
+
+  border-bottom: 1px solid #DCDCDC;
+  padding: 1rem;
 
   .nav-link {
     text-transform: uppercase;

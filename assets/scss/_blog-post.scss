@@ -1,7 +1,30 @@
 @import "base";
 
-.article-featured-image {
-  img {
-    width: 100%;
+.post-article {
+
+  margin: 2rem 1rem 0;
+
+  .article-info {
+    font-size: 18px;
+  }
+
+  .article-featured-image {
+    margin-bottom: 2rem;
+
+    img {
+      width: 100%;
+    }
+  }
+
+  .article-content {
+
+    p {
+      font-family: $articleBodyFontFamily;
+      font-size: 21px;
+      color: #252525;
+      margin-bottom: 2rem;
+      line-height: 32px;
+    }
   }
 }
+

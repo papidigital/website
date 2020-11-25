@@ -12,8 +12,8 @@
             </a>
             {% endfor %}
         </div>
-        <h2 class="post-list-article-title"><a href="{{ post.url }}">{{ post.title }}</a></h2>
         {% endif %}
+        <h2 class="post-list-article-title"><a href="{{ post.url }}">{{ post.title }}</a></h2>
         <p class="post-list-article-date">
             {{ post.published_at | date('F jS, Y') | trans }}
 

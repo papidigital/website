@@ -6,17 +6,16 @@
             <h1 class="article-title">{{ post.title }}</h1>
 
             <p class="article-info">
-                {% if post.categories.count %}
-                {% set categoryLinks = post.categories | map(c => "<a href=\"#{c.url}\">#{c.name}</a>") | join(', ') %}
+                {{ post.published_at | date('F jS, Y') | trans }}
 
-                {{ 'rainlab.blog::lang.post.posted_byline' | trans({
-                date: post.published_at | date('rainlab.blog::lang.post.date_format' | trans),
-                categories: categoryLinks
-                }) }}
+                <span class=\"date-separator\">|</span>
+                {% if post.categories.count %}
+                {% set categoryLinks = post.categories | map(c => "<a href=\"#{c.url}\">#{c.name}</a>") | join("<span class=\"separator\">, </span>") %}
+
+                {{ categoryLinks | trans }}
+
                 {% else %}
-                {{ 'rainlab.blog::lang.post.posted_byline_no_categories' | trans({
-                date: post.published_at | date('rainlab.blog::lang.post.date_format'|trans)
-                }) }}
+                Uncategorized
                 {% endif %}
             </p>
 

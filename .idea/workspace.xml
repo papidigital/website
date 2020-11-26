@@ -3,8 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="fd35833c-3f2e-4b6a-b711-55ce51b19c21" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/blog-page.htm" beforeDir="false" afterPath="$PROJECT_DIR$/pages/blog-page.htm" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pages/blog.htm" beforeDir="false" afterPath="$PROJECT_DIR$/pages/blog.htm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/partials/blogPost/default.htm" beforeDir="false" afterPath="$PROJECT_DIR$/partials/blogPost/default.htm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/podcast.htm" beforeDir="false" afterPath="$PROJECT_DIR$/pages/podcast.htm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/partials/blogPosts/default.htm" beforeDir="false" afterPath="$PROJECT_DIR$/partials/blogPosts/default.htm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/partials/header.htm" beforeDir="false" afterPath="$PROJECT_DIR$/partials/header.htm" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,7 +37,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="editorconfig.notification" value="lf;" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/partials/categories" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/partials/podcastEpisodes" />
     <property name="nodejs_package_manager_path" value="yarn" />
     <property name="options.lastSelected" value="Configurable.PHP" />
     <property name="options.searchVisible" value="true" />
@@ -45,6 +48,7 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/partials/podcastEpisodes" />
       <recent name="$PROJECT_DIR$/partials/categories" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -79,7 +83,7 @@
       <option name="presentableId" value="Default" />
       <updated>1604376275728</updated>
       <workItem from="1604376276838" duration="32689000" />
-      <workItem from="1606341342414" duration="2266000" />
+      <workItem from="1606341342414" duration="3413000" />
     </task>
     <servers />
   </component>

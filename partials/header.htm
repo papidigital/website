@@ -20,7 +20,7 @@
                 </div>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ 'blog'|page }}">weekly hacks</a>
+                <a class="nav-link {% if this.page.id == 'blog' %}active{% endif %}" href="{{ 'blog'|page }}">weekly hacks</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if this.page.id == 'podcast' %}active{% endif %}" href="{{ 'podcast'|page }}">podcast</a>

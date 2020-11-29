@@ -3,13 +3,13 @@
 .post-article {
 
   margin: 2rem 1rem 0;
+  padding-bottom: 2rem;
 
   .article-info {
     font-size: 18px;
   }
 
   .article-featured-image {
-    margin-bottom: 2rem;
 
     img {
       width: 100%;
@@ -22,7 +22,7 @@
       font-family: $articleBodyFontFamily;
       font-size: 21px;
       color: #252525;
-      margin-bottom: 2rem;
+      margin-top: 2rem;
       line-height: 32px;
     }
   }

@@ -3,11 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="fd35833c-3f2e-4b6a-b711-55ce51b19c21" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/blog-page.htm" beforeDir="false" afterPath="$PROJECT_DIR$/pages/blog-page.htm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/blog.htm" beforeDir="false" afterPath="$PROJECT_DIR$/pages/blog.htm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/css/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/assets/css/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/scss/_podcast.scss" beforeDir="false" afterPath="$PROJECT_DIR$/assets/scss/_podcast.scss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pages/podcast.htm" beforeDir="false" afterPath="$PROJECT_DIR$/pages/podcast.htm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/partials/blogPosts/default.htm" beforeDir="false" afterPath="$PROJECT_DIR$/partials/blogPosts/default.htm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/partials/header.htm" beforeDir="false" afterPath="$PROJECT_DIR$/partials/header.htm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/partials/podcastEpisodes/default.htm" beforeDir="false" afterPath="$PROJECT_DIR$/partials/podcastEpisodes/default.htm" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,7 +42,7 @@
     <property name="options.searchVisible" value="true" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="settings.editor.selected.configurable" value="terminal" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Color Scheme Font" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
@@ -83,7 +82,7 @@
       <option name="presentableId" value="Default" />
       <updated>1604376275728</updated>
       <workItem from="1604376276838" duration="32689000" />
-      <workItem from="1606341342414" duration="3413000" />
+      <workItem from="1606341342414" duration="5571000" />
     </task>
     <servers />
   </component>
@@ -119,10 +118,10 @@
       <screen x="0" y="23" width="2560" height="1417" />
     </state>
     <state width="221" height="457" key="HiddenNamespacesPopup/0.23.2560.1417@0.23.2560.1417" timestamp="1605385720286" />
-    <state x="393" y="147" key="SettingsEditor" timestamp="1605632011320">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state x="221" y="100" key="SettingsEditor" timestamp="1606672977009">
+      <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state x="221" y="100" key="SettingsEditor/0.23.1440.877@0.23.1440.877" timestamp="1604382628335" />
+    <state x="221" y="100" key="SettingsEditor/0.23.1440.877@0.23.1440.877" timestamp="1606672977009" />
     <state x="393" y="147" key="SettingsEditor/0.23.2560.1417@0.23.2560.1417" timestamp="1605632011320" />
     <state x="684" y="330" width="1192" height="1093" key="search.everywhere.popup" timestamp="1606342975784">
       <screen x="0" y="23" width="2560" height="1417" />

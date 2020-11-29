@@ -1,39 +1,30 @@
 {% set posts = podcastEpisodes.posts %}
-<h1>HELLO</h1>
 
-<div class="row container-xl post-list-container">
-    {% for post in posts %}
-    <article class="col-md-6 post-list-article">
-        {% if post.featured_images.count %}
-        <div class="post-list-article-featured-image" id="post-list-featured-images-top">
-            {% for image in post.featured_images|slice(0, 1) %}
-            <a href="{{ post.url }}">
-                <img class="img-fluid" data-src="{{ image.filename }}" src="{{ image.path }}" alt="{{ image.description != null ? image.description : image.filename }}" title="{{ image.title != null ? image.title : post.title }}">
-            </a>
-            {% endfor %}
-        </div>
-        {% endif %}
-        <h2 class="post-list-article-title"><a href="{{ post.url }}">{{ post.title }}</a></h2>
-        <p class="post-list-article-date">
-            {{ post.published_at | date('F jS, Y') | trans }}
+<section class="podcast-episodes container-fluid p-5 text-center">
 
-            <span class=\"date-separator\">|</span>
-            {% if post.categories.count %}
-            {% set categoryLinks = post.categories | map(c => "<a href=\"#{c.url}\">#{c.name}</a>") | join("<span class=\"separator\">, </span>") %}
-
-            {{ categoryLinks | trans }}
-
-            {% else %}
-            Uncategorized
+    <div class="row h-100">
+        {% for post in posts %}
+        <div class="podcast-episode col-md-4">
+            {% if post.featured_images.count %}
+            <div class="post-list-article-featured-image" id="post-list-featured-images-top">
+                {% for image in post.featured_images|slice(0, 1) %}
+                <a href="{{ post.url }}">
+                    <img class="podcast-episode-img img-fluid" data-src="{{ image.filename }}" src="{{ image.path }}" alt="{{ image.description != null ? image.description : image.filename }}" title="{{ image.title != null ? image.title : post.title }}">
+                </a>
+                {% endfor %}
+            </div>
             {% endif %}
-        </p>
-        <p class="post-list-article-excerpt">{{ post.excerpt | raw }}</p>
-        <a class="post-list-article-btn btn-outline" href="{{ post.url }}">Read this post</a>
-    </article>
-    {% else %}
-    <div class="no-data">{{ blogPosts.noPostsMessage }}</div>
-    {% endfor %}
-</div>
+            <h2 class="podcast-episode-title header2"><a href="{{ post.url }}">{{ post.title }}</a></h2>
+            <p class="podcast-episode-desc">{{ post.excerpt | raw }}</p>
+            <a class="podcast-episode-listen-btn btn-outline" href="{{ post.url }}">listen now</a>
+        </div>
+
+        {% else %}
+        <div class="no-data">{{ podcastEpisodes.noPostsMessage }}</div>
+        {% endfor %}
+    </div>
+
+</section>
 
 {% if posts.lastPage > 1 %}
 <ul class="pagination">

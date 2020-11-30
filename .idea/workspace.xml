@@ -5,6 +5,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/css/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/assets/css/main.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/scss/_blog-post.scss" beforeDir="false" afterPath="$PROJECT_DIR$/assets/scss/_blog-post.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/partials/blogPost/default.htm" beforeDir="false" afterPath="$PROJECT_DIR$/partials/blogPost/default.htm" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,7 +81,7 @@
       <option name="presentableId" value="Default" />
       <updated>1604376275728</updated>
       <workItem from="1604376276838" duration="32689000" />
-      <workItem from="1606341342414" duration="6058000" />
+      <workItem from="1606341342414" duration="8813000" />
     </task>
     <servers />
   </component>

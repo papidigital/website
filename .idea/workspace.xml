@@ -6,7 +6,15 @@
   <component name="ChangeListManager">
     <list default="true" id="fd35833c-3f2e-4b6a-b711-55ce51b19c21" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/papidigital/partials/podcastEpisodes/default.htm" beforeDir="false" afterPath="$PROJECT_DIR$/themes/papidigital/partials/podcastEpisodes/default.htm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/papidigital/assets/css/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/themes/papidigital/assets/css/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/papidigital/assets/images/case-studies/keep-me-certified-logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/themes/papidigital/assets/images/case-study-preview/keep-me-certified-logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/papidigital/assets/images/case-studies/la-startup-logo.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/themes/papidigital/assets/images/case-study-preview/la-startup-logo.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/papidigital/assets/images/case-studies/tooth-fairy-logo.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/papidigital/assets/images/case-studies/tucker-gunleather-logo.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/themes/papidigital/assets/images/case-study-preview/tucker-gunleather-logo.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/papidigital/assets/scss/_index.scss" beforeDir="false" afterPath="$PROJECT_DIR$/themes/papidigital/assets/scss/_index.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/papidigital/assets/scss/main.scss" beforeDir="false" afterPath="$PROJECT_DIR$/themes/papidigital/assets/scss/main.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/papidigital/layouts/default.htm" beforeDir="false" afterPath="$PROJECT_DIR$/themes/papidigital/layouts/default.htm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/themes/papidigital/pages/home.htm" beforeDir="false" afterPath="$PROJECT_DIR$/themes/papidigital/pages/home.htm" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -138,6 +146,9 @@
       <path value="$PROJECT_DIR$/vendor/league/flysystem-aws-s3-v3" />
     </include_path>
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedIndex" value="1" />
+  </component>
   <component name="ProjectId" id="1jlQcBjtL0O6jmpA54XLwvGjaQX" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -215,7 +226,7 @@
       <workItem from="1607054383713" duration="238000" />
       <workItem from="1607054944066" duration="360000" />
       <workItem from="1607055348875" duration="4838000" />
-      <workItem from="1608177680618" duration="9706000" />
+      <workItem from="1608177680618" duration="11502000" />
     </task>
     <servers />
   </component>

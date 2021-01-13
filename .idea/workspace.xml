@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="fd35833c-3f2e-4b6a-b711-55ce51b19c21" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/papidigital/assets/css/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/themes/papidigital/assets/css/main.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/papidigital/assets/scss/_case-study.scss" beforeDir="false" afterPath="$PROJECT_DIR$/themes/papidigital/assets/scss/_case-study.scss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/themes/papidigital/pages/case-study.htm" beforeDir="false" afterPath="$PROJECT_DIR$/themes/papidigital/pages/case-study.htm" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -220,7 +218,8 @@
       <workItem from="1607054383713" duration="238000" />
       <workItem from="1607054944066" duration="360000" />
       <workItem from="1607055348875" duration="4838000" />
-      <workItem from="1608177680618" duration="15022000" />
+      <workItem from="1608177680618" duration="16558000" />
+      <workItem from="1610555601017" duration="1660000" />
     </task>
     <servers />
   </component>

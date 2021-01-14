@@ -1,0 +1,92 @@
+title = "blog"
+url = "/blog"
+layout = "blog"
+description = "List of blogs"
+is_hidden = 0
+
+[blogPosts]
+pageNumber = "{{ :page }}"
+postsPerPage = 10
+noPostsMessage = "No posts found"
+sortOrder = "published_at desc"
+categoryPage = 404
+postPage = 404
+==
+<?php
+use RainLab\Blog\Models\Post as BlogPost;
+
+function onStart(){
+    //This is where you list the categories you want to display
+    $categories = ['super-hero'];
+    $posts = [];
+    foreach(BlogPost::all() as $blog){
+        foreach($blog->categories as $cat){
+            if(in_array($cat->slug, $categories)) {
+                array_push($posts, $blog);
+                break;
+            }
+        }
+    }
+   $this['heroPosts'] = $posts;
+   
+       //This is where you list the categories you want to display
+    $categories = ['uncategorized'];
+    $posts = [];
+    foreach(BlogPost::all() as $blog){
+        foreach($blog->categories as $cat){
+            if(in_array($cat->slug, $categories)) {
+                array_push($posts, $blog);
+                break;
+            }
+        }
+    }
+   $this['allPosts'] = $posts;
+}
+?>
+==
+<div class="container">
+    <h2>Featured Blogs</h2>
+    <div class="row">
+        <ul class="small-grid">
+        {% for post in heroPosts %}
+            <li class="col-md-6 col-sm-6">
+                <div class="featured-post">
+                    <div class="featured-post-content" style="background-image: url('{{ post.featured_images[0].path }}')">
+                        <div class="hero-post">
+                            <div class="hero-post-body">
+                                <h3>Feature Post</h3>
+                            </div>
+                        </div>
+                        <div class="blog-content-container">
+                            <div class="blog-summary">
+                                <h3><a href="/blog/post/{{ post.slug }}">{{ post.title }}</a></h3>
+                                <div>{{ str_limit(post.content_html, 100,"... <a href='/blog/post/#{ post.slug }'>read more</a>")|raw }}</div>
+                                <div class="timestamp">
+                                    {{ post.published_at | date('d M, Y') }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+        {% for post in allPosts %}
+            <li class="col-md-6 col-sm-6 right-column">
+                <div class="small-post">
+                    <div class="post-content" style="background-image: url('{{ post.featured_images[0].path }}')">
+                        <div class="blog-content-container">
+                            <div class="blog-summary">
+                                <h3><a href="/blog/post/{{ post.slug }}">{{ post.title }}</a></h3>
+                                <div>{{ str_limit(post.content_html, 100,"... <a href='/blog/post/#{ post.slug }'>read more</a>")|raw }}</div>
+                                <div class="timestamp">
+                                    {{ post.published_at | date('d M, Y') }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,38 @@
+{% set featuredPost = __SELF__.featuredPost %}
+{% set recentPosts = __SELF__.recentPosts %}
+
+<div class="row container-xl post-list-container">
+    <div class="col-sm-12 col-md-8">
+        {% for post in featuredPost %}
+            {% if post.featured_images.count %}
+                <div class="card">
+                    {% for image in post.featured_images|slice(0, 1) %}
+                        <a href="{{ post.url }}">
+                            <img class="img-fluid" data-src="{{ image.filename }}" src="{{ image.path }}" alt="{{ image.description != null ? image.description : image.filename }}" title="{{ image.title != null ? image.title : post.title }}">
+                            <div class="col align-self-center" style="position:relative; margin: -50%;margin-left: 10%;">
+                                <h1 style="color:white;">{{ post.title }}</h1>
+                                <span style="color:white;">{{ 'rainlab.blog::lang.post.posted_byline' | trans({
+                                    date: post.published_at | date('rainlab.blog::lang.post.date_format' | trans),
+                                    categories: categoryLinks
+                                    }) }}</span>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="col-sm-12 col-md-4">
+        {% for post in recentPosts %}
+            {% if post.featured_images.count %}
+                <div class="card">
+                    {% for image in post.featured_images|slice(0, 1) %}
+                        <a href="{{ post.url }}">
+                            <img class="img-fluid" data-src="{{ image.filename }}" src="{{ image.path }}" alt="{{ image.description != null ? image.description : image.filename }}" title="{{ image.title != null ? image.title : post.title }}">
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>

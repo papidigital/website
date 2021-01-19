@@ -20,6 +20,12 @@
                 </div>
             </li>
             <li class="nav-item">
+                <a class="nav-link {% if this.page.id == 'donnie-brasco-case-study' %}active{% endif %}"
+                   href="{{ 'donnie-brasco-case-study'|page }}">
+                    case studies
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link {% if this.page.id == 'blog' %}active{% endif %}" href="{{ 'blog'|page }}">weekly hacks</a>
             </li>
             <li class="nav-item">

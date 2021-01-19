@@ -137,4 +137,37 @@ $emphasisBoxColor: #F7F7F7;
       }
     }
   }
+
+  .case-study-highlights {
+
+    @include media-breakpoint-down(md) {
+      display: none;
+    }
+
+    .case-study-topics {
+
+      ul {
+        list-style-type: none;
+        padding-left: 0;
+      }
+    }
+
+    .case-study-results {
+
+      p {
+        margin-top: 0;
+      }
+
+      .case-study-results-cost-per-listen {
+        margin: auto 0;
+
+        .case-study-results-cost {
+          color: $primaryColor;
+          font-weight: $font-weight-medium;
+          font-size: 1.5rem;
+          align-self: center;
+        }
+      }
+    }
+  }
 }

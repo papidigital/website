@@ -4,6 +4,15 @@ $emphasisBoxColor: #F7F7F7;
 
 .case-study {
 
+  .container-xl {
+
+    @include media-breakpoint-down(md) {
+      padding-left: 1rem;
+      padding-right: 1rem;
+      padding-bottom: 2rem;
+    }
+  }
+
   section {
     margin-top: 2rem;
   }

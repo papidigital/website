@@ -1,0 +1,43 @@
+{% set featuredPost = __SELF__.featuredPost %}
+{% set recentPosts = __SELF__.recentPosts %}
+
+<div class="row container-xl post-list-container">
+    <div class="col-sm-12 col-md-8">
+        {% for post in featuredPost %}
+            <div style="position: relative; text-align: center;" class="mb-3">
+                {% if post.featured_images.count %}
+                    {% for image in post.featured_images|slice(0, 1) %}
+                        <img class="img-fluid" data-src="{{ image.filename }}" src="{{ image.path }}" alt="{{ image.description != null ? image.description : image.filename }}" title="{{ image.title != null ? image.title : post.title }}">
+                    {% endfor %}
+                {% endif %}
+                <div style="position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);">
+                    <a href="{{ post.slug }}">
+                        <h3 class="post-list-article-title"><a style="color: white;" href="{{ post.slug }}">{{ post.title }}</a></h3>
+                        <p class="post-list-article-date" style="color:white;">
+                            {{ post.published_at | date('F jS, Y') | trans }}
+                        </p>
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="col-sm-12 col-md-4">
+        {% for post in recentPosts %}
+            <div style="position: relative; text-align: center;" class="mb-3">
+                {% if post.featured_images.count %}
+                    {% for image in post.featured_images|slice(0, 1) %}
+                        <img class="img-fluid" data-src="{{ image.filename }}" src="{{ image.path }}" alt="{{ image.description != null ? image.description : image.filename }}" title="{{ image.title != null ? image.title : post.title }}">
+                    {% endfor %}
+                {% endif %}
+                <div style="position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);">
+                    <a href="{{ post.slug }}">
+                        <h3 class="post-list-article-title"><a style="color: white;" href="{{ post.slug }}">{{ post.title }}</a></h3>
+                        <p class="post-list-article-date" style="color:white">
+                            {{ post.published_at | date('F jS, Y') | trans }}
+                        </p>
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

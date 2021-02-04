@@ -1,0 +1,26 @@
+/* This stylesheet is used for the feature blog posts only */
+.featured-blog-plugin .card {
+    border: none;
+    border-radius:0;
+}
+.category-names:hover, .date-text:hover {
+    color: white;
+}
+.featured-blog-plugin .post-list-article-title {
+    transition: 0.3s;
+}
+.featured-blog-plugin img {
+    opacity: 1;
+    transition: .5s ease;
+    backface-visibility: hidden;
+}
+.featured-blog-plugin .featured-blog-link:hover img {
+    opacity: 0.7;
+}
+.featured-hover { 
+    background: rgba(76, 175, 80, 0.3);
+}
+.featured-blog-plugin .featured-blogs:hover .featured-hover {
+    background-color: white;
+    opacity: 0.5;
+}

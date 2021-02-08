@@ -8,9 +8,12 @@ pageNumber = "{{ :page }}"
 postsPerPage = 10
 noPostsMessage = "No posts found"
 sortOrder = "published_at desc"
-categoryPage = "blog-category-page"
+categoryPage = "blog"
 postPage = "blog-page"
-exceptCategories = "podcast-episode, job-posting"
+
+[showFeaturedPosts]
+postPage = "blog-page"
 ==
 {% partial 'services-title' %}
+{% component 'showFeaturedPosts' %}
 {% component 'blogPosts' %}

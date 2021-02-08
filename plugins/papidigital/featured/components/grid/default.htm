@@ -1,0 +1,64 @@
+{% set featuredPost = __SELF__.featuredPost %}
+{% set recentPosts = __SELF__.recentPosts %}
+
+<link rel="stylesheet" href="/plugins/papidigital/featured/components/assets/style.css">
+
+<div class="row container-xl post-list-container featured-blog-plugin">
+    <div class="row p-3">
+
+        <div class="col-sm-12 col-md-6 align-self-stretch p-3">
+            {% for post in featuredPost %}
+
+            <a class="featured-blog-link" href="{{ post.slug }}">
+                {% for image in post.featured_images|slice(0, 1) %}
+                <div class="card featured-hover text-center h-100" style="background-image: url('{{ image.path }}'); background-size: cover;">
+                {% endfor %}
+                    <div class="card-img-overlay" style="width: 100%; position: absolute;top: 55%;left: 50%;transform: translate(-50%, -50%);">
+                        {% if post.categories.count %}
+                            {% set categoryLinks = post.categories | map(c => "<a href=\"#{c.url}\">#{c.name}</a>") | join("<span class=\"separator\">, </span>") %}
+                                <p class="card-text small font-weight-light text-white category-names">{{ categoryLinks | trans }}</p>
+                        {% else %}
+                                <p class="card-text small font-weight-light text-white category-names">No Category</p>
+                        {% endif %}
+                        <h2 class="post-list-article-title">{{ post.title }}</h2>
+                        <p class="card-text font-weight-light small text-white date-text">{{ post.published_at | date('F jS, Y') | trans }}</p>
+                    </div>
+                </div>
+            </a>
+
+            {% endfor %}
+        </div>
+
+        <div class="col-sm-12 col-md-6">
+
+            {% for post in recentPosts %}
+
+                <div class="row position-relative p-3 text-center">
+                    <a class="featured-blog-link" href="{{ post.slug }}">
+
+                        {% if post.featured_images.count %}
+                            {% for image in post.featured_images|slice(0, 1) %}
+                                <img class="img-fluid" data-src="{{ image.filename }}" src="{{ image.path }}" alt="{{ image.description != null ? image.description : image.filename }}" title="{{ image.title != null ? image.title : post.title }}">
+                            {% endfor %}
+                        {% endif %}
+                        <div style="width: 90%; position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);">
+                                {% if post.categories.count %}
+                                {% set categoryLinks = post.categories | map(c => "<a href=\"#{c.url}\">#{c.name}</a>") | join("<span class=\"separator\">, </span>") %}
+                                    <p class="card-text small font-weight-light text-white category-names">{{ categoryLinks | trans }}</p>
+                                {% else %}
+                                        <p class="card-text small font-weight-light text-white category-names">No Category</p>
+                                {% endif %}
+                                <h2 class="post-list-article-title">{{ post.title }}</h2>
+                                <p class="card-text font-weight-light small text-white date-text">
+                                    {{ post.published_at | date('F jS, Y') | trans }}
+                                </p>
+                        </div>
+
+                    </a>
+                </div>
+        
+            {% endfor %}
+            
+        </div>
+    </div>
+</div>

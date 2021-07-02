@@ -5,6 +5,12 @@ is_hidden = 0
 ==
 <!-- As of now let's keep it simple because we don't have a lot of case studies. Make the Donnie clickable
 and case study to the menu and link it to Donnie -->
+
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js"></script>
+
+<!-- or the reference on CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@2.4.21/dist/css/splide.min.css">
+
 <article class="case-study">
     <div class="case-study-banner-container papidigital-hero-banner">
         <img class="img-fluid" src="{{ 'assets/images/case-study/donnie-brasco/donnie-brasco-banner.webp'|theme }}" alt="" title="">
@@ -103,6 +109,9 @@ and case study to the menu and link it to Donnie -->
                                             </div>
                                         </div>
                                     </div>
+                                    
+                                    
+
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="case-study-assets-examples case-study-emphasis-box">
@@ -111,24 +120,45 @@ and case study to the menu and link it to Donnie -->
                                                         <h3 class="case-study-emphasis-box-title case-study-emphasize-text">Clips We Used</h3>
                                                     </div>
                                                 </div>
-                                                <div class="case-study-assets-clips">
-                                                    <div class="row">
-                                                        <div class="col-lg-6">
-                                                            <div class="case-study-assets-clip">
-                                                                <a href="#">
-                                                                    <img class="img-fluid" src="{{ 'assets/images/case-study/donnie-brasco/donnie-case-study-clip-1@2x.jpg'|theme }}" alt="" title="">
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-6">
-                                                            <div class="case-study-assets-clip">
-                                                                <a href="#">
-                                                                    <img class="img-fluid" src="{{ 'assets/images/case-study/donnie-brasco/donnie-case-study-clip-2@2x.jpg'|theme }}" alt="" title="">
-                                                                </a>
-                                                            </div>
-                                                        </div>
+                                                
+                                                <div id="splide" class="splide">
+                                                    <div class="splide__track">
+                                                      <ul class="splide__list">
+                                                        <li class="splide__slide">
+                                                            <video id="vid1" height='100%' width="95%" style="background-color: black;" controls>
+                                                                <source src="{{ 'assets/videos/Joe Poses As Jewel Theif.MP4'|theme }}" type="video/mp4">
+                                                              Your browser does not support the video tag.
+                                                              </video>
+                                                        </li>
+                                                        <li class="splide__slide">
+                                                            <video id="vid2" height='100%' style="background-color: black;" width="95%" controls>
+                                                                <source src="{{ 'assets/videos/Joe Nearly Exposed.MOV'|theme }}" type="video/mp4">
+                                                              Your browser does not support the video tag.
+                                                              </video>
+                                                        </li>
+                                                        
+                                                        <li class="splide__slide">
+                                                            <video id="vid3" height='100%' width="95%" style="background-color: black;" controls>
+                                                                <source src="{{ 'assets/videos/Joe Doesnt Back Down.MOV'|theme }}" type="video/mp4">
+                                                              Your browser does not support the video tag.
+                                                              </video>
+                                                        </li>
+                                                        <li class="splide__slide">
+                                                            <video id="vid4" height='100%' width="95%" style="background-color: black;" controls>
+                                                                <source src="{{ 'assets/videos/Mafia Guys Wife.mp4'|theme }}" type="video/mp4">
+                                                              Your browser does not support the video tag.
+                                                              </video>
+                                                        </li>
+                                                        <li class="splide__slide">
+                                                            <video id="vid5" height='100%' width="95%" style="background-color: black;" controls>
+                                                                <source src="{{ 'assets/videos/Terrance Winters Writer for Sopranos.MOV'|theme }}" type="video/mp4">
+                                                              Your browser does not support the video tag.
+                                                              </video>
+                                                        </li>
+                                                      </ul>
                                                     </div>
-                                                </div>
+                                                  </div>
+                                                  
                                             </div>
                                         </div>
                                     </div>
@@ -270,3 +300,39 @@ and case study to the menu and link it to Donnie -->
         </div>
     </div>
 </article>
+
+<script>
+	new Splide( '.splide', {
+        rewind: true, 
+        trimSpace: false,
+        Width: '720px',
+        perPage:2,
+    } ).mount();
+
+
+    (function () {
+    var videos = [
+        document.getElementById("vid1"),
+        document.getElementById("vid2"),
+        document.getElementById("vid3"),
+        document.getElementById("vid4"),
+        document.getElementById("vid5")
+    ];
+
+    function stopOthers () {
+        var id = this.id, i = 0;
+        for (var j = videos.length; i < j; i++) {
+            if (videos[i].id !== id) {
+                videos[i].pause();
+            }
+        }
+    }
+
+    var i = 0;
+    for (var j = videos.length; i < j; i++) {
+        videos[i].addEventListener("play", stopOthers, false);
+        console.log('hey');
+    }
+})();
+
+</script>

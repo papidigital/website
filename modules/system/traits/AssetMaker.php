@@ -105,7 +105,7 @@ trait AssetMaker
     /**
      * Adds JavaScript asset to the asset list. Call $this->makeAssets() in a view
      * to output corresponding markup.
-     * @param array|string $name Specifies a path (URL) or an array of paths to the script(s).
+     * @param string $name Specifies a path (URL) to the script.
      * @param array $attributes Adds extra HTML attributes to the asset link.
      * @return void
      */
@@ -133,7 +133,7 @@ trait AssetMaker
     /**
      * Adds StyleSheet asset to the asset list. Call $this->makeAssets() in a view
      * to output corresponding markup.
-     * @param array|string $name Specifies a path (URL) or an array of paths to the stylesheet(s).
+     * @param string $name Specifies a path (URL) to the script.
      * @param array $attributes Adds extra HTML attributes to the asset link.
      * @return void
      */

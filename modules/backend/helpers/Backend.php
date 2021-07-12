@@ -10,7 +10,6 @@ use October\Rain\Router\Helper as RouterHelper;
 use System\Helpers\DateTime as DateTimeHelper;
 use Backend\Classes\Skin;
 use Backend\Helpers\Exception\DecompileException;
-use Exception;
 
 /**
  * Backend Helper
@@ -84,26 +83,6 @@ class Backend
     public function redirectIntended($path, $status = 302, $headers = [], $secure = null)
     {
         return Redirect::intended($this->uri() . '/' . $path, $status, $headers, $secure);
-    }
-
-    /**
-     * makeCarbon converts mixed inputs to a Carbon object and sets the backend timezone
-     * @return \Carbon\Carbon
-     */
-    public static function makeCarbon($value, $throwException = true)
-    {
-        $carbon = DateTimeHelper::makeCarbon($value, $throwException);
-
-        try {
-            // Find user preference
-            $carbon->setTimezone(\Backend\Models\Preference::get('timezone'));
-        }
-        catch (Exception $ex) {
-            // Use system default
-            $carbon->setTimezone(Config::get('backend.timezone', Config::get('app.timezone')));
-        }
-
-        return $carbon;
     }
 
     /**

@@ -156,7 +156,7 @@
 
             $(event.relatedTarget).on('input', '#controlFilterPopover input[data-search]', function (e) {
                 self.searchQuery($(this))
-            })
+            });
         })
 
         // Setup event handler to apply selected options when closing the type: group scope popup
@@ -176,7 +176,7 @@
      */
     FilterWidget.prototype.bindDependants = function() {
         if (!$('[data-scope-depends]', this.$el).length) {
-            return
+            return;
         }
 
         var self = this,
@@ -290,17 +290,18 @@
             active = this.scopeValues[this.activeScopeName],
             available = this.scopeAvailable[this.activeScopeName],
             fromItems = isDeselect ? active : available,
+            toItems = isDeselect ? available : active,
             testFunc = function(active){ return active.id == itemId },
-            item = $.grep(fromItems, testFunc).pop() ?? {'id': itemId, 'name': $item.text()},
+            item = $.grep(fromItems, testFunc).pop(),
             filtered = $.grep(fromItems, testFunc, true)
 
-        if (isDeselect) {
+        if (isDeselect)
             this.scopeValues[this.activeScopeName] = filtered
-            this.scopeAvailable[this.activeScopeName].push(item)
-        } else {
+        else
             this.scopeAvailable[this.activeScopeName] = filtered
-            this.scopeValues[this.activeScopeName].push(item)
-        }
+
+        if (item)
+            toItems.push(item)
 
         this.toggleFilterButtons(active)
         this.updateScopeSetting(this.$activeScope, isDeselect ? filtered.length : active.length)
@@ -398,8 +399,8 @@
         if (!data.active) data.active = []
         if (!data.available) data.available = []
 
-        this.scopeValues[scopeName] = data.active
-        this.scopeAvailable[scopeName] = data.available
+        this.scopeValues[scopeName] = data.active;
+        this.scopeAvailable[scopeName] = data.available;
 
         // Do not render if scope has changed
         if (scopeName != this.activeScopeName)
@@ -551,12 +552,11 @@
         if (isReset) {
             this.scopeValues[scopeName] = null
             this.scopeAvailable[scopeName] = null
-            this.isActiveScopeDirty = true
             this.updateScopeSetting(this.$activeScope, 0)
         }
 
-        this.pushOptions(scopeName)
-        this.isActiveScopeDirty = false
+        this.pushOptions(scopeName);
+        this.isActiveScopeDirty = true;
         this.$activeScope.data('oc.popover').hide()
     }
 

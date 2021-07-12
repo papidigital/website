@@ -120,8 +120,6 @@ class VersionManager
      */
     protected function applyPluginUpdate($code, $version, $details)
     {
-        $version = $this->normalizeVersion($version);
-
         list($comments, $scripts) = $this->extractScriptsAndComments($details);
 
         /*
@@ -287,18 +285,13 @@ class VersionManager
             $versionInfo = [];
         }
 
-        // Sort result
-        uksort($versionInfo, function ($a, $b) {
-            return version_compare($a, $b);
-        });
-
-        $result = [];
-
-        foreach ($versionInfo as $version => $info) {
-            $result[$this->normalizeVersion($version)] = $info;
+        if ($versionInfo) {
+            uksort($versionInfo, function ($a, $b) {
+                return version_compare($a, $b);
+            });
         }
 
-        return $this->fileVersions[$code] = $result;
+        return $this->fileVersions[$code] = $versionInfo;
     }
 
     /**
@@ -525,11 +518,6 @@ class VersionManager
         $this->notesOutput = $output;
 
         return $this;
-    }
-
-    protected function normalizeVersion($version)
-    {
-        return ltrim((string) $version, 'v');
     }
 
     /**

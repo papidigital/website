@@ -464,7 +464,7 @@ class CombineAssets
      */
     protected function setHashOnCombinerFilters($hash)
     {
-        $allFilters = array_merge(...array_values($this->getFilters()));
+        $allFilters = call_user_func_array('array_merge', $this->getFilters());
 
         foreach ($allFilters as $filter) {
             if (method_exists($filter, 'setHash')) {

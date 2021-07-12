@@ -237,8 +237,8 @@ class UpdateManager
 
         $params = [
             'core'    => $this->getHash(),
-            'plugins' => base64_encode(json_encode($versions)),
-            'themes'  => base64_encode(json_encode($themes)),
+            'plugins' => serialize($versions),
+            'themes'  => serialize($themes),
             'build'   => $build,
             'force'   => $force
         ];
@@ -330,7 +330,7 @@ class UpdateManager
         /*
          * Rollback plugins
          */
-        $plugins = array_reverse($this->pluginManager->getPlugins());
+        $plugins = $this->pluginManager->getPlugins();
         foreach ($plugins as $name => $plugin) {
             $this->rollbackPlugin($name);
         }
@@ -613,9 +613,8 @@ class UpdateManager
     {
         $fileCode = $name . $hash;
         $filePath = $this->getFilePath($fileCode);
-        $innerPath = str_replace('.', '/', strtolower($name));
 
-        if (!Zip::extract($filePath, plugins_path($innerPath))) {
+        if (!Zip::extract($filePath, plugins_path())) {
             throw new ApplicationException(Lang::get('system::lang.zip.extract_failed', ['file' => $filePath]));
         }
 
@@ -656,9 +655,8 @@ class UpdateManager
     {
         $fileCode = $name . $hash;
         $filePath = $this->getFilePath($fileCode);
-        $innerPath = str_replace('.', '-', strtolower($name));
 
-        if (!Zip::extract($filePath, themes_path($innerPath))) {
+        if (!Zip::extract($filePath, themes_path())) {
             throw new ApplicationException(Lang::get('system::lang.zip.extract_failed', ['file' => $filePath]));
         }
 
@@ -905,16 +903,13 @@ class UpdateManager
             $http->toFile($filePath);
         });
 
-        if (in_array($result->code, [301, 302])) {
-            if ($redirectUrl = array_get($result->info, 'redirect_url')) {
-                $result = Http::get($redirectUrl, function ($http) use ($postData, $filePath) {
-                    $http->toFile($filePath);
-                });
-            }
-        }
-
         if ($result->code != 200) {
             throw new ApplicationException(File::get($filePath));
+        }
+
+        if (md5_file($filePath) != $expectedHash) {
+            @unlink($filePath);
+            throw new ApplicationException(Lang::get('system::lang.server.file_corrupt'));
         }
     }
 
@@ -947,7 +942,7 @@ class UpdateManager
      */
     protected function createServerUrl($uri)
     {
-        $gateway = Config::get('cms.updateServer', 'https://gateway.octobercms.com/api');
+        $gateway = Config::get('cms.updateServer', 'http://gateway.octobercms.com/api');
         if (substr($gateway, -1) != '/') {
             $gateway .= '/';
         }
@@ -963,10 +958,10 @@ class UpdateManager
      */
     protected function applyHttpAttributes($http, $postData)
     {
-        $postData['protocol_version'] = '1.2';
+        $postData['protocol_version'] = '1.1';
         $postData['client'] = 'october';
 
-        $postData['server'] = base64_encode(json_encode([
+        $postData['server'] = base64_encode(serialize([
             'php'   => PHP_VERSION,
             'url'   => Url::to('/'),
             'since' => PluginVersion::orderBy('created_at')->value('created_at')
@@ -1030,10 +1025,6 @@ class UpdateManager
      */
     protected function addMessage($class, $message)
     {
-        if (empty($message)) {
-            return;
-        }
-
         if (is_object($class)) {
             $class = get_class($class);
         }
@@ -1043,7 +1034,7 @@ class UpdateManager
 
         if (is_string($message)) {
             $this->messages[$class][] = $message;
-        } elseif (is_array($message)) {
+        } else if (is_array($message)) {
             array_merge($this->messages[$class], $message);
         }
     }

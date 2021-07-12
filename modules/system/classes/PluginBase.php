@@ -279,13 +279,17 @@ class PluginBase extends ServiceProviderBase
      * Registers a new console (artisan) command
      *
      * @param string $key The command name
-     * @param string|\Closure $command The command class or closure
+     * @param string $class The command class
      * @return void
      */
-    public function registerConsoleCommand($key, $command)
+    public function registerConsoleCommand($key, $class)
     {
         $key = 'command.'.$key;
-        $this->app->singleton($key, $command);
+
+        $this->app->singleton($key, function ($app) use ($class) {
+            return new $class;
+        });
+
         $this->commands($key);
     }
 

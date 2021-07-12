@@ -2,12 +2,12 @@ ip: 192.168.10.10
 memory: 2048
 cpus: 2
 provider: virtualbox
-authorize: C:\Users\Utilizador/.ssh/id_rsa.pub
+authorize: ~/.ssh/id_rsa.pub
 keys:
-    - C:\Users\Utilizador/.ssh/id_rsa.pub
+    - ~/.ssh/id_rsa
 folders:
     -
-        map: C:\Projects\papidigital\website
+        map: /Users/ryansimon/WebProjects/papidigital-website-official
         to: /home/vagrant/code
 sites:
     - map: papidigital.local

@@ -6,6 +6,9 @@ use Backend\Classes\FormWidgetBase;
 
 /**
  * Repeater Form Widget
+ *
+ * @package october\backend
+ * @author Alexey Bobkov, Samuel Georges
  */
 class Repeater extends FormWidgetBase
 {
@@ -21,7 +24,7 @@ class Repeater extends FormWidgetBase
     /**
      * @var string Prompt text for adding new items.
      */
-    public $prompt;
+    public $prompt = 'backend::lang.repeater.add_new_item';
 
     /**
      * @var bool Items can be sorted.
@@ -77,27 +80,17 @@ class Repeater extends FormWidgetBase
     protected static $onAddItemCalled = false;
 
     /**
-     * Determines if a child repeater has made an AJAX request to add an item
-     *
-     * @var bool
+     * @var bool useGroups
      */
-    protected $childAddItemCalled = false;
-
-    /**
-     * Determines which child index has made the AJAX request to add an item
-     *
-     * @var int
-     */
-    protected $childIndexCalled;
-
     protected $useGroups = false;
 
+    /**
+     * @var array groupDefinitions
+     */
     protected $groupDefinitions = [];
 
     /**
-     * Determines if repeater has been initialised previously
-     *
-     * @var boolean
+     * @var boolean Determines if repeater has been initialised previously
      */
     protected $loaded = false;
 
@@ -106,8 +99,6 @@ class Repeater extends FormWidgetBase
      */
     public function init()
     {
-        $this->prompt = Lang::get('backend::lang.repeater.add_new_item');
-
         $this->fillFromConfig([
             'form',
             'style',
@@ -123,11 +114,10 @@ class Repeater extends FormWidgetBase
         }
 
         // Check for loaded flag in POST
-        if ((bool) post($this->alias . '_loaded') === true) {
+        if (post($this->alias . '_loaded')) {
             $this->loaded = true;
         }
 
-        $this->checkAddItemRequest();
         $this->processGroupMode();
 
         if (!self::$onAddItemCalled) {
@@ -145,13 +135,15 @@ class Repeater extends FormWidgetBase
     }
 
     /**
-     * Prepares the form widget view data
+     * prepareVars for display
      */
     public function prepareVars()
     {
-        // Refresh the loaded data to support being modified by filterFields
-        // @see https://github.com/octobercms/october/issues/2613
-        if (!self::$onAddItemCalled) {
+        // Refresh the loaded data to support being modified by filterFields.
+        // This logic needs review because it doesn't work fully, filterFields
+        // does not appear to modify the repeater on the second pass anyway
+        // because the refreshed values come from the postback -sg
+        if (!self::$onAddItemCalled && !$this->loaded) {
             $this->processItems();
         }
 
@@ -190,7 +182,7 @@ class Repeater extends FormWidgetBase
     }
 
     /**
-     * Splices in some meta data (group and index values) to the dataset.
+     * processSaveValue splices in some meta data (group and index values) to the dataset
      * @param array $value
      * @return array
      */
@@ -214,7 +206,8 @@ class Repeater extends FormWidgetBase
             if (isset($this->formWidgets[$index])) {
                 if ($this->useGroups) {
                     $value[$index] = array_merge($this->formWidgets[$index]->getSaveData(), ['_group' => $data['_group']]);
-                } else {
+                }
+                else {
                     $value[$index] = $this->formWidgets[$index]->getSaveData();
                 }
             }
@@ -224,21 +217,20 @@ class Repeater extends FormWidgetBase
     }
 
     /**
-     * Processes form data and applies it to the form widgets.
-     * @return void
+     * processItems processes form data and applies it to the form widgets
      */
     protected function processItems()
     {
-        $currentValue = ($this->loaded === true)
+        $currentValue = $this->loaded === true
             ? post($this->formField->getName())
             : $this->getLoadValue();
 
-        // Detect when a child widget is trying to run an AJAX handler
-        // outside of the form element that contains all the repeater
-        // fields that would normally be used to identify that case
+        // This lets record finder work inside a repeater with some hacks
+        // since record finder spawns outside the form and its AJAX calls
+        // don't reinitialize this repeater's items. We a need better way
+        // remove if year >= 2023 -sg
         $handler = $this->controller->getAjaxHandler();
         if (!$this->loaded && starts_with($handler, $this->alias . 'Form')) {
-            // Attempt to get the index of the repeater
             $handler = str_after($handler, $this->alias . 'Form');
             preg_match("~^(\d+)~", $handler, $matches);
 
@@ -248,42 +240,38 @@ class Repeater extends FormWidgetBase
             }
         }
 
+        if ($currentValue === null) {
+            $this->formWidgets = [];
+            return;
+        }
+
         // Ensure that the minimum number of items are preinitialized
-        // ONLY DONE WHEN NOT IN GROUP MODE
+        // only done when not in group mode
         if (!$this->useGroups && $this->minItems > 0) {
             if (!is_array($currentValue)) {
                 $currentValue = [];
                 for ($i = 0; $i < $this->minItems; $i++) {
                     $currentValue[$i] = [];
                 }
-            } elseif (count($currentValue) < $this->minItems) {
+            }
+            elseif (count($currentValue) < $this->minItems) {
                 for ($i = 0; $i < ($this->minItems - count($currentValue)); $i++) {
                     $currentValue[] = [];
                 }
             }
         }
 
-        if (!$this->childAddItemCalled && $currentValue === null) {
-            $this->formWidgets = [];
-            return;
-        }
-
-        if ($this->childAddItemCalled && !isset($currentValue[$this->childIndexCalled])) {
-            // If no value is available but a child repeater has added an item, add a "stub" repeater item
-            $this->makeItemFormWidget($this->childIndexCalled);
-        }
-
         if (!is_array($currentValue)) {
             return;
         }
 
-        collect($currentValue)->each(function ($value, $index) {
+        foreach ($currentValue as $index => $value) {
             $this->makeItemFormWidget($index, array_get($value, '_group', null));
-        });
+        }
     }
 
     /**
-     * Creates a form widget based on a field index and optional group code.
+     * makeItemFormWidget creates a form widget based on a field index and optional group code
      * @param int $index
      * @param string $index
      * @return \Backend\Widgets\Form
@@ -300,6 +288,7 @@ class Repeater extends FormWidgetBase
         $config->alias = $this->alias . 'Form' . $index;
         $config->arrayName = $this->getFieldName().'['.$index.']';
         $config->isNested = true;
+
         if (self::$onAddItemCalled || $this->minItems > 0) {
             $config->enableDefaults = true;
         }
@@ -316,12 +305,12 @@ class Repeater extends FormWidgetBase
     }
 
     /**
-     * Returns the data at a given index.
+     * getValueFromIndex returns the data at a given index
      * @param int $index
      */
     protected function getValueFromIndex($index)
     {
-        $value = ($this->loaded === true)
+        $value = $this->loaded === true
             ? post($this->formField->getName())
             : $this->getLoadValue();
 
@@ -336,8 +325,13 @@ class Repeater extends FormWidgetBase
     // AJAX handlers
     //
 
+    /**
+     * onAddItem handler
+     */
     public function onAddItem()
     {
+        self::$onAddItemCalled = true;
+
         $groupCode = post('_repeater_group');
 
         $index = $this->getNextIndex();
@@ -353,11 +347,17 @@ class Repeater extends FormWidgetBase
         ];
     }
 
+    /**
+     * onRemoveItem
+     */
     public function onRemoveItem()
     {
         // Useful for deleting relations
     }
 
+    /**
+     * onRefresh
+     */
     public function onRefresh()
     {
         $index = post('_repeater_index');
@@ -369,11 +369,10 @@ class Repeater extends FormWidgetBase
     }
 
     /**
-     * Determines the next available index number for assigning to a new repeater item.
-     *
-     * @return int
+     * getNextIndex determines the next available index number for assigning to a
+     * new repeater item
      */
-    protected function getNextIndex()
+    protected function getNextIndex(): int
     {
         if ($this->loaded === true) {
             $data = post($this->formField->getName());
@@ -381,7 +380,8 @@ class Repeater extends FormWidgetBase
             if (is_array($data) && count($data)) {
                 return (max(array_keys($data)) + 1);
             }
-        } else {
+        }
+        else {
             $data = $this->getLoadValue();
 
             if (is_array($data)) {
@@ -392,47 +392,12 @@ class Repeater extends FormWidgetBase
         return 0;
     }
 
-    /**
-     * Determines the repeater that has triggered an AJAX request to add an item.
-     *
-     * @return void
-     */
-    protected function checkAddItemRequest()
-    {
-        $handler = $this->getParentForm()
-            ->getController()
-            ->getAjaxHandler();
-
-        if ($handler === null || strpos($handler, '::') === false) {
-            return;
-        }
-
-        list($widgetName, $handlerName) = explode('::', $handler);
-        if ($handlerName !== 'onAddItem') {
-            return;
-        }
-
-        if ($this->alias === $widgetName) {
-            // This repeater has made the AJAX request
-            self::$onAddItemCalled = true;
-        } else if (strpos($widgetName, $this->alias . 'Form') === 0) {
-            // A child repeater has made the AJAX request
-
-            // Get index from AJAX handler
-            $handlerSuffix = str_replace($this->alias . 'Form', '', $widgetName);
-            if (preg_match('/^[0-9]+/', $handlerSuffix, $matches)) {
-                $this->childAddItemCalled = true;
-                $this->childIndexCalled = (int) $matches[0];
-            }
-        }
-    }
-
     //
     // Group mode
     //
 
     /**
-     * Returns the form field configuration for a group, identified by code.
+     * getGroupFormFieldConfig returns the form field configuration for a group, identified by code
      * @param string $code
      * @return array|null
      */
@@ -452,8 +417,7 @@ class Repeater extends FormWidgetBase
     }
 
     /**
-     * Process features related to group mode.
-     * @return void
+     * processGroupMode processes features related to group mode
      */
     protected function processGroupMode()
     {
@@ -483,7 +447,7 @@ class Repeater extends FormWidgetBase
     }
 
     /**
-     * Returns a field group code from its index.
+     * getGroupCodeFromIndex returns a field group code from its index
      * @param $index int
      * @return string
      */
@@ -493,7 +457,7 @@ class Repeater extends FormWidgetBase
     }
 
     /**
-     * Returns the group title from its unique code.
+     * getGroupTitle returns the group title from its unique code
      * @param $groupCode string
      * @return string
      */

@@ -1,12 +1,11 @@
 <?php namespace Backend\Classes;
 
-use Config;
 use System\Classes\PluginManager;
 use October\Rain\Auth\Manager as RainAuthManager;
 use October\Rain\Exception\SystemException;
 
 /**
- * Back-end authentication manager.
+ * AuthManager is backend authentication manager.
  *
  * @package october\backend
  * @author Alexey Bobkov, Samuel Georges
@@ -56,12 +55,6 @@ class AuthManager extends RainAuthManager
      * @var array Cache of registered permissions.
      */
     protected $permissionCache = false;
-
-    protected function init()
-    {
-        $this->useThrottle = Config::get('auth.throttle.enabled', true);
-        parent::init();
-    }
 
     /**
      * Registers a callback function that defines authentication permissions.
@@ -162,7 +155,7 @@ class AuthManager extends RainAuthManager
          * Sort permission items
          */
         usort($this->permissions, function ($a, $b) {
-            if ($a->order == $b->order) {
+            if ($a->order === $b->order) {
                 return 0;
             }
 
@@ -201,20 +194,12 @@ class AuthManager extends RainAuthManager
         return parent::createUserModelQuery()->withTrashed();
     }
 
-
     /**
      * {@inheritdoc}
      */
     protected function validateUserModel($user)
     {
-        if ( ! $user instanceof $this->userModel) {
-            return false;
-        }
-
-        // Perform the deleted_at check manually since the relevant migrations
-        // might not have been run yet during the update to build 444.
-        // @see https://github.com/octobercms/october/issues/3999
-        if (array_key_exists('deleted_at', $user->getAttributes()) && $user->deleted_at !== null) {
+        if (!$user instanceof $this->userModel) {
             return false;
         }
 

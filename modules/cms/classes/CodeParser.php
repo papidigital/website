@@ -42,7 +42,7 @@ class CodeParser
     {
         $this->object = $object;
         $this->filePath = $object->getFilePath();
-        $this->dataCacheKey = Config::get('cache.codeParserDataCacheKey', 'cms-php-file-data');
+        $this->dataCacheKey = Config::get('cms.code_parser_cache_key', 'cms-php-file-data');
     }
 
     /**
@@ -128,8 +128,8 @@ class CodeParser
         $body = $this->object->code;
         $body = preg_replace('/^\s*function/m', 'public function', $body);
 
-        $namespaces = [];
-        $pattern = '/(use\s+[a-z0-9_\\\\]+(\s+as\s+[a-z0-9_]+)?;(\r\n|\n)?)/mi';
+        $codeNamespaces = [];
+        $pattern = '/(use\s+[a-z0-9_\\\\]+(\s+as\s+[a-z0-9_]+)?;\n?)/mi';
         preg_match_all($pattern, $body, $namespaces);
         $body = preg_replace($pattern, '', $body);
 
@@ -141,15 +141,12 @@ class CodeParser
         $fileContents = '<?php '.PHP_EOL;
 
         foreach ($namespaces[0] as $namespace) {
-            // Only allow compound or aliased use statements
-            if (str_contains($namespace, '\\') || str_contains($namespace, ' as ')) {
-                $fileContents .= trim($namespace).PHP_EOL;
-            }
+            $fileContents .= $namespace;
         }
 
         $fileContents .= 'class '.$className.$parentClass.PHP_EOL;
         $fileContents .= '{'.PHP_EOL;
-        $fileContents .= trim($body).PHP_EOL;
+        $fileContents .= $body.PHP_EOL;
         $fileContents .= '}'.PHP_EOL;
 
         $this->validate($fileContents);
@@ -337,15 +334,8 @@ class CodeParser
         /*
          * Compile cached file into bytecode cache
          */
-        if (Config::get('cms.forceBytecodeInvalidation', false)) {
-            $opcache_enabled = ini_get('opcache.enable');
-            $opcache_path = trim(ini_get('opcache.restrict_api'));
-
-            if (!empty($opcache_path) && !starts_with(__FILE__, $opcache_path)) {
-                $opcache_enabled = false;
-            }
-
-            if (function_exists('opcache_invalidate') && $opcache_enabled) {
+        if (Config::get('cms.force_bytecode_invalidation', false)) {
+            if (function_exists('opcache_invalidate') && ini_get('opcache.enable')) {
                 opcache_invalidate($path, true);
             }
             elseif (function_exists('apc_compile_file')) {

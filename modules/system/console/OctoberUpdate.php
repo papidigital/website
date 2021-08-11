@@ -1,16 +1,13 @@
 <?php namespace System\Console;
 
-use Str;
 use Illuminate\Console\Command;
 use System\Classes\UpdateManager;
-use Symfony\Component\Console\Input\InputOption;
+use Exception;
 
 /**
- * Console command to perform a system update.
+ * OctoberUpdate performs a system update.
  *
- * This updates October CMS and all plugins, database and files. It uses the
- * October gateway to receive the files via a package manager, then saves
- * the latest build number to the system.
+ * This updates October CMS and all plugins, database and libraries.
  *
  * @package october\system
  * @author Alexey Bobkov, Samuel Georges
@@ -18,98 +15,51 @@ use Symfony\Component\Console\Input\InputOption;
 class OctoberUpdate extends Command
 {
     /**
-     * The console command name.
+     * @var string name of console command
      */
     protected $name = 'october:update';
 
     /**
-     * The console command description.
+     * @var string description of the console command
      */
     protected $description = 'Updates October CMS and all plugins, database and files.';
 
     /**
-     * Execute the console command.
+     * handle executes the console command
      */
     public function handle()
     {
-        $this->output->writeln('<info>Updating October...</info>');
-        $manager = UpdateManager::instance()->setNotesOutput($this->output);
-        $forceUpdate = $this->option('force');
+        $this->output->writeln('<info>Updating October CMS...</info>');
 
-        /*
-         * Check for disabilities
-         */
-        $disableCore = $disablePlugins = $disableThemes = false;
+        $this->comment("Executing: composer update");
+        $this->output->newLine();
 
-        if ($this->option('plugins')) {
-            $disableCore = true;
-            $disableThemes = true;
+        // Composer update
+        $errCode = null;
+        passthru('composer update', $errCode);
+
+        if ($errCode !== 0) {
+            $this->output->error('Update failed. Check output above');
+            exit(1);
         }
 
-        if ($this->option('core')) {
-            $disablePlugins = true;
-            $disableThemes = true;
+        $this->comment("Executing: php artisan october:migrate");
+        $this->output->newLine();
+
+        // Migrate database
+        $errCode = null;
+        passthru('php artisan october:migrate', $errCode);
+
+        if ($errCode !== 0) {
+            $this->output->error('Migration failed. Check output above');
+            exit(1);
         }
 
-        /*
-         * Perform update
-         */
-        $updateList = $manager->requestUpdateList($forceUpdate);
-        $updates = (int) array_get($updateList, 'update', 0);
-
-        if ($updates == 0) {
-            $this->output->writeln('<info>No new updates found</info>');
-            return;
+        try {
+            $this->output->success(sprintf('System Updated to v%s', UpdateManager::instance()->getCurrentVersion()));
         }
-
-        $this->output->writeln(sprintf('<info>Found %s new %s!</info>', $updates, Str::plural('update', $updates)));
-
-        $coreHash = $disableCore ? null : array_get($updateList, 'core.hash');
-        $coreBuild = array_get($updateList, 'core.build');
-
-        if ($coreHash) {
-            $this->output->writeln('<info>Downloading application files</info>');
-            $manager->downloadCore($coreHash);
+        catch (Exception $ex) {
+            // ...
         }
-
-        $plugins = $disablePlugins ? [] : array_get($updateList, 'plugins');
-        foreach ($plugins as $code => $plugin) {
-            $pluginName = array_get($plugin, 'name');
-            $pluginHash = array_get($plugin, 'hash');
-
-            $this->output->writeln(sprintf('<info>Downloading plugin: %s</info>', $pluginName));
-            $manager->downloadPlugin($code, $pluginHash);
-        }
-
-        if ($coreHash) {
-            $this->output->writeln('<info>Unpacking application files</info>');
-            $manager->extractCore();
-            $manager->setBuild($coreBuild, $coreHash);
-        }
-
-        foreach ($plugins as $code => $plugin) {
-            $pluginName = array_get($plugin, 'name');
-            $pluginHash = array_get($plugin, 'hash');
-
-            $this->output->writeln(sprintf('<info>Unpacking plugin: %s</info>', $pluginName));
-            $manager->extractPlugin($code, $pluginHash);
-        }
-
-        /*
-         * Run migrations
-         */
-        $this->call('october:up');
-    }
-
-    /**
-     * Get the console command options.
-     */
-    protected function getOptions()
-    {
-        return [
-            ['force', null, InputOption::VALUE_NONE, 'Force updates.'],
-            ['core', null, InputOption::VALUE_NONE, 'Update core application files only.'],
-            ['plugins', null, InputOption::VALUE_NONE, 'Update plugin files only.'],
-        ];
     }
 }

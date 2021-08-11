@@ -16,26 +16,20 @@
         this.tabOpenTimeout = undefined
         this.panelOpenTimeout = undefined
         this.$sideNav = $('#layout-sidenav')
+        this.$sideNavRes = $('#layout-sidenav-responsive')
         this.$sideNavItems = $('ul li', this.$sideNav)
         this.$sidePanelItems = $('[data-content-id]', this.$el)
-        this.sideNavWidth = this.$sideNavItems.outerWidth()
+        this.sideNavWidth = $('#layout-sidenav').outerWidth()
         this.mainNavHeight = $('#layout-mainmenu').outerHeight()
         this.panelVisible = false
         this.visibleItemId = false
-        this.$fixButton = $('<a href="#" class="fix-button"><i class="icon-thumb-tack"></i></a>')
-
-        this.$fixButton.click(function() {
-            self.fixPanel()
-            return false
-        })
-        $('.fix-button-container', this.$el).append(this.$fixButton)
 
         this.$sideNavItems.click(function() {
             if ($(this).data('no-side-panel')) {
                 return
             }
 
-            if (Modernizr.touchevents && $(window).width() < self.options.breakpoint) {
+            if ($(window).width() < self.options.breakpoint) {
                 if ($(this).data('menu-item') == self.visibleItemId && self.panelVisible) {
                     self.hideSidePanel()
                     return
@@ -50,62 +44,16 @@
             return false
         })
 
-        if (!Modernizr.touchevents) {
-            // The side panel now opens only when a menu item is hovered and
-            // when the item doesn't have the "data-no-side-panel" attribute.
-            // TODO: remove the comment and the code below if no issues noticed.
-            // self.$sideNav.mouseenter(function() {
-            //     if ($(window).width() < self.options.breakpoint || !self.panelFixed()) {
-            //         self.panelOpenTimeout = setTimeout(function() {
-            //             self.displaySidePanel()
-            //         }, self.tabOpenDelay)
-            //     }
-            // })
-
-            self.$sideNav.mouseleave(function() {
-                clearTimeout(self.panelOpenTimeout)
-            })
-
-            self.$el.mouseleave(function() {
+        $('#layout-body').click(function() {
+            if (self.panelVisible) {
                 self.hideSidePanel()
-            })
+                return false
+            }
+        })
 
-            self.$sideNavItems.mouseenter(function() {
-                if ($(window).width() < self.options.breakpoint || !self.panelFixed()) {
-                    if ($(this).data('no-side-panel')) {
-                        self.hideSidePanel()
-                        return
-                    }
-
-                    var _this = this
-                    self.tabOpenTimeout = setTimeout(function() {
-                        self.displaySidePanel()
-                        self.displayTab(_this)
-                    }, self.tabOpenDelay)
-                }
-            })
-
-            self.$sideNavItems.mouseleave(function() {
-                clearTimeout(self.tabOpenTimeout)
-            })
-
-            $(window).resize(function() {
-                self.updatePanelPosition()
-                self.updateActiveTab()
-            })
-        }
-        else {
-            $('#layout-body').click(function() {
-                if (self.panelVisible) {
-                    self.hideSidePanel()
-                    return false
-                }
-            })
-
-            self.$el.on('close.oc.sidePanel', function() {
-                self.hideSidePanel()
-            })
-        }
+        self.$el.on('close.oc.sidePanel', function() {
+            self.hideSidePanel()
+        })
 
         this.updateActiveTab()
     }
@@ -115,9 +63,7 @@
 
         this.visibleItemId = menuItemId
 
-        if ($.oc.sideNav !== undefined) {
-            $.oc.sideNav.setActiveItem(menuItemId)
-        }
+        $.oc.sideNav.setActiveItem(menuItemId)
 
         this.$sidePanelItems.each(function() {
             var  $el = $(this)
@@ -129,6 +75,17 @@
 
     SidePanelTab.prototype.displaySidePanel = function() {
         $(document.body).addClass('display-side-panel')
+
+        if (this.$sideNavRes.is(':visible')) {
+            this.mainNavHeight = $('#layout-mainmenu').outerHeight() + this.$sideNavRes.outerHeight();
+        }
+
+        if ($('#layout-sidenav').is(':visible')) {
+            this.sideNavWidth = $('#layout-sidenav').outerWidth();
+        }
+        else {
+            this.sideNavWidth = 0;
+        }
 
         this.$el.appendTo('#layout-canvas')
         this.panelVisible = true
@@ -153,55 +110,20 @@
     }
 
     SidePanelTab.prototype.updatePanelPosition = function() {
-        if (!this.panelFixed() || Modernizr.touchevents) {
-            this.$el.height($(document).height() - this.mainNavHeight)
-        }
-        else {
-            this.$el.css('height', '')
-        }
+        this.$el.height($(document).height() - this.mainNavHeight)
 
-        if (this.panelVisible && $(window).width() > this.options.breakpoint && this.panelFixed()) {
+        if (this.panelVisible && $(window).width() > this.options.breakpoint) {
             this.hideSidePanel()
         }
     }
 
     SidePanelTab.prototype.updateActiveTab = function() {
-        if ($.oc.sideNav === undefined) {
-            return
-        }
-
-        if (!this.panelVisible && ($(window).width() < this.options.breakpoint || !this.panelFixed())) {
+        if (!this.panelVisible && ($(window).width() < this.options.breakpoint)) {
             $.oc.sideNav.unsetActiveItem()
         }
         else {
             $.oc.sideNav.setActiveItem(this.visibleItemId)
         }
-    }
-
-    SidePanelTab.prototype.panelFixed = function() {
-        return !($(window).width() < this.options.breakpoint) &&
-            !$(document.body).hasClass('side-panel-not-fixed')
-    }
-
-    SidePanelTab.prototype.fixPanel = function() {
-        $(document.body).toggleClass('side-panel-not-fixed')
-
-        var self = this
-
-        window.setTimeout(function() {
-            var fixed = self.panelFixed()
-
-            if (fixed) {
-                self.updateActiveTab()
-                $(document.body).addClass('side-panel-fix-shadow')
-            } else {
-                $(document.body).removeClass('side-panel-fix-shadow')
-                self.hideSidePanel()
-            }
-
-            if (typeof(localStorage) !== 'undefined')
-                localStorage.ocSidePanelFixed = fixed ? 1 : 0
-        }, 0)
     }
 
     SidePanelTab.DEFAULTS = {
@@ -240,19 +162,4 @@
         $('[data-control=layout-sidepanel]').sidePanelTab()
     })
 
-    // STORED PREFERENCES
-    // ====================
-
-    $(document).ready(function() {
-        if (Modernizr.touchevents || (typeof(localStorage) !== 'undefined')) {
-            if (localStorage.ocSidePanelFixed == 0) {
-                $(document.body).addClass('side-panel-not-fixed')
-                $(window).trigger('resize')
-            }
-            else if (localStorage.ocSidePanelFixed == 1) {
-                $(document.body).removeClass('side-panel-not-fixed')
-                $(window).trigger('resize')
-            }
-        }
-    })
 }(window.jQuery);

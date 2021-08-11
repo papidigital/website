@@ -16,6 +16,22 @@ $.ajaxPrefilter(function(options) {
 })
 
 /*
+ * Security helper
+ * Prevents front end service workers from leaking in to the backend
+ */
+function unregisterServiceWorkers() {
+    if (location.protocol === 'https:') {
+        navigator.serviceWorker.getRegistrations().then(
+            function(registrations) {
+                for (var index=0; index<registrations.length; index++) {
+                    registrations[index].unregister({ immediate: true })
+                }
+            }
+        );
+    }
+}
+
+/*
  * Path helpers
  */
 
@@ -40,7 +56,7 @@ $.oc.backendUrl = function(url) {
  * Usage: assetManager.load({ css:[], js:[], img:[] }, onLoadedCallback)
  */
 
-AssetManager = function() {
+var AssetManager = function() {
 
     var o = {
 
@@ -159,7 +175,7 @@ AssetManager = function() {
     return o;
 };
 
-assetManager = new AssetManager();
+var assetManager = new AssetManager();
 
 /*
  * String escape
@@ -183,10 +199,18 @@ $.oc.escapeHtmlString = function(string) {
     })
 }
 
+window.addEventListener('touchstart', function onFirstTouch() {
+    window.removeEventListener('touchstart', onFirstTouch, false);
+
+    $.cookie('oc-user-touch', 1, { expires: 365, path: '/' });
+
+    $(document.documentElement).addClass('user-touch');
+}, false);
+
 /*
  * Inverse Click Event (not used)
  *
- * Calls the handler function if the user has clicked outside the object 
+ * Calls the handler function if the user has clicked outside the object
  * and not on any of the elements in the exception list.
  */
 /*

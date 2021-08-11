@@ -3,11 +3,10 @@
 use Mail;
 use Event;
 use Backend;
-use BackendAuth;
 use October\Rain\Auth\Models\User as UserBase;
 
 /**
- * Administrator user model
+ * User is an administrator model
  *
  * @package october\backend
  * @author Alexey Bobkov, Samuel Georges
@@ -17,22 +16,22 @@ class User extends UserBase
     use \October\Rain\Database\Traits\SoftDelete;
 
     /**
-     * @var string The database table used by the model.
+     * @var string table associated with the model
      */
     protected $table = 'backend_users';
 
     /**
-     * Validation rules
+     * @var array rules for validation
      */
     public $rules = [
         'email' => 'required|between:6,255|email|unique:backend_users',
         'login' => 'required|between:2,255|unique:backend_users',
-        'password' => 'required:create|min:4|confirmed',
-        'password_confirmation' => 'required_with:password|min:4'
+        'password' => 'required:create|between:4,255|confirmed',
+        'password_confirmation' => 'required_with:password|between:4,255'
     ];
 
     /**
-     * @var array Attributes that should be cast to dates
+     * @var array dates attributes that should be mutated to dates
      */
     protected $dates = [
         'activated_at',
@@ -43,7 +42,7 @@ class User extends UserBase
     ];
 
     /**
-     * Relations
+     * belongsToMany relation
      */
     public $belongsToMany = [
         'groups' => [UserGroup::class, 'table' => 'backend_users_groups']
@@ -58,25 +57,26 @@ class User extends UserBase
     ];
 
     /**
-     * Purge attributes from data set.
+     * @var array purgeable list of attribute names which should not be saved to the database
      */
     protected $purgeable = ['password_confirmation', 'send_invite'];
 
     /**
-     * @var string Login attribute
+     * @var string loginAttribute
      */
     public static $loginAttribute = 'login';
 
     /**
-     * @return string Returns the user's full name.
+     * getFullNameAttribute returns the user's full name
      */
-    public function getFullNameAttribute()
+    public function getFullNameAttribute(): string
     {
         return trim($this->first_name . ' ' . $this->last_name);
     }
 
     /**
-     * Gets a code for when the user is persisted to a cookie or session which identifies the user.
+     * getPersistCode gets a code for when the user is persisted to a cookie or session
+     * which identifies the user
      * @return string
      */
     public function getPersistCode()
@@ -93,7 +93,7 @@ class User extends UserBase
     }
 
     /**
-     * Returns the public image file path to this user's avatar.
+     * getAvatarThumb returns the public image file path to this user's avatar
      */
     public function getAvatarThumb($size = 25, $options = null)
     {
@@ -118,8 +118,7 @@ class User extends UserBase
     }
 
     /**
-     * After create event
-     * @return void
+     * afterCreate event
      */
     public function afterCreate()
     {
@@ -131,8 +130,7 @@ class User extends UserBase
     }
 
     /**
-     * After login event
-     * @return void
+     * afterLogin event
      */
     public function afterLogin()
     {
@@ -153,8 +151,7 @@ class User extends UserBase
     }
 
     /**
-     * Sends an invitation to the user using template "backend::mail.invite".
-     * @return void
+     * sendInvitation sends an invitation to the user using template "backend::mail.invite"
      */
     public function sendInvitation()
     {
@@ -170,6 +167,9 @@ class User extends UserBase
         });
     }
 
+    /**
+     * getGroupsOptions returns available group options
+     */
     public function getGroupsOptions()
     {
         $result = [];
@@ -181,6 +181,9 @@ class User extends UserBase
         return $result;
     }
 
+    /**
+     * getRoleOptions returns available role options
+     */
     public function getRoleOptions()
     {
         $result = [];
@@ -193,20 +196,34 @@ class User extends UserBase
     }
 
     /**
-     * Check if the user is suspended.
-     * @return bool
+     * createDefaultAdmin inserts a new administrator with the default featureset
      */
-    public function isSuspended()
+    public static function createDefaultAdmin(array $data)
     {
-        return BackendAuth::findThrottleByUserId($this->id)->checkSuspended();
-    }
+        // Look up default role
+        $roleId = UserRole::where('code', UserRole::CODE_DEVELOPER)->first()->id ?? null;
 
-    /**
-     * Remove the suspension on this user.
-     * @return void
-     */
-    public function unsuspend()
-    {
-        BackendAuth::findThrottleByUserId($this->id)->unsuspend();
+        // Create admin
+        $user = new self;
+        $user->forceFill([
+            'last_name'             => array_get($data, 'last_name'),
+            'first_name'            => array_get($data, 'first_name'),
+            'email'                 => array_get($data, 'email'),
+            'login'                 => array_get($data, 'login'),
+            'password'              => array_get($data, 'password'),
+            'password_confirmation' => array_get($data, 'password_confirmation'),
+            'permissions'           => [],
+            'is_superuser'          => true,
+            'is_activated'          => true,
+            'role_id'               => $roleId
+        ]);
+        $user->save();
+
+        // Add to default group
+        if ($group = UserGroup::where('code', UserGroup::CODE_OWNERS)->first()) {
+            $user->addGroup($group);
+        }
+
+        return $user;
     }
 }

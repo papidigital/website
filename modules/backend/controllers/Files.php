@@ -11,14 +11,11 @@ use ApplicationException;
 use Exception;
 
 /**
- * Backend files controller
- *
- * Used for delivering protected system files, and generating URLs
+ * Files controller used for delivering protected system files, and generating URLs
  * for accessing them.
  *
  * @package october\backend
  * @author Alexey Bobkov, Samuel Georges
- *
  */
 class Files extends Controller
 {
@@ -86,7 +83,7 @@ class Files extends Controller
 
             // The AWS S3 storage drivers will return a valid temporary URL even if the file does not exist
             if (is_null($url) && $disk->exists($path)) {
-                $expires = now()->addSeconds(Config::get('cms.storage.uploads.temporaryUrlTTL', 3600));
+                $expires = now()->addSeconds(Config::get('system.storage.uploads.ttl', 3600));
                 $url = Cache::remember($pathKey, $expires, function () use ($disk, $path, $expires) {
                     return $disk->temporaryUrl($path, $expires);
                 });
@@ -162,7 +159,7 @@ class Files extends Controller
             throw new ApplicationException('Invalid code');
         }
 
-        list($id, $hash) = $parts;
+        [$id, $hash] = $parts;
 
         if (!$file = FileModel::find((int) $id)) {
             throw new ApplicationException('Unable to find file');

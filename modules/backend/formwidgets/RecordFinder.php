@@ -5,8 +5,7 @@ use ApplicationException;
 use Backend\Classes\FormWidgetBase;
 
 /**
- * Record Finder
- * Renders a record finder field.
+ * RecordFinder renders a record finder field
  *
  *    user:
  *        label: User
@@ -178,32 +177,37 @@ class RecordFinder extends FormWidgetBase
     public function onRefresh()
     {
         $value = post($this->getFieldName());
+
         if ($this->useRelation) {
-            list($model, $attribute) = $this->resolveModelAttribute($this->valueFrom);
+            [$model, $attribute] = $this->resolveModelAttribute($this->valueFrom);
             $model->{$attribute} = $value;
-        } else {
+        }
+        else {
             $this->formField->value = $value;
         }
 
         $this->prepareVars();
+
         return ['#'.$this->getId('container') => $this->makePartial('recordfinder')];
     }
 
     public function onClearRecord()
     {
         if ($this->useRelation) {
-            list($model, $attribute) = $this->resolveModelAttribute($this->valueFrom);
+            [$model, $attribute] = $this->resolveModelAttribute($this->valueFrom);
             $model->{$attribute} = null;
-        } else {
+        }
+        else {
             $this->formField->value = null;
         }
 
         $this->prepareVars();
+
         return ['#'.$this->getId('container') => $this->makePartial('recordfinder')];
     }
 
     /**
-     * Prepares the list data
+     * prepareVars for display
      */
     public function prepareVars()
     {
@@ -247,12 +251,12 @@ class RecordFinder extends FormWidgetBase
         $value = null;
 
         if ($this->useRelation) {
-            list($model, $attribute) = $this->resolveModelAttribute($this->valueFrom);
+            [$model, $attribute] = $this->resolveModelAttribute($this->valueFrom);
             if ($model !== null) {
                 $value = $model->{$attribute};
             }
         } else {
-            $value = $this->modelClass::where($this->keyFrom, parent::getLoadValue())->first();
+            $value = $this->modelClass::find(parent::getLoadValue());
         }
 
         return $value;

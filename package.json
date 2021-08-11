@@ -1,31 +1,35 @@
 {
-    "name": "papidigital",
-    "description": "",
-    "version": "1.0.0",
-    "main": "index.js",
+    "name": "octobercms",
+    "description": "October CMS is a self-hosted CMS platform based on the Laravel PHP Framework.",
     "directories": {
         "test": "tests/js/cases",
         "helpers": "tests/js/helpers"
     },
     "scripts": {
-        "test": "mocha --require @babel/register tests/js/cases/**/*.js",
-        "build-task:scss-compile": "node_modules/.bin/node-sass-chokidar --source-map true themes/papidigital/assets/scss/ -o themes/papidigital/assets/css",
-        "build-task:bootstrap-scss-compile": "node_modules/.bin/node-sass-chokidar --source-map true node_modules/bootstrap/scss/ -o themes/papidigital/assets/css",
-        "build-task:autoprefixer": "node_modules/.bin/postcss node_modules/bootstrap/css/*.css themes/papidigital/assets/css/*.css --use autoprefixer -d themes/papidigital/assets/css",
-        "sass:build": "node_modules/.bin/npm-run-all -p build-task:*",
-        "sass:watch": "node_modules/.bin/chokidar 'themes/papidigital/assets/scss/**/*.scss' -c 'npm run sass:build'",
-        "dev": "node_modules/.bin/npm-run-all -p sass:*"
+        "compile-less": "php artisan october:util compile less",
+        "compile-js": "php artisan october:util compile js",
+        "watch-less": "onchange -v \"modules/**/*.less\" \"plugins/**/*.less\" -- php artisan october:util compile less",
+        "watch-js": "onchange -v \"modules/**/*.js\" \"plugins/**/*.js\" --exclude \"**/*-min.js\" -- php artisan october:util compile js",
+        "test": "mocha --require @babel/register tests/js/cases/**/*.js"
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "dependencies": {
-        "autoprefixer": "^9.7.3",
-        "chokidar-cli": "^2.1.0",
-        "node-sass-chokidar": "^1.5.0",
-        "npm-run-all": "^4.1.5",
-        "postcss-cli": "^8.3.0"
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/octobercms/october.git"
     },
+    "contributors": [
+        {
+            "name": "Alexey Bobkov",
+            "email": "aleksey.bobkov@gmail.com"
+        },
+        {
+            "name": "Samuel Georges",
+            "email": "daftspunky@gmail.com"
+        }
+    ],
+    "bugs": {
+        "url": "https://github.com/octobercms/october/issues"
+    },
+    "homepage": "https://octobercms.com/",
     "devDependencies": {
         "@babel/cli": "^7.5.5",
         "@babel/core": "^7.5.5",
@@ -33,11 +37,11 @@
         "@babel/preset-env": "^7.5.5",
         "@babel/register": "^7.5.5",
         "babel-plugin-module-resolver": "^3.2.0",
-        "bootstrap": "4.4.1",
         "chai": "^4.2.0",
         "jquery": "^3.4.1",
         "jsdom": "^15.1.1",
         "mocha": "^6.2.0",
+        "onchange": "^6.1.0",
         "sinon": "^7.4.1"
     }
 }

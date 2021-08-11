@@ -108,9 +108,9 @@ class Extension extends TwigExtension
      * @param array $parameters A optional list of parameters to pass to the content.
      * @return string Returns the file contents.
      */
-    public function contentFunction($name, $parameters = [])
+    public function contentFunction($name, $parameters = [], $throwException = false)
     {
-        return $this->controller->renderContent($name, $parameters);
+        return $this->controller->renderContent($name, $parameters, $throwException);
     }
 
     /**
@@ -130,7 +130,11 @@ class Extension extends TwigExtension
      */
     public function assetsFunction($type = null)
     {
-        return $this->controller->makeAssets($type);
+        $result = $this->controller->makeAssets($type);
+
+        Event::fire('cms.assets.render', [$type, &$result]);
+
+        return $result;
     }
 
     /**
@@ -145,6 +149,7 @@ class Extension extends TwigExtension
         }
 
         $result = str_replace('<!-- X_OCTOBER_DEFAULT_BLOCK_CONTENT -->', trim($default), $result);
+
         return $result;
     }
 
@@ -211,6 +216,7 @@ class Extension extends TwigExtension
         }
 
         $result = str_replace('<!-- X_OCTOBER_DEFAULT_BLOCK_CONTENT -->', trim($default), $result);
+
         return $result;
     }
 

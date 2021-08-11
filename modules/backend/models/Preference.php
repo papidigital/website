@@ -54,7 +54,7 @@ class Preference extends Model
         $config = App::make('config');
         $this->locale = $config->get('app.locale', 'en');
         $this->fallback_locale = $this->getFallbackLocale($this->locale);
-        $this->timezone = $config->get('cms.backendTimezone', $config->get('app.timezone'));
+        $this->timezone = $config->get('backend.timezone', $config->get('app.timezone'));
 
         $this->editor_font_size = $config->get('editor.font_size', 12);
         $this->editor_word_wrap = $config->get('editor.word_wrap', 'fluid');
@@ -210,7 +210,6 @@ class Preference extends Model
             'pt-br' => [Lang::get('system::lang.locale.pt-br'), 'flag-br'],
             'pt-pt' => [Lang::get('system::lang.locale.pt-pt'), 'flag-pt'],
             'ro'    => [Lang::get('system::lang.locale.ro'),    'flag-ro'],
-            'rs'    => [Lang::get('system::lang.locale.rs'),    'flag-rs'],
             'ru'    => [Lang::get('system::lang.locale.ru'),    'flag-ru'],
             'sk'    => [Lang::get('system::lang.locale.sk'),    'flag-sk'],
             'sl'    => [Lang::get('system::lang.locale.sl'),    'flag-si'],
@@ -273,26 +272,10 @@ class Preference extends Model
      */
     public function getEditorThemeOptions()
     {
-        $themeDir = new DirectoryIterator("modules/backend/formwidgets/codeeditor/assets/vendor/ace/");
-        $themes = [];
-
-        // Iterate through the themes
-        foreach ($themeDir as $node) {
-            // If this file is a theme (starting by "theme-")
-            if (!$node->isDir() && substr($node->getFileName(), 0, 6) == 'theme-') {
-                // Remove the theme- prefix and the .js suffix, create an user friendly and capitalized name
-                $themeId = substr($node->getFileName(), 6, -3);
-                $themeName = ucwords(str_replace("_", " ", $themeId));
-
-                // Add the values to the themes array
-                if ($themeId != static::DEFAULT_THEME) {
-                    $themes[$themeId] = $themeName;
-                }
-            }
-        }
-
-        // Sort the theme alphabetically, and push the default theme
-        asort($themes);
-        return [static::DEFAULT_THEME => ucwords(static::DEFAULT_THEME)] + $themes;
+        return [
+            static::DEFAULT_THEME => 'Dark',
+            'sqlserver' => 'Light',
+            'merbivore' => 'High Contrast',
+        ];
     }
 }

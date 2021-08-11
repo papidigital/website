@@ -31,7 +31,7 @@ trait InspectableContainer
 
         $traitFound = in_array('System\Traits\PropertyContainer', class_uses_recursive($className));
         if (!$traitFound) {
-            throw new ApplicationException('The options cannot be loaded for the specified class.');
+            throw new ApplicationException('Dynamic Inspector control options cannot be loaded for the specified class.');
         }
 
         $obj = new $className(null);

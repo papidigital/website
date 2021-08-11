@@ -3,34 +3,30 @@
 use Lang;
 use View;
 use Flash;
-use Config;
-use Closure;
+use System;
 use Request;
 use Backend;
-use Session;
 use Redirect;
 use Response;
 use Exception;
 use BackendAuth;
 use Backend\Models\UserPreference;
 use Backend\Models\Preference as BackendPreference;
-use Backend\Widgets\MediaManager;
 use October\Rain\Exception\AjaxException;
 use October\Rain\Exception\SystemException;
 use October\Rain\Exception\ValidationException;
 use October\Rain\Exception\ApplicationException;
+use October\Rain\Extension\Extendable;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Routing\Controller as ControllerBase;
 
 /**
- * The Backend base controller class, used by Backend controllers.
- * The base controller services back end pages.
+ * Controller is a backend base controller class used by all Backend controllers
  *
  * @package october\backend
  * @author Alexey Bobkov, Samuel Georges
  */
-class Controller extends ControllerBase
+class Controller extends Extendable
 {
     use \System\Traits\ViewMaker;
     use \System\Traits\AssetMaker;
@@ -38,14 +34,9 @@ class Controller extends ControllerBase
     use \System\Traits\EventEmitter;
     use \System\Traits\ResponseMaker;
     use \System\Traits\SecurityController;
+    use \Backend\Traits\VueMaker;
     use \Backend\Traits\ErrorMaker;
     use \Backend\Traits\WidgetMaker;
-    use \October\Rain\Extension\ExtendableTrait;
-
-    /**
-     * @var array Behaviors implemented by this controller.
-     */
-    public $implement;
 
     /**
      * @var object Reference the logged in admin user.
@@ -53,7 +44,7 @@ class Controller extends ControllerBase
     protected $user;
 
     /**
-     * @var array Collection of WidgetBase objects used on this page.
+     * @var object Collection of WidgetBase objects used on this page.
      */
     public $widget;
 
@@ -101,13 +92,7 @@ class Controller extends ControllerBase
      * @var array Default methods which cannot be called as actions.
      */
     public $hiddenActions = [
-        'run',
-        'actionExists',
-        'pageAction',
-        'getId',
-        'setStatusCode',
-        'handleError',
-        'makeHintPartial'
+        'run'
     ];
 
     /**
@@ -120,6 +105,10 @@ class Controller extends ControllerBase
      */
     public function __construct()
     {
+        if (!is_array($this->implement)) {
+            $this->implement = [];
+        }
+
         /*
          * Allow early access to route data.
          */
@@ -151,46 +140,17 @@ class Controller extends ControllerBase
         $this->user = BackendAuth::getUser();
 
         /*
-         * Media Manager widget is available on all back-end pages
+         * No booting behaviors for undesirables
          */
-        if ($this->user && $this->user->hasAccess('media.*')) {
-            $manager = new MediaManager($this, 'ocmediamanager');
-            $manager->bindToController();
+        if ($this->user || $this->isPublicAction($this->action)) {
+            parent::__construct();
         }
 
-        $this->extendableConstruct();
+        $this->registerVueComponent(\Backend\VueComponents\Modal::class);
     }
 
     /**
-     * Extend this object properties upon construction.
-     */
-    public static function extend(Closure $callback)
-    {
-        self::extendableExtendCallback($callback);
-    }
-
-    public function __get($name)
-    {
-        return $this->extendableGet($name);
-    }
-
-    public function __set($name, $value)
-    {
-        $this->extendableSet($name, $value);
-    }
-
-    public function __call($name, $params)
-    {
-        return $this->extendableCall($name, $params);
-    }
-
-    public static function __callStatic($name, $params)
-    {
-        return self::extendableCallStatic($name, $params);
-    }
-
-    /**
-     * Execute the controller action.
+     * run executes the controller action
      * @param string $action The action name.
      * @param array $params Routing parameters to pass to the action.
      * @return mixed The action result.
@@ -217,14 +177,9 @@ class Controller extends ControllerBase
         }
 
         /*
-         * Determine if this request is a public action.
-         */
-        $isPublicAction = in_array($action, $this->publicActions);
-
-        /*
          * Check that user is logged in and has permission to view this page
          */
-        if (!$isPublicAction) {
+        if (!$this->isPublicAction($action)) {
             /*
              * Not logged in, redirect to login screen or show ajax error.
              */
@@ -242,6 +197,11 @@ class Controller extends ControllerBase
             }
         }
 
+        /*
+         * Logic hook for all actions
+         */
+        $this->beforeDisplay();
+
         /**
          * @event backend.page.beforeDisplay
          * Provides an opportunity to override backend page content
@@ -249,14 +209,14 @@ class Controller extends ControllerBase
          * Example usage:
          *
          *     Event::listen('backend.page.beforeDisplay', function ((\Backend\Classes\Controller) $backendController, (string) $action, (array) $params) {
-         *         trace_log('redirect all backend pages to google');
+         *         traceLog('redirect all backend pages to google');
          *         return \Redirect::to('https://google.com');
          *     });
          *
          * Or
          *
          *     $backendController->bindEvent('page.beforeDisplay', function ((string) $action, (array) $params) {
-         *         trace_log('redirect all backend pages to google');
+         *         traceLog('redirect all backend pages to google');
          *         return \Redirect::to('https://google.com');
          *     });
          *
@@ -277,18 +237,12 @@ class Controller extends ControllerBase
         if ($ajaxResponse = $this->execAjaxHandlers()) {
             $result = $ajaxResponse;
         }
-
         /*
          * Execute postback handler
          */
-        elseif (
-            ($handler = post('_handler')) &&
-            ($handlerResponse = $this->runAjaxHandler($handler)) &&
-            $handlerResponse !== true
-        ) {
+        elseif ($handlerResponse = $this->execPostbackHandler()) {
             $result = $handlerResponse;
         }
-
         /*
          * Execute page action
          */
@@ -304,27 +258,38 @@ class Controller extends ControllerBase
     }
 
     /**
-     * This method is used internally.
-     * Determines whether an action with the specified name exists.
-     * Action must be a class public method. Action name can not be prefixed with the underscore character.
+     * actionExists is used internally to determines whether an action with the specified name exists.
+     *
+     * - Action must be a class public method.
+     * - Action name can not be prefixed with the underscore character.
+     * - Action name must be lowercase.
+     * - Action must not appear in hiddenActions.
+     *
      * @param string $name Specifies the action name.
      * @param bool $internal Allow protected actions.
      * @return boolean
      */
     public function actionExists($name, $internal = false)
     {
-        if (!strlen($name) || substr($name, 0, 1) == '_' || !$this->methodExists($name)) {
+        // Must have length, not start with underscore and actually exist
+        if (!strlen($name) || substr($name, 0, 1) === '_' || !$this->methodExists($name)) {
             return false;
         }
 
+        // Only allow lowercase actions
+        if (strtolower($name) !== $name) {
+            return false;
+        }
+
+        // Checks hidden actions
         foreach ($this->hiddenActions as $method) {
-            if (strtolower($name) == strtolower($method)) {
+            if (strtolower($name) === strtolower($method)) {
                 return false;
             }
         }
 
+        // Internal method check
         $ownMethod = method_exists($this, $name);
-
         if ($ownMethod) {
             $methodInfo = new \ReflectionMethod($this, $name);
             $public = $methodInfo->isPublic();
@@ -380,6 +345,14 @@ class Controller extends ControllerBase
     }
 
     /**
+     * beforeDisplay is a method to override in your controller as a way to execute logic before
+     * each action executes. It is preferred over placing logic in the constructor
+     */
+    public function beforeDisplay()
+    {
+    }
+
+    /**
      * This method is used internally.
      * Invokes the controller action and loads the corresponding view.
      * @param string $actionName Specifies a action name to execute.
@@ -390,7 +363,7 @@ class Controller extends ControllerBase
         $result = null;
 
         if (!$this->actionExists($actionName)) {
-            if (Config::get('app.debug', false)) {
+            if (System::checkDebugMode()) {
                 throw new SystemException(sprintf(
                     "Action %s is not found in the controller %s",
                     $actionName,
@@ -402,7 +375,7 @@ class Controller extends ControllerBase
         }
 
         // Execute the action
-        $result = call_user_func_array([$this, $actionName], $parameters);
+        $result = $this->$actionName(...$parameters);
 
         // Expecting \Response and \RedirectResponse
         if ($result instanceof \Symfony\Component\HttpFoundation\Response) {
@@ -411,7 +384,7 @@ class Controller extends ControllerBase
 
         // No page title
         if (!$this->pageTitle) {
-            $this->pageTitle = 'backend::lang.page.untitled';
+            $this->pageTitle = Lang::get('backend::lang.page.untitled');
         }
 
         // Load the view
@@ -428,7 +401,7 @@ class Controller extends ControllerBase
      */
     public function getAjaxHandler()
     {
-        if (!Request::ajax() || Request::method() != 'POST') {
+        if (!Request::ajax() || Request::method() !== 'POST') {
             return null;
         }
 
@@ -440,20 +413,13 @@ class Controller extends ControllerBase
     }
 
     /**
-     * This method is used internally.
-     * Invokes a controller event handler and loads the supplied partials.
+     * execAjaxHandlers is used internally and unvokes a controller event handler and
+     * loads the supplied partials.
      */
     protected function execAjaxHandlers()
     {
         if ($handler = $this->getAjaxHandler()) {
             try {
-                /*
-                 * Validate the handler name
-                 */
-                if (!preg_match('/^(?:\w+\:{2})?on[A-Z]{1}[\w+]*$/', $handler)) {
-                    throw new SystemException(Lang::get('backend::lang.ajax_handler.invalid_name', ['name'=>$handler]));
-                }
-
                 /*
                  * Validate the handler partial list
                  */
@@ -462,7 +428,7 @@ class Controller extends ControllerBase
 
                     foreach ($partialList as $partial) {
                         if (!preg_match('/^(?!.*\/\/)[a-z0-9\_][a-z0-9\_\-\/]*$/i', $partial)) {
-                            throw new SystemException(Lang::get('backend::lang.partial.invalid_name', ['name'=>$partial]));
+                            throw new ApplicationException(Lang::get('backend::lang.partial.invalid_name', ['name'=>$partial]));
                         }
                     }
                 }
@@ -531,7 +497,9 @@ class Controller extends ControllerBase
                  */
                 Flash::error($ex->getMessage());
                 $responseContents = [];
-                $responseContents['#layout-flash-messages'] = $this->makeLayoutPartial('flash_messages');
+                $responseContents['#layout-flash-messages'] = $this->makeLayoutPartial('flash_messages', [
+                    'isValidationError' => true
+                ]);
                 $responseContents['X_OCTOBER_ERROR_FIELDS'] = $ex->getFields();
                 throw new AjaxException($responseContents);
             }
@@ -547,12 +515,42 @@ class Controller extends ControllerBase
     }
 
     /**
-     * Tries to find and run an AJAX handler in the page action.
+     * execPostbackHandler is used internally to execute a postback version of an
+     * AJAX handler.
+     */
+    protected function execPostbackHandler()
+    {
+        if (Request::method() !== 'POST') {
+            return null;
+        }
+
+        $handler = post('_handler');
+        if (!$handler) {
+            return null;
+        }
+
+        $handlerResponse = $this->runAjaxHandler($handler);
+        if ($handlerResponse && $handlerResponse !== true) {
+            return $handlerResponse;
+        }
+
+        return null;
+    }
+
+    /**
+     * runAjaxHandler tries to find and run an AJAX handler in the page action.
      * The method stops as soon as the handler is found.
      * @return boolean Returns true if the handler was found. Returns false otherwise.
      */
     protected function runAjaxHandler($handler)
     {
+        /*
+         * Validate the handler name
+         */
+        if (!preg_match('/^(?:\w+\:{2})?on[A-Z]{1}[\w+]*$/', $handler)) {
+            throw new ApplicationException(Lang::get('backend::lang.ajax_handler.invalid_name', ['name'=>$handler]));
+        }
+
         /**
          * @event backend.ajax.beforeRunHandler
          * Provides an opportunity to modify an AJAX request
@@ -563,7 +561,7 @@ class Controller extends ControllerBase
          *
          *     Event::listen('backend.ajax.beforeRunHandler', function ((\Backend\Classes\Controller) $controller, (string) $handler) {
          *         if (strpos($handler, '::')) {
-         *             list($componentAlias, $handlerName) = explode('::', $handler);
+         *             [$componentAlias, $handlerName] = explode('::', $handler);
          *             if ($componentAlias === $this->getBackendWidgetAlias()) {
          *                 return $this->backendControllerProxy->runAjaxHandler($handler);
          *             }
@@ -574,7 +572,7 @@ class Controller extends ControllerBase
          *
          *     $this->controller->bindEvent('ajax.beforeRunHandler', function ((string) $handler) {
          *         if (strpos($handler, '::')) {
-         *             list($componentAlias, $handlerName) = explode('::', $handler);
+         *             [$componentAlias, $handlerName] = explode('::', $handler);
          *             if ($componentAlias === $this->getBackendWidgetAlias()) {
          *                 return $this->backendControllerProxy->runAjaxHandler($handler);
          *             }
@@ -590,7 +588,7 @@ class Controller extends ControllerBase
          * Process Widget handler
          */
         if (strpos($handler, '::')) {
-            list($widgetName, $handlerName) = explode('::', $handler);
+            [$widgetName, $handlerName] = explode('::', $handler);
 
             /*
              * Execute the page action so widgets are initialized
@@ -617,7 +615,7 @@ class Controller extends ControllerBase
             $pageHandler = $this->action . '_' . $handler;
 
             if ($this->methodExists($pageHandler)) {
-                $result = call_user_func_array([$this, $pageHandler], $this->params);
+                $result = $this->$pageHandler(...$this->params);
                 return $result ?: true;
             }
 
@@ -625,7 +623,7 @@ class Controller extends ControllerBase
              * Process page global handler (onSomething)
              */
             if ($this->methodExists($handler)) {
-                $result = call_user_func_array([$this, $handler], $this->params);
+                $result = $this->$handler(...$this->params);
                 return $result ?: true;
             }
 
@@ -646,7 +644,7 @@ class Controller extends ControllerBase
         /*
          * Generic handler that does nothing
          */
-        if ($handler == 'onAjax') {
+        if ($handler === 'onAjax') {
             return true;
         }
 
@@ -670,11 +668,23 @@ class Controller extends ControllerBase
     }
 
     /**
-     * Returns the controllers public actions.
+     * getPublicActions returns the controllers public actions
      */
     public function getPublicActions()
     {
         return $this->publicActions;
+    }
+
+    /**
+     * isPublicAction returns true if the current action is public
+     */
+    public function isPublicAction(?string $action): bool
+    {
+        if (!$action) {
+            return false;
+        }
+
+        return in_array($action, $this->publicActions);
     }
 
     /**

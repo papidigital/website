@@ -6,7 +6,8 @@ fields:
 
     hint:
         type: hint
-        path: ~/modules/cms/models/maintenancesetting/_hint.htm
+        mode: tip
+        label: cms::lang.maintenance.hint
 
     is_enabled:
         label: cms::lang.maintenance.is_enabled

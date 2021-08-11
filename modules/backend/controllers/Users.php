@@ -4,7 +4,6 @@ use Lang;
 use Flash;
 use Backend;
 use Redirect;
-use Response;
 use BackendMenu;
 use BackendAuth;
 use Backend\Models\UserGroup;
@@ -132,43 +131,11 @@ class Users extends Controller
     }
 
     /**
-     * Impersonate this user
-     */
-    public function update_onImpersonateUser($recordId)
-    {
-        if (!$this->user->hasAccess('backend.impersonate_users')) {
-            return Response::make(Lang::get('backend::lang.page.access_denied.label'), 403);
-        }
-
-        $model = $this->formFindModelObject($recordId);
-
-        BackendAuth::impersonate($model);
-
-        Flash::success(Lang::get('backend::lang.account.impersonate_success'));
-
-        return Backend::redirect('backend/users/myaccount');
-    }
-
-    /**
-     * Unsuspend this user
-     */
-    public function update_onUnsuspendUser($recordId)
-    {
-        $model = $this->formFindModelObject($recordId);
-
-        $model->unsuspend();
-
-        Flash::success(Lang::get('backend::lang.account.unsuspend_success'));
-
-        return Redirect::refresh();
-    }
-
-    /**
      * My Settings controller
      */
     public function myaccount()
     {
-        SettingsManager::setContext('October.Backend', 'myaccount');
+        // SettingsManager::setContext('October.Backend', 'myaccount');
 
         $this->pageTitle = 'backend::lang.myaccount.menu_label';
         return $this->update($this->user->id, 'myaccount');
@@ -234,7 +201,7 @@ class Users extends Controller
         return [
             'permissions' => [
                 'tab' => 'backend::lang.user.permissions',
-                'type' => 'Backend\FormWidgets\PermissionEditor',
+                'type' => \Backend\FormWidgets\PermissionEditor::class,
                 'trigger' => [
                     'action' => 'disable',
                     'field' => 'is_superuser',

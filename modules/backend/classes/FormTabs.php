@@ -2,74 +2,79 @@
 
 use IteratorAggregate;
 use ArrayIterator;
-use ArrayAccess;
 
 /**
- * Form Tabs definition
- * A translation of the form field tab configuration
+ * FormTabs is a translation of the form field tab configuration
  *
  * @package october\backend
  * @author Alexey Bobkov, Samuel Georges
  */
-class FormTabs implements IteratorAggregate, ArrayAccess
+class FormTabs implements IteratorAggregate
 {
     const SECTION_OUTSIDE = 'outside';
     const SECTION_PRIMARY = 'primary';
     const SECTION_SECONDARY = 'secondary';
 
+    //
+    // Configurable properties
+    //
+
     /**
-     * @var string Specifies the form section these tabs belong to.
+     * @var string section specifies the form section these tabs belong to
      */
     public $section = 'outside';
 
     /**
-     * @var array Collection of panes fields to these tabs.
-     */
-    public $fields = [];
-
-    /**
-     * @var array Names of tabs to lazy load.
+     * @var array lazy is the n Names of tabs to lazy load
      */
     public $lazy = [];
 
     /**
-     * @var string Default tab label to use when none is specified.
+     * @var string defaultTab is default tab label to use when none is specified
      */
     public $defaultTab = 'backend::lang.form.undefined_tab';
 
     /**
-     * @var array List of icons for their corresponding tabs.
+     * @var array icons lists of icons for their corresponding tabs
      */
     public $icons = [];
 
     /**
-     * @var bool Should these tabs stretch to the bottom of the page layout.
+     * @var bool stretch should these tabs stretch to the bottom of the page layout
      */
     public $stretch;
 
     /**
-     * @var boolean If set to TRUE, fields will not be displayed in tabs.
+     * @var boolean suppressTabs if set to TRUE, fields will not be displayed in tabs
      */
     public $suppressTabs = false;
 
     /**
-     * @var string Specifies a CSS class to attach to the tab container.
+     * @var string cssClass cpecifies a CSS class to attach to the tab container
      */
     public $cssClass;
 
     /**
-     * @var array Specifies a CSS class to an individual tab pane.
+     * @var array paneCssClass specifies a CSS class to an individual tab pane
      */
     public $paneCssClass;
 
     /**
-     * @var bool Each tab gets url fragment to be linkable.
+     * @var bool linkable means tab gets url fragment to be linkable
      */
     public $linkable = true;
 
+    //
+    // Object properties
+    //
+
     /**
-     * Constructor.
-     * Specifies a tabs rendering section. Supported sections are:
+     * @var array fields is a collection of panes fields to these tabs
+     */
+    protected $fields = [];
+
+    /**
+     * __construct specifies a tabs rendering section. Supported sections are:
      * - outside - stores a section of "tabless" fields.
      * - primary - tabs section for primary fields.
      * - secondary - tabs section for secondary fields.
@@ -81,15 +86,13 @@ class FormTabs implements IteratorAggregate, ArrayAccess
         $this->section = strtolower($section) ?: $this->section;
         $this->config = $this->evalConfig($config);
 
-        if ($this->section == self::SECTION_OUTSIDE) {
+        if ($this->section === self::SECTION_OUTSIDE) {
             $this->suppressTabs = true;
         }
     }
 
     /**
-     * Process options and apply them to this object.
-     * @param array $config
-     * @return array
+     * evalConfig process options and apply them to this object
      */
     protected function evalConfig($config)
     {
@@ -117,60 +120,48 @@ class FormTabs implements IteratorAggregate, ArrayAccess
             $this->paneCssClass = $config['paneCssClass'];
         }
 
-        if (array_key_exists('linkable', $config)) {
-            $this->linkable = (bool) $config['linkable'];
-        }
-
         if (array_key_exists('lazy', $config)) {
             $this->lazy = $config['lazy'];
         }
     }
 
     /**
-     * Add a field to the collection of tabs.
+     * isLazy checks if a tab should be lazy loaded
+     */
+    public function isLazy($tabName): bool
+    {
+        return in_array($tabName, $this->lazy);
+    }
+
+    /**
+     * addField to the collection of tabs
      * @param string    $name
      * @param FormField $field
      * @param string    $tab
      */
-    public function addField($name, FormField $field, $tab = null)
+    public function addField($name, FormField $field)
     {
-        if (!$tab) {
-            $tab = $this->defaultTab;
-        }
-
-        $this->fields[$tab][$name] = $field;
+        $this->fields[$name] = $field;
     }
 
     /**
-     * Remove a field from all tabs by name.
-     * @param string    $name
+     * removeField from all tabs by name
+     * @param string $name
      * @return boolean
      */
     public function removeField($name)
     {
-        foreach ($this->fields as $tab => $fields) {
-            foreach ($fields as $fieldName => $field) {
-                if ($fieldName == $name) {
-                    unset($this->fields[$tab][$fieldName]);
-
-                    /*
-                     * Remove empty tabs from collection
-                     */
-                    if (!count($this->fields[$tab])) {
-                        unset($this->fields[$tab]);
-                    }
-
-                    return true;
-                }
-            }
+        if (isset($this->fields[$name])) {
+            unset($this->fields[$name]);
+            return true;
         }
 
         return false;
     }
 
     /**
-     * Returns true if any fields have been registered for these tabs
-     * @return boolean
+     * hasFields returns true if any fields have been registered for these tabs
+     * @return bool
      */
     public function hasFields()
     {
@@ -178,31 +169,33 @@ class FormTabs implements IteratorAggregate, ArrayAccess
     }
 
     /**
-     * Returns an array of the registered fields, including tabs.
+     * getFields returns an array of the registered fields, includes tabs in format
+     * array[tab][field]
      * @return array
      */
     public function getFields()
+    {
+        $fieldsTabbed = [];
+
+        foreach ($this->fields as $name => $field) {
+            $tabName = $field->tab ?: $this->defaultTab;
+            $fieldsTabbed[$tabName][$name] = $field;
+        }
+
+        return $fieldsTabbed;
+    }
+
+    /**
+     * getAllFields returns an array of the registered fields, without tabs
+     * @return array
+     */
+    public function getAllFields()
     {
         return $this->fields;
     }
 
     /**
-     * Returns an array of the registered fields, without tabs.
-     * @return array
-     */
-    public function getAllFields()
-    {
-        $tablessFields = [];
-
-        foreach ($this->getFields() as $tab) {
-            $tablessFields += $tab;
-        }
-
-        return $tablessFields;
-    }
-
-    /**
-     * Returns an icon for the tab based on the tab's name.
+     * getIcon returns an icon for the tab based on the tab's name
      * @param string $name
      * @return string
      */
@@ -214,7 +207,7 @@ class FormTabs implements IteratorAggregate, ArrayAccess
     }
 
     /**
-     * Returns a tab pane CSS class.
+     * getPaneCssClass returns a tab pane CSS class
      * @param string $index
      * @param string $label
      * @return string
@@ -235,7 +228,7 @@ class FormTabs implements IteratorAggregate, ArrayAccess
     }
 
     /**
-     * Get an iterator for the items.
+     * getIterator gets an iterator for the items
      * @return ArrayIterator
      */
     public function getIterator()
@@ -245,37 +238,5 @@ class FormTabs implements IteratorAggregate, ArrayAccess
                 ? $this->getAllFields()
                 : $this->getFields()
         );
-    }
-
-    /**
-     * ArrayAccess implementation
-     */
-    public function offsetSet($offset, $value)
-    {
-        $this->fields[$offset] = $value;
-    }
-
-    /**
-     * ArrayAccess implementation
-     */
-    public function offsetExists($offset)
-    {
-        return isset($this->fields[$offset]);
-    }
-
-    /**
-     * ArrayAccess implementation
-     */
-    public function offsetUnset($offset)
-    {
-        unset($this->fields[$offset]);
-    }
-
-    /**
-     * ArrayAccess implementation
-     */
-    public function offsetGet($offset)
-    {
-        return $this->fields[$offset] ?? null;
     }
 }

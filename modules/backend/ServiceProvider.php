@@ -4,11 +4,10 @@ use App;
 use Backend;
 use BackendMenu;
 use BackendAuth;
-use Backend\Models\UserRole;
-use Backend\Classes\WidgetManager;
 use System\Classes\MailManager;
 use System\Classes\CombineAssets;
 use System\Classes\SettingsManager;
+use Backend\Classes\WidgetManager;
 use October\Rain\Support\ModuleServiceProvider;
 
 class ServiceProvider extends ModuleServiceProvider
@@ -66,20 +65,13 @@ class ServiceProvider extends ModuleServiceProvider
     protected function registerAssetBundles()
     {
         CombineAssets::registerCallback(function ($combiner) {
-            $combiner->registerBundle('~/modules/backend/assets/less/october.less');
-            $combiner->registerBundle('~/modules/backend/assets/js/october.js');
             $combiner->registerBundle('~/modules/backend/widgets/table/assets/js/build.js');
-            $combiner->registerBundle('~/modules/backend/widgets/mediamanager/assets/js/mediamanager-browser.js');
-            $combiner->registerBundle('~/modules/backend/widgets/mediamanager/assets/less/mediamanager.less');
             $combiner->registerBundle('~/modules/backend/formwidgets/codeeditor/assets/less/codeeditor.less');
             $combiner->registerBundle('~/modules/backend/formwidgets/repeater/assets/less/repeater.less');
             $combiner->registerBundle('~/modules/backend/formwidgets/codeeditor/assets/js/build.js');
-            $combiner->registerBundle('~/modules/backend/formwidgets/fileupload/assets/less/fileupload.less');
             $combiner->registerBundle('~/modules/backend/formwidgets/nestedform/assets/less/nestedform.less');
             $combiner->registerBundle('~/modules/backend/formwidgets/richeditor/assets/js/build-plugins.js');
-            $combiner->registerBundle('~/modules/backend/formwidgets/colorpicker/assets/less/colorpicker.less');
             $combiner->registerBundle('~/modules/backend/formwidgets/permissioneditor/assets/less/permissioneditor.less');
-            $combiner->registerBundle('~/modules/backend/formwidgets/markdowneditor/assets/less/markdowneditor.less');
             $combiner->registerBundle('~/modules/backend/formwidgets/sensitive/assets/less/sensitive.less');
 
             /*
@@ -106,14 +98,6 @@ class ServiceProvider extends ModuleServiceProvider
                     'url'         => Backend::url('backend'),
                     'permissions' => ['backend.access_dashboard'],
                     'order'       => 10
-                ],
-                'media' => [
-                    'label'       => 'backend::lang.media.menu_label',
-                    'icon'        => 'icon-folder',
-                    'iconSvg'     => 'modules/backend/assets/images/media-icon.svg',
-                    'url'         => Backend::url('backend/media'),
-                    'permissions' => ['media.*'],
-                    'order'       => 200
                 ]
             ]);
         });
@@ -141,50 +125,28 @@ class ServiceProvider extends ModuleServiceProvider
             $manager->registerPermissions('October.Backend', [
                 'backend.access_dashboard' => [
                     'label' => 'system::lang.permissions.view_the_dashboard',
-                    'tab'   => 'system::lang.permissions.name',
+                    'tab'   => 'system::lang.permissions.name'
                 ],
                 'backend.manage_default_dashboard' => [
                     'label' => 'system::lang.permissions.manage_default_dashboard',
                     'tab'   => 'system::lang.permissions.name',
-                    'roles' => UserRole::CODE_DEVELOPER,
                 ],
                 'backend.manage_users' => [
                     'label' => 'system::lang.permissions.manage_other_administrators',
-                    'tab'   => 'system::lang.permissions.name',
-                    'roles' => UserRole::CODE_DEVELOPER,
-                ],
-                'backend.impersonate_users' => [
-                    'label' => 'system::lang.permissions.impersonate_users',
-                    'tab'   => 'system::lang.permissions.name',
-                    'roles' => UserRole::CODE_DEVELOPER,
+                    'tab'   => 'system::lang.permissions.name'
                 ],
                 'backend.manage_preferences' => [
                     'label' => 'system::lang.permissions.manage_preferences',
-                    'tab'   => 'system::lang.permissions.name',
+                    'tab'   => 'system::lang.permissions.name'
                 ],
                 'backend.manage_editor' => [
                     'label' => 'system::lang.permissions.manage_editor',
-                    'tab'   => 'system::lang.permissions.name',
-                    'roles' => UserRole::CODE_DEVELOPER,
-                ],
-                'backend.manage_own_editor' => [
-                    'label' => 'system::lang.permissions.manage_own_editor',
-                    'tab'   => 'system::lang.permissions.name',
+                    'tab'   => 'system::lang.permissions.name'
                 ],
                 'backend.manage_branding' => [
                     'label' => 'system::lang.permissions.manage_branding',
-                    'tab'   => 'system::lang.permissions.name',
-                    'roles' => UserRole::CODE_DEVELOPER,
-                ],
-                'media.manage_media' => [
-                    'label' => 'backend::lang.permissions.manage_media',
-                    'tab' => 'system::lang.permissions.name',
-                ],
-                'backend.allow_unsafe_markdown' => [
-                    'label' => 'backend::lang.permissions.allow_unsafe_markdown',
-                    'tab' => 'system::lang.permissions.name',
-                    'roles' => UserRole::CODE_DEVELOPER,
-                ],
+                    'tab'   => 'system::lang.permissions.name'
+                ]
             ]);
         });
     }
@@ -195,21 +157,20 @@ class ServiceProvider extends ModuleServiceProvider
     protected function registerBackendWidgets()
     {
         WidgetManager::instance()->registerFormWidgets(function ($manager) {
-            $manager->registerFormWidget('Backend\FormWidgets\CodeEditor', 'codeeditor');
-            $manager->registerFormWidget('Backend\FormWidgets\RichEditor', 'richeditor');
-            $manager->registerFormWidget('Backend\FormWidgets\MarkdownEditor', 'markdown');
-            $manager->registerFormWidget('Backend\FormWidgets\FileUpload', 'fileupload');
-            $manager->registerFormWidget('Backend\FormWidgets\Relation', 'relation');
-            $manager->registerFormWidget('Backend\FormWidgets\DatePicker', 'datepicker');
-            $manager->registerFormWidget('Backend\FormWidgets\TimePicker', 'timepicker');
-            $manager->registerFormWidget('Backend\FormWidgets\ColorPicker', 'colorpicker');
-            $manager->registerFormWidget('Backend\FormWidgets\DataTable', 'datatable');
-            $manager->registerFormWidget('Backend\FormWidgets\RecordFinder', 'recordfinder');
-            $manager->registerFormWidget('Backend\FormWidgets\Repeater', 'repeater');
-            $manager->registerFormWidget('Backend\FormWidgets\TagList', 'taglist');
-            $manager->registerFormWidget('Backend\FormWidgets\MediaFinder', 'mediafinder');
-            $manager->registerFormWidget('Backend\FormWidgets\NestedForm', 'nestedform');
-            $manager->registerFormWidget('Backend\FormWidgets\Sensitive', 'sensitive');
+            $manager->registerFormWidget(\Backend\FormWidgets\CodeEditor::class, 'codeeditor');
+            $manager->registerFormWidget(\Backend\FormWidgets\RichEditor::class, 'richeditor');
+            $manager->registerFormWidget(\Backend\FormWidgets\MarkdownEditor::class, 'markdown');
+            $manager->registerFormWidget(\Backend\FormWidgets\FileUpload::class, 'fileupload');
+            $manager->registerFormWidget(\Backend\FormWidgets\Relation::class, 'relation');
+            $manager->registerFormWidget(\Backend\FormWidgets\DatePicker::class, 'datepicker');
+            $manager->registerFormWidget(\Backend\FormWidgets\TimePicker::class, 'timepicker');
+            $manager->registerFormWidget(\Backend\FormWidgets\ColorPicker::class, 'colorpicker');
+            $manager->registerFormWidget(\Backend\FormWidgets\DataTable::class, 'datatable');
+            $manager->registerFormWidget(\Backend\FormWidgets\RecordFinder::class, 'recordfinder');
+            $manager->registerFormWidget(\Backend\FormWidgets\Repeater::class, 'repeater');
+            $manager->registerFormWidget(\Backend\FormWidgets\TagList::class, 'taglist');
+            $manager->registerFormWidget(\Backend\FormWidgets\NestedForm::class, 'nestedform');
+            $manager->registerFormWidget(\Backend\FormWidgets\Sensitive::class, 'sensitive');
         });
     }
 
@@ -224,7 +185,7 @@ class ServiceProvider extends ModuleServiceProvider
                     'label'       => 'backend::lang.branding.menu_label',
                     'description' => 'backend::lang.branding.menu_description',
                     'category'    => SettingsManager::CATEGORY_SYSTEM,
-                    'icon'        => 'icon-paint-brush',
+                    'icon'        => 'octo-icon-paint-brush-1',
                     'class'       => 'Backend\Models\BrandSetting',
                     'permissions' => ['backend.manage_branding'],
                     'order'       => 500,
@@ -244,7 +205,7 @@ class ServiceProvider extends ModuleServiceProvider
                     'label'       => 'backend::lang.myaccount.menu_label',
                     'description' => 'backend::lang.myaccount.menu_description',
                     'category'    => SettingsManager::CATEGORY_MYSETTINGS,
-                    'icon'        => 'icon-user',
+                    'icon'        => 'octo-icon-user-account',
                     'url'         => Backend::url('backend/users/myaccount'),
                     'order'       => 500,
                     'context'     => 'mysettings',
@@ -254,7 +215,7 @@ class ServiceProvider extends ModuleServiceProvider
                     'label'       => 'backend::lang.backend_preferences.menu_label',
                     'description' => 'backend::lang.backend_preferences.menu_description',
                     'category'    => SettingsManager::CATEGORY_MYSETTINGS,
-                    'icon'        => 'icon-laptop',
+                    'icon'        => 'octo-icon-app-window',
                     'url'         => Backend::url('backend/preferences'),
                     'permissions' => ['backend.manage_preferences'],
                     'order'       => 510,
@@ -264,7 +225,7 @@ class ServiceProvider extends ModuleServiceProvider
                     'label'       => 'backend::lang.access_log.menu_label',
                     'description' => 'backend::lang.access_log.menu_description',
                     'category'    => SettingsManager::CATEGORY_LOGS,
-                    'icon'        => 'icon-lock',
+                    'icon'        => 'octo-icon-lock',
                     'url'         => Backend::url('backend/accesslogs'),
                     'permissions' => ['system.access_logs'],
                     'order'       => 920

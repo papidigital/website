@@ -1,6 +1,7 @@
 <?php namespace Backend\Widgets;
 
 use Db;
+use Str;
 use Html;
 use Lang;
 use Backend;
@@ -10,8 +11,6 @@ use October\Rain\Html\Helper as HtmlHelper;
 use October\Rain\Router\Helper as RouterHelper;
 use System\Helpers\DateTime as DateTimeHelper;
 use System\Classes\PluginManager;
-use System\Classes\MediaLibrary;
-use System\Classes\ImageResizer;
 use Backend\Classes\ListColumn;
 use Backend\Classes\WidgetBase;
 use October\Rain\Database\Model;
@@ -19,7 +18,7 @@ use ApplicationException;
 use BackendAuth;
 
 /**
- * List Widget
+ * Lists Widget
  * Used for building back end lists, renders a list of model objects
  *
  * @package october\backend
@@ -64,6 +63,11 @@ class Lists extends WidgetBase
     public $recordsPerPage;
 
     /**
+     * @var array perPageOptions is the number of items per page.
+     */
+    public $perPageOptions;
+
+    /**
      * @var bool Shows the sorting options for each column.
      */
     public $showSorting = true;
@@ -82,16 +86,6 @@ class Lists extends WidgetBase
      * @var bool Display the list set up used for column visibility and ordering.
      */
     public $showSetup = false;
-
-    /**
-     * @var bool Display parent/child relationships in the list.
-     */
-    public $showTree = false;
-
-    /**
-     * @var bool Expand the tree nodes by default.
-     */
-    public $treeExpanded = false;
 
     /**
      * @var bool|string Display pagination when limiting records per page.
@@ -134,7 +128,7 @@ class Lists extends WidgetBase
     protected $visibleColumns;
 
     /**
-     * @var array Model data collection.
+     * @var object Model data collection.
      */
     protected $records;
 
@@ -200,11 +194,10 @@ class Lists extends WidgetBase
             'showPageNumbers',
             'recordsPerPage',
             'showSorting',
+            'perPageOptions',
             'defaultSort',
             'showCheckboxes',
             'showSetup',
-            'showTree',
-            'treeExpanded',
             'showPagination',
             'customViewPath',
         ]);
@@ -225,7 +218,6 @@ class Lists extends WidgetBase
         }
 
         $this->validateModel();
-        $this->validateTree();
     }
 
     /**
@@ -246,7 +238,7 @@ class Lists extends WidgetBase
     }
 
     /**
-     * Prepares the list data
+     * prepareVars for display
      */
     public function prepareVars()
     {
@@ -262,14 +254,14 @@ class Lists extends WidgetBase
         $this->vars['showSorting'] = $this->showSorting;
         $this->vars['sortColumn'] = $this->getSortColumn();
         $this->vars['sortDirection'] = $this->sortDirection;
-        $this->vars['showTree'] = $this->showTree;
-        $this->vars['treeLevel'] = 0;
 
         if ($this->showPagination) {
             $this->vars['pageCurrent'] = $this->records->currentPage();
+
             // Store the currently visited page number in the session so the same
             // data can be displayed when the user returns to this list.
             $this->putSession('lastVisitedPage', $this->vars['pageCurrent']);
+
             if ($this->showPageNumbers) {
                 $this->vars['recordTotal'] = $this->records->total();
                 $this->vars['pageLast'] = $this->records->lastPage();
@@ -292,6 +284,7 @@ class Lists extends WidgetBase
     public function onRefresh()
     {
         $this->prepareVars();
+
         return ['#'.$this->getId() => $this->makePartial('list')];
     }
 
@@ -301,6 +294,7 @@ class Lists extends WidgetBase
     public function onPaginate()
     {
         $this->currentPageNumber = post('page');
+
         return $this->onRefresh();
     }
 
@@ -310,6 +304,7 @@ class Lists extends WidgetBase
     public function onFilter()
     {
         $this->currentPageNumber = 1;
+
         return $this->onRefresh();
     }
 
@@ -384,7 +379,6 @@ class Lists extends WidgetBase
         $primarySearchable = [];
         $relationSearchable = [];
 
-        $columnsToSearch = [];
         if (!empty($this->searchTerm) && ($searchableColumns = $this->getSearchableColumns())) {
             foreach ($searchableColumns as $column) {
                 /*
@@ -415,8 +409,7 @@ class Lists extends WidgetBase
          * Prepare related eager loads (withs) and custom selects (joins)
          */
         foreach ($this->getVisibleColumns() as $column) {
-            // If useRelationCount is enabled, eager load the count of the relation into $relation_count
-            if ($column->relation && @$column->config['useRelationCount']) {
+            if ($column->useRelationCount()) {
                 $query->withCount($column->relation);
             }
 
@@ -524,15 +517,14 @@ class Lists extends WidgetBase
         /*
          * Apply sorting
          */
-        if (($sortColumn = $this->getSortColumn()) && !$this->showTree && in_array($sortColumn, array_keys($this->getVisibleColumns()))) {
+        if ($this->useSorting() && ($sortColumn = $this->getSortColumn())) {
             if (($column = array_get($this->allColumns, $sortColumn)) && $column->valueFrom) {
                 $sortColumn = $this->isColumnPivot($column)
                     ? 'pivot_' . $column->valueFrom
                     : $column->valueFrom;
             }
 
-            // Set the sorting column to $relation_count if useRelationCount enabled
-            if (isset($column->relation) && @$column->config['useRelationCount']) {
+            if ($column->useRelationCount()) {
                 $sortColumn = $column->relation . '_count';
             }
 
@@ -581,12 +573,6 @@ class Lists extends WidgetBase
         return $query;
     }
 
-    public function prepareModel()
-    {
-        traceLog('Method ' . __METHOD__ . '() has been deprecated, please use the ' . __CLASS__ . '::prepareQuery() method instead.');
-        return $this->prepareQuery();
-    }
-
     /**
      * Returns all the records from the supplied model, after filtering.
      * @return Collection
@@ -595,11 +581,8 @@ class Lists extends WidgetBase
     {
         $query = $this->prepareQuery();
 
-        if ($this->showTree) {
-            $records = $query->getNested();
-        }
-        elseif ($this->showPagination) {
-            $method            = $this->showPageNumbers ? 'paginate' : 'simplePaginate';
+        if ($this->showPagination) {
+            $method = $this->showPageNumbers ? 'paginate' : 'simplePaginate';
             $currentPageNumber = $this->getCurrentPageNumber($query);
             $records = $query->{$method}($this->recordsPerPage, $currentPageNumber);
         }
@@ -643,6 +626,7 @@ class Lists extends WidgetBase
      */
     protected function getCurrentPageNumber($query)
     {
+        // Restore the last visited page from the session if available.
         $currentPageNumber = $this->currentPageNumber;
         if (empty($currentPageNumber)) {
             $currentPageNumber = $this->getSession('lastVisitedPage');
@@ -663,6 +647,84 @@ class Lists extends WidgetBase
     }
 
     /**
+     * hasRecordAction will specify is anything is clickable
+     */
+    public function hasRecordAction(): bool
+    {
+        return isset($this->recordOnClick) || isset($this->recordUrl);
+    }
+
+    /**
+     * getRecordAction
+     */
+    public function getRecordAction($record): ?array
+    {
+        if (!$this->hasRecordAction()) {
+            return null;
+        }
+
+        $url = $this->getRecordUrl($record);
+        $onClick = $this->getRecordOnClick($record);
+
+        /**
+         * @event backend.list.overrideRecordAction
+         * Overrides the record url or onclick event in a list widget.
+         *
+         * If a value is returned from this event, it will be used as the url for the provided record.
+         * $url contains the default url and $record is a reference to the model instance.
+         * Example usage:
+         *
+         *     Event::listen('backend.list.overrideRecordAction', function ($listWidget, $record, $url, $onClick) {
+         *         if ($record->user_id !== BackendAuth::getUser()->id) {
+         *             return 'acme/blog/posts/preview/' . $record->id;
+         *         }
+         *     });
+         *
+         * Or
+         *
+         *     $listWidget->bindEvent('list.overrideRecordAction', function ($record, $url, $onClick) {
+         *         if ($record->user_id !== BackendAuth::getUser()->id) {
+         *             return 'acme/blog/posts/preview/' . $record->id;
+         *         }
+         *     });
+         *
+         */
+        if ($event = $this->fireSystemEvent('backend.list.overrideRecordAction', [$record, $url, $onClick])) {
+            if (is_array($event)) {
+                // Override onclick event
+                if (array_key_exists('onclick', $event)) {
+                    if ($event['onclick'] === null) {
+                        $onClick = null;
+                    }
+                    else {
+                        $onClick = Html::attributes(['onclick' => $event['onclick']]);
+                    }
+                }
+
+                // Override URL
+                if (array_key_exists('url', $event)) {
+                    if ($event['url'] === null) {
+                        $url = 'javascript:;';
+                    }
+                    else {
+                        $url = Backend::url($event['url']);
+                    }
+                }
+
+                // Override clickable entirely
+                if (array_key_exists('clickable', $event) && $event['clickable'] === false) {
+                    return null;
+                }
+            }
+            elseif (is_string($event)) {
+                $url = Backend::url($event);
+            }
+        }
+
+        return [$url, $onClick];
+    }
+
+    /**
      * Returns the record URL address for a list row.
      * @param  Model $record
      * @return string
@@ -678,6 +740,7 @@ class Lists extends WidgetBase
         }
 
         $url = RouterHelper::replaceParameters($record, $this->recordUrl);
+
         return Backend::url($url);
     }
 
@@ -693,6 +756,7 @@ class Lists extends WidgetBase
         }
 
         $recordOnClick = RouterHelper::replaceParameters($record, $this->recordOnClick);
+
         return Html::attributes(['onclick' => $recordOnClick]);
     }
 
@@ -835,7 +899,7 @@ class Lists extends WidgetBase
         /*
          * Use a supplied column order
          */
-        if ($columnOrder = $this->getSession('order', null)) {
+        if ($columnOrder = $this->getUserPreference('order', null)) {
             $orderedDefinitions = [];
             foreach ($columnOrder as $column) {
                 if (isset($this->allColumns[$column])) {
@@ -945,10 +1009,6 @@ class Lists extends WidgetBase
             $total++;
         }
 
-        if ($this->showTree) {
-            $total++;
-        }
-
         return $total;
     }
 
@@ -985,7 +1045,7 @@ class Lists extends WidgetBase
     }
 
     /**
-     * Returns a raw column value
+     * getColumnValueRaw returns a raw column value
      * @return string
      */
     public function getColumnValueRaw($record, $column)
@@ -1025,12 +1085,17 @@ class Lists extends WidgetBase
          * if the value is NULL.
          */
         else {
-            if ($record->hasRelation($columnName) && array_key_exists($columnName, $record->attributes)) {
+            if (
+                $record->hasRelation($columnName) &&
+                array_key_exists($columnName, $record->attributes)
+            ) {
                 $value = $record->attributes[$columnName];
-            // Load the value from the relationship counter if useRelationCount is specified
-            } elseif ($column->relation && @$column->config['useRelationCount']) {
-                $value = $record->{"{$column->relation}_count"};
-            } else {
+            }
+            elseif ($column->useRelationCount()) {
+                $countColumnName = Str::snake($column->relation) . '_count';
+                $value = $record->{$countColumnName};
+            }
+            else {
                 $value = $record->{$columnName};
             }
         }
@@ -1061,13 +1126,27 @@ class Lists extends WidgetBase
     }
 
     /**
-     * Returns a column value, with filters applied
-     * @return string
+     * getColumnValue returns a column value, with filters applied
      */
     public function getColumnValue($record, $column)
     {
-        $value = $this->getColumnValueRaw($record, $column);
+        /*
+         * Custom display attribute that pulls directly from the model
+         */
+        if ($column->displayFrom) {
+            $columnName = $column->displayFrom;
+            $value = $record->{$columnName};
+        }
+        /*
+         * Standard value
+         */
+        else {
+            $value = $this->getColumnValueRaw($record, $column);
+        }
 
+        /*
+         * Apply filters
+         */
         if (method_exists($this, 'eval'. studly_case($column->type) .'TypeValue')) {
             $value = $this->{'eval'. studly_case($column->type) .'TypeValue'}($record, $column, $value);
         }
@@ -1078,8 +1157,8 @@ class Lists extends WidgetBase
         /*
          * Apply default value.
          */
-        if (($value === '' || is_null($value)) && !empty($column->defaults)) {
-            $value = Lang::get($column->defaults);
+        if ($value === '' || $value === null) {
+            $value = $column->defaults;
         }
 
         /**
@@ -1141,6 +1220,19 @@ class Lists extends WidgetBase
         return $value;
     }
 
+    /**
+     * getColumnTimezonePreference for date specific columns
+     */
+    protected function getColumnTimezonePreference($column, $default = true): bool
+    {
+        // @deprecated API
+        if (!empty($column->config['ignoreTimezone'])) {
+            return false;
+        }
+
+        return (bool) $column->getConfig('useTimezone', $default);
+    }
+
     //
     // Value processing
     //
@@ -1190,43 +1282,38 @@ class Lists extends WidgetBase
     }
 
     /**
-     * Process an image value
+     * evalImageTypeValue will process an image value
      * @return string
      */
     protected function evalImageTypeValue($record, $column, $value)
     {
         $config = $column->config;
 
-        // Get config options with defaults
         $width = isset($config['width']) ? $config['width'] : 50;
         $height = isset($config['height']) ? $config['height'] : 50;
         $options = isset($config['options']) ? $config['options'] : [];
 
-        // Handle attachMany relationships
         if (isset($record->attachMany[$column->columnName])) {
             $image = $value->first();
-
-        // Handle attachOne relationships
-        } elseif (isset($record->attachOne[$column->columnName])) {
+        }
+        elseif (isset($record->attachOne[$column->columnName])) {
             $image = $value;
-
-        // Handle absolute URLs
-        } elseif (str_contains($value, '://')) {
+        }
+        elseif (strpos($value, '://') !== false) {
             $image = $value;
-
-        // Assume all other values to be from the media library
-        } else {
-            $image = MediaLibrary::url($value);
+        }
+        else {
+            $image = \Media\Classes\MediaLibrary::url($value);
         }
 
         if (!is_null($image)) {
-            $imageUrl = ImageResizer::filterGetUrl($image, $width, $height, $options);
-            return "<img src='$imageUrl' width='$width' height='$height' />";
+            $imageUrl = \System\Classes\ResizeImages::resize($image, $width, $height, $options);
+            return '<img src="'.$imageUrl.'" width="'.$width.'" height="'.$height.'" alt="" />';
         }
     }
 
     /**
-     * Process as number, proxy to text
+     * evalNumberTypeValue process as number, proxy to text but uses different styling
      * @return string
      */
     protected function evalNumberTypeValue($record, $column, $value)
@@ -1287,12 +1374,9 @@ class Lists extends WidgetBase
         $options = [
             'defaultValue' => $value,
             'format' => $column->format,
-            'formatAlias' => 'dateTimeLongMin'
+            'formatAlias' => 'dateTimeLongMin',
+            'useTimezone' => $this->getColumnTimezonePreference($column),
         ];
-
-        if (!empty($column->config['ignoreTimezone'])) {
-            $options['ignoreTimezone'] = true;
-        }
 
         return Backend::dateTime($dateTime, $options);
     }
@@ -1315,12 +1399,9 @@ class Lists extends WidgetBase
         $options = [
             'defaultValue' => $value,
             'format' => $column->format,
-            'formatAlias' => 'time'
+            'formatAlias' => 'time',
+            'useTimezone' => $this->getColumnTimezonePreference($column, false),
         ];
-
-        if (!empty($column->config['ignoreTimezone'])) {
-            $options['ignoreTimezone'] = true;
-        }
 
         return Backend::dateTime($dateTime, $options);
     }
@@ -1346,12 +1427,9 @@ class Lists extends WidgetBase
         $options = [
             'defaultValue' => $value,
             'format' => $column->format,
-            'formatAlias' => 'dateLongMin'
+            'formatAlias' => 'dateLongMin',
+            'useTimezone' => $this->getColumnTimezonePreference($column, false),
         ];
-
-        if (!empty($column->config['ignoreTimezone'])) {
-            $options['ignoreTimezone'] = true;
-        }
 
         return Backend::dateTime($dateTime, $options);
     }
@@ -1371,12 +1449,9 @@ class Lists extends WidgetBase
 
         $options = [
             'defaultValue' => $value,
-            'timeSince' => true
+            'timeSince' => true,
+            'useTimezone' => $this->getColumnTimezonePreference($column),
         ];
-
-        if (!empty($column->config['ignoreTimezone'])) {
-            $options['ignoreTimezone'] = true;
-        }
 
         return Backend::dateTime($dateTime, $options);
     }
@@ -1396,15 +1471,35 @@ class Lists extends WidgetBase
 
         $options = [
             'defaultValue' => $value,
-            'timeTense' => true
+            'timeTense' => true,
+            'useTimezone' => $this->getColumnTimezonePreference($column),
         ];
-
-        if (!empty($column->config['ignoreTimezone'])) {
-            $options['ignoreTimezone'] = true;
-        }
 
         return Backend::dateTime($dateTime, $options);
     }
+
+    /**
+     * evalSelectableTypeValue processes as selectable value types for 'dropdown',
+     * 'radio', 'balloon-selector' and similar form field types
+     */
+    protected function evalSelectableTypeValue($record, $column, $value)
+    {
+        $formField = new \Backend\Classes\FormField($column->columnName, $column->label);
+
+        $fieldOptions = $formField->getOptionsFromModel(
+            $this->model,
+            $column->config['options'] ?? null,
+            $record->toArray()
+        );
+
+        return is_array($value)
+            ? $value = implode(', ', array_map(function ($value) use ($fieldOptions) {
+                    return $fieldOptions[$value];
+                }, $value))
+            : $fieldOptions[$value] ?? null
+        ;
+    }
+
     /**
      * Process as background color, to be seen at list
      */
@@ -1412,6 +1507,7 @@ class Lists extends WidgetBase
     {
         return  '<span style="width:30px; height:30px; display:inline-block; background:'.e($value).'; padding:10px"><span>';
     }
+
     /**
      * Validates a column type as a date
      */
@@ -1450,14 +1546,12 @@ class Lists extends WidgetBase
      */
     public function setSearchTerm($term, $resetPagination = false)
     {
-        if (!empty($term)) {
-            $this->showTree = false;
-        }
-
+        // Reset pagination
         if ($resetPagination) {
             $this->currentPageNumber = 1;
         }
 
+        // Set the actual term
         $this->searchTerm = $term;
     }
 
@@ -1545,8 +1639,8 @@ class Lists extends WidgetBase
             $this->currentPageNumber = post('page');
 
             /*
-             * Try to refresh the list with the new sortOptions. Put the
-             * new sortOptions in to the session if the query succeeded.
+             * Attempt a refresh with the new sortOptions and update the
+             * the user session only if the query succeeded.
              */
             $result = $this->onRefresh();
 
@@ -1606,7 +1700,15 @@ class Lists extends WidgetBase
         return $this->sortColumn;
     }
 
-    /*
+    /**
+     * useSorting
+     */
+    protected function useSorting(): bool
+    {
+        return true;
+    }
+
+    /**
      * Returns the current sort direction or default of 'asc'
      */
     public function getSortDirection()
@@ -1669,8 +1771,11 @@ class Lists extends WidgetBase
         }
 
         $this->recordsPerPage = post('records_per_page', $this->recordsPerPage);
-        $this->putSession('order', post('column_order'));
+
+        $this->putUserPreference('order', post('column_order'));
+
         $this->putUserPreference('per_page', $this->recordsPerPage);
+
         return $this->onRefresh();
     }
 
@@ -1679,8 +1784,12 @@ class Lists extends WidgetBase
      */
     public function onResetSetup()
     {
-        $this->clearUserPreference('visible');
-        $this->clearUserPreference('per_page');
+        $this->resetUserPreference('visible');
+
+        $this->resetUserPreference('per_page');
+
+        $this->resetUserPreference('order');
+
         return $this->onRefresh();
     }
 
@@ -1689,12 +1798,16 @@ class Lists extends WidgetBase
      */
     protected function getSetupPerPageOptions()
     {
-        $perPageOptions = [20, 40, 80, 100, 120];
+        $perPageOptions = is_array($this->perPageOptions)
+            ? $this->perPageOptions
+            : [20, 40, 80, 100, 120];
+
         if (!in_array($this->recordsPerPage, $perPageOptions)) {
             $perPageOptions[] = $this->recordsPerPage;
         }
 
         sort($perPageOptions);
+
         return $perPageOptions;
     }
 
@@ -1712,56 +1825,6 @@ class Lists extends WidgetBase
         }
 
         return array_merge($columns, $this->getVisibleColumns());
-    }
-
-    //
-    // Tree
-    //
-
-    /**
-     * Validates the model and settings if showTree is used
-     * @return void
-     */
-    public function validateTree()
-    {
-        if (!$this->showTree) {
-            return;
-        }
-
-        $this->showSorting = $this->showPagination = false;
-
-        if (!$this->model->methodExists('getChildren')) {
-            throw new ApplicationException(
-                'To display list as a tree, the specified model must have a method "getChildren"'
-            );
-        }
-
-        if (!$this->model->methodExists('getChildCount')) {
-            throw new ApplicationException(
-                'To display list as a tree, the specified model must have a method "getChildCount"'
-            );
-        }
-    }
-
-    /**
-     * Checks if a node (model) is expanded in the session.
-     * @param  Model $node
-     * @return boolean
-     */
-    public function isTreeNodeExpanded($node)
-    {
-        return $this->getSession('tree_node_status_' . $node->getKey(), $this->treeExpanded);
-    }
-
-    /**
-     * Sets a node (model) to an expanded or collapsed state, stored in the
-     * session, then renders the list again.
-     * @return string List HTML contents.
-     */
-    public function onToggleTreeNode()
-    {
-        $this->putSession('tree_node_status_' . post('node_id'), post('status') ? 0 : 1);
-        return $this->onRefresh();
     }
 
     //

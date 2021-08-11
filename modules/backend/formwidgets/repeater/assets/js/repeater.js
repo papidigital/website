@@ -18,17 +18,17 @@
     // ============================
 
     var Repeater = function(element, options) {
-        this.options   = options
-        this.$el       = $(element)
-        this.$sortable = $(options.sortableContainer, this.$el)
+        this.options   = options;
+        this.$el       = $(element);
+        this.$sortable = $(options.sortableContainer, this.$el);
 
-        $.oc.foundation.controlUtils.markDisposable(element)
-        Base.call(this)
-        this.init()
+        $.oc.foundation.controlUtils.markDisposable(element);
+        Base.call(this);
+        this.init();
     }
 
-    Repeater.prototype = Object.create(BaseProto)
-    Repeater.prototype.constructor = Repeater
+    Repeater.prototype = Object.create(BaseProto);
+    Repeater.prototype.constructor = Repeater;
 
     Repeater.DEFAULTS = {
         sortableHandle: '.repeater-item-handle',
@@ -36,44 +36,44 @@
         titleFrom: null,
         minItems: null,
         maxItems: null,
-        style: 'default',
+        style: 'default'
     }
 
     Repeater.prototype.init = function() {
-        this.bindSorting()
+        this.bindSorting();
 
-        this.$el.on('ajaxDone', '> .field-repeater-items > .field-repeater-item > .repeater-item-remove > [data-repeater-remove]', this.proxy(this.onRemoveItemSuccess))
-        this.$el.on('ajaxDone', '> .field-repeater-add-item > [data-repeater-add]', this.proxy(this.onAddItemSuccess))
-        this.$el.on('click', '> ul > li > .repeater-item-collapse .repeater-item-collapse-one', this.proxy(this.toggleCollapse))
-        this.$el.on('click', '> .field-repeater-add-item > [data-repeater-add-group]', this.proxy(this.clickAddGroupButton))
+        this.$el.on('ajaxDone', '> .field-repeater-items > .field-repeater-item > .repeater-item-remove > [data-repeater-remove]', this.proxy(this.onRemoveItemSuccess));
+        this.$el.on('ajaxDone', '> .field-repeater-add-item > [data-repeater-add]', this.proxy(this.onAddItemSuccess));
+        this.$el.on('click', '> ul > li > .repeater-item-collapse .repeater-item-collapse-one', this.proxy(this.toggleCollapse));
+        this.$el.on('click', '> .field-repeater-add-item > [data-repeater-add-group]', this.proxy(this.clickAddGroupButton));
 
-        this.$el.one('dispose-control', this.proxy(this.dispose))
+        this.$el.one('dispose-control', this.proxy(this.dispose));
 
-        this.togglePrompt()
-        this.applyStyle()
+        this.togglePrompt();
+        this.applyStyle();
     }
 
     Repeater.prototype.dispose = function() {
-        this.$sortable.sortable('destroy')
+        this.$sortable.sortable('destroy');
 
-        this.$el.off('ajaxDone', '> .field-repeater-items > .field-repeater-item > .repeater-item-remove > [data-repeater-remove]', this.proxy(this.onRemoveItemSuccess))
-        this.$el.off('ajaxDone', '> .field-repeater-add-item > [data-repeater-add]', this.proxy(this.onAddItemSuccess))
-        this.$el.off('click', '> .field-repeater-items > .field-repeater-item > .repeater-item-collapse .repeater-item-collapse-one', this.proxy(this.toggleCollapse))
-        this.$el.off('click', '> .field-repeater-add-item > [data-repeater-add-group]', this.proxy(this.clickAddGroupButton))
+        this.$el.off('ajaxDone', '> .field-repeater-items > .field-repeater-item > .repeater-item-remove > [data-repeater-remove]', this.proxy(this.onRemoveItemSuccess));
+        this.$el.off('ajaxDone', '> .field-repeater-add-item > [data-repeater-add]', this.proxy(this.onAddItemSuccess));
+        this.$el.off('click', '> .field-repeater-items > .field-repeater-item > .repeater-item-collapse .repeater-item-collapse-one', this.proxy(this.toggleCollapse));
+        this.$el.off('click', '> .field-repeater-add-item > [data-repeater-add-group]', this.proxy(this.clickAddGroupButton));
 
-        this.$el.off('dispose-control', this.proxy(this.dispose))
-        this.$el.removeData('oc.repeater')
+        this.$el.off('dispose-control', this.proxy(this.dispose));
+        this.$el.removeData('oc.repeater');
 
-        this.$el = null
-        this.$sortable = null
-        this.options = null
+        this.$el = null;
+        this.$sortable = null;
+        this.options = null;
 
-        BaseProto.dispose.call(this)
+        BaseProto.dispose.call(this);
     }
 
     // Deprecated
     Repeater.prototype.unbind = function() {
-        this.dispose()
+        this.dispose();
     }
 
     Repeater.prototype.bindSorting = function() {
@@ -82,24 +82,24 @@
             nested: false
         }
 
-        this.$sortable.sortable(sortableOptions)
+        this.$sortable.sortable(sortableOptions);
     }
 
     Repeater.prototype.clickAddGroupButton = function(ev) {
-        var $self = this;
-        var templateHtml = $('> [data-group-palette-template]', this.$el).html(),
+        var $self = this,
+            templateHtml = $('> [data-group-palette-template]', this.$el).html(),
             $target = $(ev.target),
             $form = this.$el.closest('form'),
-            $loadContainer = $target.closest('.loading-indicator-container')
+            $loadContainer = $target.closest('.loading-indicator-container');
 
         $target.ocPopover({
             content: templateHtml
-        })
+        });
 
-        var $container = $target.data('oc.popover').$container
+        var $container = $target.data('oc.popover').$container;
 
         // Initialize the scrollpad control in the popup
-        $container.trigger('render')
+        $container.trigger('render');
 
         $container
             .on('click', 'a', function (ev) {
@@ -112,33 +112,29 @@
                     $loadContainer.loadIndicator('hide')
                     $self.togglePrompt()
                 })
-            })
+            });
 
-        $('[data-repeater-add]', $container).data('request-form', $form)
+        $('[data-repeater-add]', $container).data('request-form', $form);
     }
 
     Repeater.prototype.onRemoveItemSuccess = function(ev) {
-        var $target = $(ev.target)
-
         // Allow any widgets inside a deleted item to be disposed
-        $target.closest('.field-repeater-item').find('[data-disposable]').each(function () {
+        $(ev.target).closest('.field-repeater-item').find('[data-disposable]').each(function () {
             var $elem = $(this),
                 control = $elem.data('control'),
-                widget = $elem.data('oc.' + control)
+                widget = $elem.data('oc.' + control);
 
             if (widget && typeof widget['dispose'] === 'function') {
-                widget.dispose()
+                widget.dispose();
             }
-        })
+        });
 
-        $target.closest('[data-field-name]').trigger('change.oc.formwidget')
-        $target.closest('.field-repeater-item').remove()
-        this.togglePrompt()
+        $(ev.target).closest('.field-repeater-item').remove();
+        this.togglePrompt();
     }
 
     Repeater.prototype.onAddItemSuccess = function(ev) {
-        this.togglePrompt()
-        $(ev.target).closest('[data-field-name]').trigger('change.oc.formwidget')
+        this.togglePrompt();
     }
 
     Repeater.prototype.togglePrompt = function () {
@@ -146,54 +142,54 @@
             var repeatedItems = this.$el.find('> .field-repeater-items > .field-repeater-item').length,
                 $removeItemBtn = this.$el.find('> .field-repeater-items > .field-repeater-item > .repeater-item-remove');
 
-            $removeItemBtn.toggleClass('disabled', !(repeatedItems > this.options.minItems))
+            $removeItemBtn.toggleClass('disabled', !(repeatedItems > this.options.minItems));
         }
 
         if (this.options.maxItems && this.options.maxItems > 0) {
             var repeatedItems = this.$el.find('> .field-repeater-items > .field-repeater-item').length,
-                $addItemBtn = this.$el.find('> .field-repeater-add-item')
+                $addItemBtn = this.$el.find('> .field-repeater-add-item');
 
-            $addItemBtn.toggle(repeatedItems < this.options.maxItems)
+            $addItemBtn.toggle(repeatedItems < this.options.maxItems);
         }
     }
 
     Repeater.prototype.toggleCollapse = function(ev) {
         var $item = $(ev.target).closest('.field-repeater-item'),
-            isCollapsed = $item.hasClass('collapsed')
+            isCollapsed = $item.hasClass('collapsed');
 
-        ev.preventDefault()
+        ev.preventDefault();
 
         if (this.getStyle() === 'accordion') {
             if (isCollapsed) {
-                this.expand($item)
+                this.expand($item);
             }
-            return
+            return;
         }
 
         if (ev.ctrlKey || ev.metaKey) {
-            isCollapsed ? this.expandAll() : this.collapseAll()
+            isCollapsed ? this.expandAll() : this.collapseAll();
         }
         else {
-            isCollapsed ? this.expand($item) : this.collapse($item)
+            isCollapsed ? this.expand($item) : this.collapse($item);
         }
     }
 
     Repeater.prototype.collapseAll = function() {
         var self = this,
-            items = $(this.$el).children('.field-repeater-items').children('.field-repeater-item')
+            items = $(this.$el).children('.field-repeater-items').children('.field-repeater-item');
 
         $.each(items, function(key, item){
-            self.collapse($(item))
-        })
+            self.collapse($(item));
+        });
     }
 
     Repeater.prototype.expandAll = function() {
         var self = this,
-            items = $(this.$el).children('.field-repeater-items').children('.field-repeater-item')
+            items = $(this.$el).children('.field-repeater-items').children('.field-repeater-item');
 
         $.each(items, function(key, item){
-            self.expand($(item))
-        })
+            self.expand($(item));
+        });
     }
 
     Repeater.prototype.collapse = function($item) {
@@ -203,28 +199,28 @@
 
     Repeater.prototype.expand = function($item) {
         if (this.getStyle() === 'accordion') {
-            this.collapseAll()
+            this.collapseAll();
         }
-        $item.removeClass('collapsed')
+        $item.removeClass('collapsed');
     }
 
     Repeater.prototype.getCollapseTitle = function($item) {
         var $target,
             defaultText = '',
-            explicitText = $item.data('collapse-title')
+            explicitText = $item.data('collapse-title');
 
         if (explicitText) {
-            return explicitText
+            return explicitText;
         }
 
         if (this.options.titleFrom) {
-            $target = $('[data-field-name="'+this.options.titleFrom+'"]', $item)
+            $target = $('[data-field-name="'+this.options.titleFrom+'"]', $item);
             if (!$target.length) {
-                $target = $item
+                $target = $item;
             }
         }
         else {
-            $target = $item
+            $target = $item;
         }
 
         var $textInput = $('input[type=text]:first, select:first', $target).first();
@@ -236,13 +232,13 @@
                     return $textInput.val();
             }
         } else {
-            var $disabledTextInput = $('.text-field:first > .form-control', $target)
+            var $disabledTextInput = $('.text-field:first > .form-control', $target);
             if ($disabledTextInput.length) {
-                return $disabledTextInput.text()
+                return $disabledTextInput.text();
             }
         }
 
-        return defaultText
+        return defaultText;
     }
 
     Repeater.prototype.getStyle = function() {
@@ -250,7 +246,7 @@
 
         // Validate style
         if (this.options.style && ['collapsed', 'accordion'].indexOf(this.options.style) !== -1) {
-            style = this.options.style
+            style = this.options.style;
         }
 
         return style;
@@ -258,27 +254,27 @@
 
     Repeater.prototype.applyStyle = function() {
         var style = this.getStyle(),
-            self = this,
-            items = $(this.$el).children('.field-repeater-items').children('.field-repeater-item')
+            items = $(this.$el).children('.field-repeater-items').children('.field-repeater-item'),
+            self = this;
 
         $.each(items, function(key, item) {
             switch (style) {
                 case 'collapsed':
-                    self.collapse($(item))
-                    break
+                    self.collapse($(item));
+                    break;
                 case 'accordion':
                     if (key !== 0) {
-                        self.collapse($(item))
+                        self.collapse($(item));
                     }
-                    break
+                    break;
             }
-        })
+        });
     }
 
     // FIELD REPEATER PLUGIN DEFINITION
     // ============================
 
-    var old = $.fn.fieldRepeater
+    var old = $.fn.fieldRepeater;
 
     $.fn.fieldRepeater = function (option) {
         var args = Array.prototype.slice.call(arguments, 1), result
@@ -289,26 +285,26 @@
             if (!data) $this.data('oc.repeater', (data = new Repeater(this, options)))
             if (typeof option == 'string') result = data[option].apply(data, args)
             if (typeof result != 'undefined') return false
-        })
+        });
 
-        return result ? result : this
+        return result ? result : this;
     }
 
-    $.fn.fieldRepeater.Constructor = Repeater
+    $.fn.fieldRepeater.Constructor = Repeater;
 
     // FIELD REPEATER NO CONFLICT
     // =================
 
     $.fn.fieldRepeater.noConflict = function () {
-        $.fn.fieldRepeater = old
-        return this
+        $.fn.fieldRepeater = old;
+        return this;
     }
 
     // FIELD REPEATER DATA-API
     // ===============
 
     $(document).render(function() {
-        $('[data-control="fieldrepeater"]').fieldRepeater()
+        $('[data-control="fieldrepeater"]').fieldRepeater();
     });
 
 }(window.jQuery);

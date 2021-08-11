@@ -8,7 +8,6 @@ class DbBackendUsers extends Migration
     public function up()
     {
         Schema::create('backend_users', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
             $table->increments('id');
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
@@ -20,6 +19,7 @@ class DbBackendUsers extends Migration
             $table->string('reset_password_code')->nullable()->index('reset_code_index');
             $table->text('permissions')->nullable();
             $table->boolean('is_activated')->default(0);
+            $table->boolean('is_superuser')->default(false);
             $table->integer('role_id')->unsigned()->nullable()->index('admin_role_index');
             $table->timestamp('activated_at')->nullable();
             $table->timestamp('last_login')->nullable();

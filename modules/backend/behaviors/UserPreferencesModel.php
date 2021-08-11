@@ -4,7 +4,7 @@ use System\Behaviors\SettingsModel;
 use Backend\Models\UserPreference;
 
 /**
- * User Preferences model extension, identical to System\Behaviors\SettingsModel
+ * UserPreferencesModel extension, identical to System\Behaviors\SettingsModel
  * except values are set against the logged in user's preferences via Backend\Models\UserPreference
  *
  * Add this the model class definition:
@@ -78,7 +78,7 @@ class UserPreferencesModel extends SettingsModel
     public function beforeModelSave()
     {
         $preferences = UserPreference::forUser();
-        list($namespace, $group, $item) = $preferences->parseKey($this->recordCode);
+        [$namespace, $group, $item] = $preferences->parseKey($this->recordCode);
         $this->model->item = $item;
         $this->model->group = $group;
         $this->model->namespace = $namespace;

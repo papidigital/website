@@ -1,6 +1,6 @@
 <?php namespace Cms\Classes;
 
-use System\Classes\MediaLibrary as SystemMediaLibrary;
+use Media\Classes\MediaLibrary as MediaMediaLibrary;
 
 /**
  * Provides abstraction level for the Media Library operations.
@@ -8,16 +8,16 @@ use System\Classes\MediaLibrary as SystemMediaLibrary;
  *
  * @package october\cms
  * @author Alexey Bobkov, Samuel Georges
- * @deprecated Use System\Classes\MediaLibrary. Remove if year >= 2020.
+ * @deprecated Use Media\Classes\MediaLibrary. Remove if year >= 2023.
  */
-class MediaLibrary extends SystemMediaLibrary
+class MediaLibrary extends MediaMediaLibrary
 {
     /**
      * Initialize this singleton.
      */
     protected function init()
     {
-        traceLog('Class ' . __CLASS__ . ' has been deprecated, use ' . SystemMediaLibrary::class . ' instead.');
+        traceLog('Class ' . __CLASS__ . ' has been deprecated, use ' . MediaMediaLibrary::class . ' instead.');
         parent::init();
     }
 }

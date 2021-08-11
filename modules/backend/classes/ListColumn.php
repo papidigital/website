@@ -13,53 +13,57 @@ use October\Rain\Html\Helper as HtmlHelper;
 class ListColumn
 {
     /**
-     * @var string List column name.
+     * @var string columnName within the list
      */
     public $columnName;
 
     /**
-     * @var string List column label.
+     * @var string label for list column
      */
     public $label;
 
     /**
-     * @var string Display mode. Text, number
+     * @var string type for display mode, eg: text, number
      */
     public $type = 'text';
 
     /**
-     * @var bool Specifies if this column can be searched.
+     * @var bool searchable specifies if this column can be searched
      */
     public $searchable = false;
 
     /**
-     * @var bool Specifies if this column is hidden by default.
+     * @var bool invisible specifies if this column is hidden by default
      */
     public $invisible = false;
 
     /**
-     * @var bool Specifies if this column can be sorted.
+     * @var bool sortable specifies if this column can be sorted
      */
     public $sortable = true;
 
     /**
-     * @var bool If set to false, disables the default click behavior when the column is clicked.
+     * @var bool clickable disables the default click behavior when the column is clicked
      */
     public $clickable = true;
 
     /**
-     * @var string Model attribute to use for the display value, this will
-     * override any `$sqlSelect` definition.
+     * @var string valueFrom is a model attribute to use for the accessed value
      */
     public $valueFrom;
 
     /**
-     * @var string Specifies a default value when value is empty.
+     * @var string displayFrom is a model attribute to use for the displayed value
+     */
+    public $displayFrom;
+
+    /**
+     * @var string defaults specifies a default value when value is empty
      */
     public $defaults;
 
     /**
-     * @var string Custom SQL for selecting this record display value,
+     * @var string sqlSelect is a custom SQL for selecting this record display value,
      * the `@` symbol is replaced with the table name.
      */
     public $sqlSelect;
@@ -68,6 +72,11 @@ class ListColumn
      * @var string Relation name, if this column represents a model relationship.
      */
     public $relation;
+
+    /**
+     * @var bool Count mode to display the number of related records.
+     */
+    public $relationCount = false;
 
     /**
      * @var string sets the column width, can be specified in percents (10%) or pixels (50px).
@@ -161,6 +170,9 @@ class ListColumn
         if (isset($config['valueFrom'])) {
             $this->valueFrom = $config['valueFrom'];
         }
+        if (isset($config['displayFrom'])) {
+            $this->displayFrom = $config['displayFrom'];
+        }
         if (isset($config['default'])) {
             $this->defaults = $config['default'];
         }
@@ -169,6 +181,9 @@ class ListColumn
         }
         if (isset($config['relation'])) {
             $this->relation = $config['relation'];
+        }
+        if (isset($config['relationCount'])) {
+            $this->relationCount = (bool) $config['relationCount'];
         }
         if (isset($config['format'])) {
             $this->format = $config['format'];
@@ -220,7 +235,24 @@ class ListColumn
     }
 
     /**
-     * Returns a raw config item value.
+     * useRelationCount
+     */
+    public function useRelationCount(): bool
+    {
+        if (!$this->relation) {
+            return false;
+        }
+
+        // @deprecated use relationCount instead
+        if (($value = $this->getConfig('useRelationCount')) !== null) {
+            return $value;
+        }
+
+        return $this->relationCount;
+    }
+
+    /**
+     * getConfig returns a raw config item value
      * @param  string $value
      * @param  string $default
      * @return mixed
@@ -231,7 +263,7 @@ class ListColumn
     }
 
     /**
-     * Returns this columns value from a supplied data set, which can be
+     * getValueFromData returns this columns value from a supplied data set, which can be
      * an array or a model or another generic collection.
      * @param mixed $data
      * @param mixed $default
@@ -240,6 +272,7 @@ class ListColumn
     public function getValueFromData($data, $default = null)
     {
         $columnName = $this->valueFrom ?: $this->columnName;
+
         return $this->getColumnNameFromData($columnName, $data, $default);
     }
 
@@ -270,9 +303,11 @@ class ListColumn
             else {
                 if (is_array($result) && array_key_exists($key, $result)) {
                     $result = $result[$key];
-                } elseif (!isset($result->{$key})) {
+                }
+                elseif (!isset($result->{$key})) {
                     return $default;
-                } else {
+                }
+                else {
                     $result = $result->{$key};
                 }
             }

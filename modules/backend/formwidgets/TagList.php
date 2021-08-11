@@ -89,7 +89,7 @@ class TagList extends FormWidgetBase
     }
 
     /**
-     * Prepares the form widget view data
+     * prepareVars for display
      */
     public function prepareVars()
     {
@@ -137,9 +137,7 @@ class TagList extends FormWidgetBase
         $newTags = $this->customTags ? array_diff($names, $existingTags) : [];
 
         foreach ($newTags as $newTag) {
-            $newModel = new $relationModel;
-            $newModel->{$this->nameFrom} = $newTag;
-            $newModel->save();
+            $newModel = $relationModel::create([$this->nameFrom => $newTag]);
             $existingTags[$newModel->getKey()] = $newTag;
         }
 
@@ -183,6 +181,27 @@ class TagList extends FormWidgetBase
         }
 
         return $options;
+    }
+
+    /**
+     * getPreviewOptions generates options for display in read only modes
+     */
+    public function getPreviewOptions(array $selectedValues, array $availableOptions): array
+    {
+        $displayOptions = [];
+        foreach ($availableOptions as $key => $option) {
+            if (!strlen($option)) {
+                continue;
+            }
+            if (
+                ($this->useKey && in_array($key, $selectedValues)) ||
+                (!$this->useKey && in_array($option, $selectedValues))
+            ) {
+                $displayOptions[] = $option;
+            }
+        }
+
+        return $displayOptions;
     }
 
     /**

@@ -30,7 +30,7 @@ div.control-popover {
 
     &.fade {
         & > div {
-            .opacity(0);
+            opacity: 0;
             .transition(~'all 0.3s, width 0s');
             .transform(~'scale(0.7)');
         }
@@ -38,7 +38,7 @@ div.control-popover {
 
     &.fade.in {
         & > div {
-            .opacity(1);
+            opacity: 1;
             .transform( ~'scale(1)');
         }
     }
@@ -165,15 +165,15 @@ div.control-popover {
             top: 12px;
             color: @color-popover-head-text;
             outline: none;
-            .opacity(0.4);
+            opacity: .4;
 
             &:hover {
-                .opacity(1);
+                opacity: 1;
             }
         }
 
         .inspector-move-to-container {
-            .opacity(0.4);
+            opacity: .4;
             position: absolute;
             top: 14px;
             right: 26px;
@@ -184,7 +184,7 @@ div.control-popover {
             line-height: 17px;
 
             &:hover {
-                .opacity(1);
+                opacity: 1;
                 color: @close-color;
             }
 

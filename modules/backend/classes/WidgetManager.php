@@ -1,13 +1,15 @@
 <?php namespace Backend\Classes;
 
 use Str;
+use Event;
 use BackendAuth;
 use SystemException;
 use System\Classes\PluginManager;
-use Event;
 
 /**
  * Widget manager
+ *
+ * @method static WidgetManager instance()
  *
  * @package october\backend
  * @author Alexey Bobkov, Samuel Georges
@@ -119,7 +121,7 @@ class WidgetManager
      * Manually registers form widget for consideration. Usage:
      *
      *     WidgetManager::registerFormWidgets(function ($manager) {
-     *         $manager->registerFormWidget('Backend\FormWidgets\CodeEditor', 'codeeditor');
+     *         $manager->registerFormWidget(\Backend\FormWidgets\CodeEditor::class, 'codeeditor');
      *     });
      *
      */

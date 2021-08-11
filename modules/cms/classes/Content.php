@@ -62,7 +62,7 @@ class Content extends CmsCompoundObject
                 $result = htmlspecialchars($this->markup);
                 break;
             case 'md':
-                $result = Markdown::parse($this->markup);
+                $result = Markdown::parse((string) $this->markup);
                 break;
             default:
                 $result = $this->markup;

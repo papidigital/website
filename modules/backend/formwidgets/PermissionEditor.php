@@ -8,23 +8,27 @@ use BackendAuth;
  * This widget is used by the system internally on the System / Administrators pages.
  *
  * Available Modes:
+ *
  * - radio: Default mode, used by user-level permissions.
  *   Provides three-state control over each available permission. States are
  *      -1: Explicitly deny the permission
  *      0: Inherit the permission's value from a parent source (User inherits from Role)
  *      1: Explicitly grant the permission
+ *
  * - checkbox: Used to define permissions for roles. Intended to define a base of what permissions are available
  *   Provides two state control over each available permission. States are
  *      1: Explicitly allow the permission
  *      null: If the checkbox is not ticked, the permission will not be sent to the server and will not be stored.
  *      This is interpreted as the permission not being present and thus not allowed
+ *
  * - switch: Used to define overriding permissions in a simpler UX than the radio.
  *   Provides two state control over each available permission. States are
  *      1: Explicitly allow the permission
- *      -1: Explicitly deny the permission
+ *     -1: Explicitly deny the permission
  *
- * Available permissions can be defined in the form of an array of permission codes to allow:
- * NOTE: Users are still not allowed to modify permissions that they themselves do not have access to
+ * Although users are still not allowed to modify permissions that they themselves do not have access to,
+ * available permissions can be defined in the form of an array of permission codes to allow:
+ *
  *     availablePermissions: ['some.author.permission', 'some.other.permission', 'etc.some.system.permission']
  *
  * @package october\backend
@@ -67,7 +71,7 @@ class PermissionEditor extends FormWidgetBase
     }
 
     /**
-     * Prepares the list data
+     * prepareVars for display
      */
     public function prepareVars()
     {
@@ -149,11 +153,10 @@ class PermissionEditor extends FormWidgetBase
 
         foreach ($permissions as $tab => $permissionsArray) {
             foreach ($permissionsArray as $index => $permission) {
-                if (!$this->user->hasAccess($permission->code) ||
-                    (
-                        is_array($this->availablePermissions) &&
-                        !in_array($permission->code, $this->availablePermissions)
-                    )) {
+                if (!$this->user->hasAccess($permission->code) || (
+                    is_array($this->availablePermissions) &&
+                    !in_array($permission->code, $this->availablePermissions)
+                )) {
                     unset($permissionsArray[$index]);
                 }
             }

@@ -1,34 +1,40 @@
 <?php namespace Backend\FormWidgets;
 
-use Backend\Classes\FormWidgetBase;
 use Backend\Widgets\Form;
+use Backend\Classes\FormWidgetBase;
 
 /**
- * Nested Form
- * Renders a nested form bound to a jsonable field of a model.
+ * NestedForm renders a nested form bound to a jsonable field of a model
  *
  * @package october\backend
- * @author Sascha Aeppli
+ * @author Alexey Bobkov, Samuel Georges, Sascha Aeppli
  */
 class NestedForm extends FormWidgetBase
 {
+    use \Backend\Traits\FormModelWidget;
+
     /**
      * @inheritDoc
      */
     protected $defaultAlias = 'nestedform';
 
     /**
-     * @var [] Form configuration
+     * @var array form configuration
      */
     public $form;
 
     /**
-     * @var bool defines if the nested form is styled like a panel (default true).
+     * @var bool showPanel defines if the nested form is styled like a panel
      */
-    public $usePanelStyles = true;
+    public $showPanel = true;
 
     /**
-     * @var Form form widget reference
+     * @var boolean useRelation will instruct the widget to look for a relationship
+     */
+    public $useRelation = false;
+
+    /**
+     * @var Form formWidget reference
      */
     protected $formWidget;
 
@@ -39,7 +45,8 @@ class NestedForm extends FormWidgetBase
     {
         $this->fillFromConfig([
             'form',
-            'usePanelStyles',
+            'showPanel',
+            'useRelation'
         ]);
 
         if ($this->formField->disabled) {
@@ -64,6 +71,30 @@ class NestedForm extends FormWidgetBase
         $this->formWidget = $widget;
     }
 
+    /**
+     * prepareVars for display
+     */
+    public function prepareVars()
+    {
+        $this->formWidget->previewMode = $this->previewMode;
+    }
+
+    /**
+     * getLoadValue
+     */
+    public function getLoadValue()
+    {
+        if ($this->useRelation) {
+            [$model, $attribute] = $this->resolveModelAttribute($this->valueFrom);
+            return $model->{$attribute};
+        }
+
+        return parent::getLoadValue();
+    }
+
+    /**
+     * loadAssets
+     */
     protected function loadAssets()
     {
         $this->addCss('css/nestedform.css', 'core');
@@ -76,10 +107,5 @@ class NestedForm extends FormWidgetBase
     {
         $this->prepareVars();
         return $this->makePartial('nestedform');
-    }
-
-    public function prepareVars()
-    {
-        $this->formWidget->previewMode = $this->previewMode;
     }
 }

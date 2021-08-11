@@ -24,12 +24,10 @@
     // OVERLOADED MODULE
     // =================
 
-    var overloaded_init = FilterWidget.prototype.init;
+    var overloadedInit = FilterWidget.prototype.init;
 
     FilterWidget.prototype.init = function () {
-        overloaded_init.apply(this)
-
-        this.ignoreTimezone = this.$el.children().get(0).hasAttribute('data-ignore-timezone');
+        overloadedInit.apply(this)
 
         this.initRegion()
         this.initFilterDate()
@@ -106,7 +104,7 @@
      */
     FilterWidget.prototype.getPopoverDateTemplate = function () {
         return '                                                                                                        \
-                <form id="controlFilterPopoverDate-{{ scopeName }}">                                                    \
+                <form>                                                                                                  \
                     <input type="hidden" name="scopeName" value="{{ scopeName }}" />                                    \
                     <div id="controlFilterPopoverDate" class="control-filter-popover control-filter-box-popover">       \
                         <div class="filter-search loading-indicator-container size-input-text">                         \
@@ -137,46 +135,46 @@
      * Get popover range template
      */
     FilterWidget.prototype.getPopoverRangeTemplate = function () {
-        return '                                                                                                          \
-                <form id="controlFilterPopoverRange-{{ scopeName }}">                                                     \
-                    <input type="hidden" name="scopeName" value="{{ scopeName }}" />                                      \
-                    <div id="controlFilterPopoverDate" class="control-filter-popover control-filter-box-popover --range"> \
-                        <div class="filter-search loading-indicator-container size-input-text">                           \
-                            <div class="field-datepicker">                                                                \
-                                <div class="input-with-icon right-align">                                                 \
-                                    <i class="icon icon-calendar-o"></i>                                                  \
-                                    <input                                                                                \
-                                        type="text"                                                                       \
-                                        name="date"                                                                       \
-                                        value="{{ date }}"                                                                \
-                                        class="form-control align-right popup-allow-focus"                                \
-                                        autocomplete="off"                                                                \
-                                        placeholder="{{ after_placeholder }}" />                                          \
-                                </div>                                                                                    \
-                            </div>                                                                                        \
-                            <div class="field-datepicker">                                                                \
-                                <div class="input-with-icon right-align">                                                 \
-                                    <i class="icon icon-calendar-o"></i>                                                  \
-                                    <input                                                                                \
-                                        type="text"                                                                       \
-                                        name="date"                                                                       \
-                                        value="{{ date }}"                                                                \
-                                        class="form-control align-right popup-allow-focus"                                \
-                                        autocomplete="off"                                                                \
-                                        placeholder="{{ before_placeholder }}" />                                         \
-                                </div>                                                                                    \
-                            </div>                                                                                        \
-                            <div class="filter-buttons">                                                                  \
-                                <button class="btn btn-block btn-primary" data-filter-action="filter">                    \
-                                    {{ filter_button_text }}                                                              \
-                                </button>                                                                                 \
-                                <button class="btn btn-block btn-secondary" data-filter-action="clear">                   \
-                                    {{ reset_button_text }}                                                               \
-                                </button>                                                                                 \
-                            </div>                                                                                        \
-                        </div>                                                                                            \
-                    </div>                                                                                                \
-                </form>                                                                                                   \
+        return '                                                                                                           \
+                <form>                                                                                                     \
+                    <input type="hidden" name="scopeName" value="{{ scopeName }}" />                                       \
+                    <div id="controlFilterPopoverDate" class="control-filter-popover control-filter-box-popover is-range"> \
+                        <div class="filter-search loading-indicator-container size-input-text">                            \
+                            <div class="field-datepicker">                                                                 \
+                                <div class="input-with-icon right-align">                                                  \
+                                    <i class="icon icon-calendar-o"></i>                                                   \
+                                    <input                                                                                 \
+                                        type="text"                                                                        \
+                                        name="date"                                                                        \
+                                        value="{{ date }}"                                                                 \
+                                        class="form-control align-right popup-allow-focus"                                 \
+                                        autocomplete="off"                                                                 \
+                                        placeholder="{{ after_placeholder }}" />                                           \
+                                </div>                                                                                     \
+                            </div>                                                                                         \
+                            <div class="field-datepicker">                                                                 \
+                                <div class="input-with-icon right-align">                                                  \
+                                    <i class="icon icon-calendar-o"></i>                                                   \
+                                    <input                                                                                 \
+                                        type="text"                                                                        \
+                                        name="date"                                                                        \
+                                        value="{{ date }}"                                                                 \
+                                        class="form-control align-right popup-allow-focus"                                 \
+                                        autocomplete="off"                                                                 \
+                                        placeholder="{{ before_placeholder }}" />                                          \
+                                </div>                                                                                     \
+                            </div>                                                                                         \
+                            <div class="filter-buttons">                                                                   \
+                                <button class="btn btn-block btn-primary" data-filter-action="filter">                     \
+                                    {{ filter_button_text }}                                                               \
+                                </button>                                                                                  \
+                                <button class="btn btn-block btn-secondary" data-filter-action="clear">                    \
+                                    {{ reset_button_text }}                                                                \
+                                </button>                                                                                  \
+                            </div>                                                                                         \
+                        </div>                                                                                             \
+                    </div>                                                                                                 \
+                </form>                                                                                                    \
             '
     }
 
@@ -396,12 +394,6 @@
         }
 
         if (!this.timezone) {
-            this.timezone = 'UTC'
-        }
-
-        // Set both timezones to UTC to disable converting between them
-        if (this.ignoreTimezone) {
-            this.appTimezone = 'UTC'
             this.timezone = 'UTC'
         }
     }

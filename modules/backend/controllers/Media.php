@@ -1,38 +1,26 @@
 <?php namespace Backend\Controllers;
 
-use BackendMenu;
-use Backend\Classes\Controller;
-use Backend\Widgets\MediaManager;
+use Backend;
+use Media\Controllers\Index as MediaController;
 
 /**
- * Backend Media Manager
+ * CMS Media Manager
  *
  * @package october\backend
  * @author Alexey Bobkov, Samuel Georges
+ * @deprecated Use Media\Controllers\Index. Remove if year >= 2023.
  */
-class Media extends Controller
+class Media extends MediaController
 {
-    /**
-     * @var array Permissions required to view this page.
-     */
-    public $requiredPermissions = ['media.*'];
-
     /**
      * Constructor.
      */
     public function __construct()
     {
+        traceLog('Controller Backend\Controllers\Media has been deprecated, use ' . MediaController::class . ' instead.');
+
         parent::__construct();
 
-        BackendMenu::setContext('October.Backend', 'media', true);
-        $this->pageTitle = 'backend::lang.media.menu_label';
-
-        $manager = new MediaManager($this, 'manager');
-        $manager->bindToController();
-    }
-
-    public function index()
-    {
-        $this->bodyClass = 'compact-container';
+        $this->setResponse(Backend::redirect('media'));
     }
 }

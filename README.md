@@ -1,70 +1,63 @@
-<p align="center">
-    <img src="https://github.com/octobercms/october/blob/develop/themes/demo/assets/images/october.png?raw=true" alt="October" width="25%" height="25%" />
-</p>
+# Papi Digital OctoberCMS Theme
 
-[October](https://octobercms.com) is a Content Management System (CMS) and web platform whose sole purpose is to make your development workflow simple again. It was born out of frustration with existing systems. We feel building websites has become a convoluted and confusing process that leaves developers unsatisfied. We want to turn you around to the simpler side and get back to basics.
+## Local Development
+Follow these steps to get a local development environment of Papi Digital
+up and running.
 
-October's mission is to show the world that web development is not rocket science.
+1. Install [Vagrant](https://www.vagrantup.com/)
+2. Install [VirtualBox](https://www.virtualbox.org/)
+3. Pull down the repo if you haven't already
+4. Ask for a local `.env` file as you'll need it for the next steps
+5. Navigate to the project directory using your terminal of choice and execute `vagrant up --provision`
+6. Make sure to update your hosts file with the IP address listed in the `Homestead.yaml` file in the root of the project
+7. Staying in the project directory, execute `vagrant ssh`; you should now be in the terminal of the vagrant server
+8. Execute the following commands in the order they appear
+   - `cd code`
+   - `php73`
+9. October CMS should now be installed and ready to go. Take note of the admin password to login to the backend.
+10. Go to `papidigital.local/thebackdoor` in your browser to login. `admin` is the username and the password was generated at the previous step
+11. Navigate to the `Settings` page and change the Front-end Theme to Papi Digital
+12. Go to `Plugins` and make sure that the `Blog` plugin is installed. You can search for it by typing `Blog` and selecting `Blog by RainLab`
+13. Check that the site is working by going to `papidigital.local`
+14. If you want to automatically track changes to your SASS files, check the instructions below.
+15. To shut down the virtual machine started by vagrant, you can execute `vagrant halt` in the root directory of the project.
+16. If you'd like to start the server back up, execute `vagrant up` in the root directory of the project
 
-[![Build Status](https://travis-ci.org/octobercms/october.svg?branch=develop)](https://travis-ci.org/octobercms/october)
-[![License](https://poser.pugx.org/october/october/license.svg)](./LICENSE.md)
+### Updating the Papi Digital Theme
+The theme lives in `/themes/papidigital`. It's using custom layouts for the blog, and carries some static assets with it for some of the pages.
 
-> *Please note*: October is open source but it is not free software. A license with a small fee is required for each website you build with October CMS.
+## Production Deployment
+The project is deployed to [cloudways.com](https://cloudways.com).
 
-## Installing October
+### Config
+It is setup to utilize Cloudways' Git integration. This works using a
+pull-based system that is not automatic. You can find the controls for
+this [here](https://platform.cloudways.com/apps/1630163/deployment).
 
-Instructions on how to install October can be found at the [installation guide](https://octobercms.com/docs/setup/installation).
+This project uses environments, and is configured using a `.env` file
+that should always be left out of the git repository.
 
-### Quick Start Installation
+If changes are needed, you can refer to the `.env` already in production.
 
-If you have composer installed, run this in your terminal to install October CMS from command line. This will place the files in a directory named **myoctober**.
+### Deployment Instructions
+1. To properly deploy, make sure to commit/merge your changes to the
+`master` branch
+2. Use the ["Pull" button in Cloudways](https://platform.cloudways.com/apps/1630163/deployment)
+to finish the deployment
+3. Run `npm update` and `yarn install` for any node dependencies
+4. Run `composer install` for any composer depedency changes
 
-    composer create-project october/october myoctober
+## SCSS / CSS Compilation
+This project uses `npm` to compile SCSS files to CSS and watch changes.
 
-If you plan on using a database, run this command inside the application directory.
+To use this functionality, run `npm run dev` in the terminal.
 
-    php artisan october:install
+Check the `package.json` file for more configuration.
 
-## Learning October
+## Theming/Templating
 
-The best place to learn October CMS is by [reading the documentation](https://octobercms.com/docs) or [following some tutorials](https://octobercms.com/support/articles/tutorials).
+### OctoberCMS Themes
+To learn how to configure this theme, check the [official OctoberCMS documentation](https://octobercms.com/docs/themes/development#customization).
 
-You may also watch these introductory videos for [beginners](https://vimeo.com/79963873) and [advanced users](https://vimeo.com/172202661). There is also the excellent video series by [Watch & Learn](https://watch-learn.com/series/making-websites-with-october-cms).
-
-## Coding Standards
-
-Please follow the following guides and code standards:
-
-* [PSR 4 Coding Standards](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-4-autoloader.md)
-* [PSR 2 Coding Style Guide](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)
-* [PSR 1 Coding Standards](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md)
-
-## Security Vulnerabilities
-
-Please review [our security policy](https://github.com/octobercms/october/security/policy) on how to report security vulnerabilities.
-
-## Development Team
-
-October CMS was created by [Alexey Bobkov](https://www.linkedin.com/in/alexey-bobkov-232ba02b/) and [Samuel Georges](https://www.linkedin.com/in/samuel-georges-0a964131/), who both continue to develop the platform.
-
-## Foundation library
-
-The CMS uses [Laravel](https://laravel.com) as a foundation PHP framework.
-
-## Contact
-
-For announcements and updates:
-
-* [Contact Us Page](http://octoberdev.test/contact)
-* [Follow us on Twitter](https://twitter.com/octobercms)
-* [Like us on Facebook](https://facebook.com/octobercms)
-
-To chat or hang out:
-
-* [Join us on Slack](https://octobercms-slack.herokuapp.com/)
-* [Join us on Discord](https://discord.gg/gEKgwSZ)
-* [Join us on Telegram](https://t.me/octoberchat)
-
-## License
-
-The October CMS platform is licensed software, see [End User License Agreement](./LICENSE.md) (EULA) for more details.
+### Twig Templating
+OctoberCMS uses Twig for templating. Visit the [official Twig documentation](https://twig.symfony.com/doc/3.x/templates.html) for more info.

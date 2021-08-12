@@ -1,9 +1,11 @@
 {
-    "name": "october/october",
-    "description": "Built using October CMS: The Platform That Gets Back to Basics",
+    "name": "papidigital/website",
+    "description": "",
+    "homepage": "https://papidigital.com",
     "type": "project",
-    "homepage": "https://octobercms.com",
+    "keywords": [],
     "license": "proprietary",
+    "authors": [],
     "require": {
         "php": ">=7.3",
         "october/rain": "^2.0",

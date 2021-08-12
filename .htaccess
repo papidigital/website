@@ -35,10 +35,9 @@
     ##
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteCond %{REQUEST_FILENAME} !/.well-known/*
-    RewriteCond %{REQUEST_FILENAME} !/app/(assets|resources)/.*
-    RewriteCond %{REQUEST_FILENAME} !/storage/app/media/.*
-    RewriteCond %{REQUEST_FILENAME} !/storage/app/resources/.*
     RewriteCond %{REQUEST_FILENAME} !/storage/app/uploads/public/.*
+    RewriteCond %{REQUEST_FILENAME} !/storage/app/media/.*
+    RewriteCond %{REQUEST_FILENAME} !/storage/app/resized/.*
     RewriteCond %{REQUEST_FILENAME} !/storage/temp/public/.*
     RewriteCond %{REQUEST_FILENAME} !/themes/.*/(assets|resources)/.*
     RewriteCond %{REQUEST_FILENAME} !/plugins/.*/(assets|resources)/.*
@@ -57,5 +56,9 @@
     ##
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+
+    Redirect 301 /strategy.html https://papidigital.com/services/strategy
+    Redirect 301 /production.html https://papidigital.com/services/production
+    Redirect 301 /distribution.html https://papidigital.com/services/distribution
 
 </IfModule>

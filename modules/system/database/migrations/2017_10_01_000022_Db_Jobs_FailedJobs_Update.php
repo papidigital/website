@@ -18,7 +18,7 @@ class DbJobsFailedJobsUpdate extends Migration
         });
 
         Schema::table($this->getFailedTableName(), function (Blueprint $table) {
-            $table->longText('exception')->nullable()->after('payload');
+            // $table->longText('exception')->nullable()->after('payload');
         });
     }
 

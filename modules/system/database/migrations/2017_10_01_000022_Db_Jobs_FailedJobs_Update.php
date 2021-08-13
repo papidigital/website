@@ -13,7 +13,7 @@ class DbJobsFailedJobsUpdate extends Migration
     public function up()
     {
         Schema::table($this->getTableName(), function (Blueprint $table) {
-            $table->dropColumn('reserved');
+            // $table->dropColumn('reserved');
             $table->index(['queue', 'reserved_at']);
         });
 

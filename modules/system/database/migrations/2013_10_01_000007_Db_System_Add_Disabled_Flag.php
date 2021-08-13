@@ -8,7 +8,7 @@ class DbSystemAddDisabledFlag extends Migration
     public function up()
     {
         Schema::table('system_plugin_versions', function (Blueprint $table) {
-            $table->boolean('is_disabled')->default(0);
+            // $table->boolean('is_disabled')->default(0);
         });
     }
 

@@ -21,7 +21,6 @@
 
                         <span class=\"date-separator\">|</span>
                         {% if post.categories.count %}
-                        {{post.categories}}
                         {% set categoryLinks = post.categories | map(c => "") | join("<span class=\"separator\">, </span>") %}
                         <!-- {% set categoryLinks = post.categories | map(c => "<a href=\'#{c.url}\'>#{c.name}</a>") | join("<span class=\"separator\">, </span>") %} -->
 

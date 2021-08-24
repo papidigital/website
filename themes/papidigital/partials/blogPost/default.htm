@@ -24,7 +24,7 @@
                         <!-- {% set categoryLinks = post.categories | map(c => "") | join("<span class=\"separator\">, </span>") %} -->
                         {% set categoryLinks = "<strong>nada</strong>" %}
 
-                        {% for tag in categories %}
+                        {% for tag in post.categories %}
                         <a href="{{tag.url}}"> dummy </a>
                         {% endfor %}
 

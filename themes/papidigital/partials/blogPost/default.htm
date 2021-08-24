@@ -2,7 +2,6 @@
 
 
 <article class="post-article">
-    {{post.featured_images.count}}
     {% if post.featured_images.count %}
     <div class="article-featured-image papidigital-hero-banner">
         {% for image in post.featured_images|slice(0, 1) %}
@@ -22,7 +21,7 @@
 
                         <span class=\"date-separator\">|</span>
                         {% if post.categories.count %}
-                        {%post.categories%}
+                        {{post.categories}}
                         {% set categoryLinks = post.categories | map(c => "") | join("<span class=\"separator\">, </span>") %}
                         <!-- {% set categoryLinks = post.categories | map(c => "<a href=\'#{c.url}\'>#{c.name}</a>") | join("<span class=\"separator\">, </span>") %} -->
 

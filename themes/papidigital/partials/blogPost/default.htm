@@ -22,9 +22,9 @@
                         <span class=\"date-separator\">|</span>
                         {% if post.categories.count %}
                         <!-- {% set categoryLinks = post.categories | map(c => "") | join("<span class=\"separator\">, </span>") %} -->
-                        {% set categoryLinks = "<b>nada</b>" %}
+                        {% set categoryLinks = '<b>nada</b>' %}
 
-                        {{ categoryLinks | trans }}
+                        {{!! categoryLinks !!}}
 
                         {% else %}
                         Uncategorized

@@ -2,19 +2,20 @@
 
 
 <article class="post-article">
-    <!-- {% if post.featured_images.count %} -->
+    {{post.featured_images.count}}
+    {% if post.featured_images.count %}
     <div class="article-featured-image papidigital-hero-banner">
         {% for image in post.featured_images|slice(0, 1) %}
         <img class="img-fluid" data-src="{{ image.filename }}" src="{{ image.path }}" alt="{{ image.description != null ? image.description : image.filename }}" title="{{ image.title != null ? image.title : post.title }}">
         {% endfor %}
     </div>
-    <!-- {% endif %} -->
+    {% endif %}
 
     <div class="article-body align-content-center">
         <div class="container-xl">
             <div class="row">
                 <div class="col-12">
-                    <!-- <h1 class="article-title">{{ post.title }}</h1> -->
+                    <h1 class="article-title">{{ post.title }}</h1>
 
                     <p class="article-info">
                         {{ post.published_at | date('F jS, Y') | trans }}

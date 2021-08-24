@@ -24,11 +24,11 @@
                         <!-- {% set categoryLinks = post.categories | map(c => "") | join("<span class=\"separator\">, </span>") %} -->
                         {% set categoryLinks = "<strong>nada</strong>" %}
 
-                        {!! categoryLinks !!}
+                        {% for tag in categories %}
+                        <a href="{{tag.url}}"> dummy </a>
+                        {% endfor %}
 
-                        {!! <strong>nada</strong> !!}
-                        {{ "<strong>nada</strong>" }}
-                        {{html_entity_decode(categoryLinks)}}
+                    
 
                         {% else %}
                         Uncategorized

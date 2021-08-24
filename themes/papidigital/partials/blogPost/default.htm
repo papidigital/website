@@ -25,7 +25,8 @@
                         {% set categoryLinks = "<strong>nada</strong>" %}
 
                         {% for tag in post.categories %}
-                        <a href="{{tag.url}}"> dummy </a>
+                        <a href="{{tag.url}}"> {{tag.name}} </a>
+                        <span class=\"separator\">, </span>
                         {% endfor %}
 
                     

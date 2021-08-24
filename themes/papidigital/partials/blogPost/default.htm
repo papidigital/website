@@ -25,7 +25,7 @@
                         {% set categoryLinks = post.categories | map(c => "<a href='www.google.pt'>Google</a>") | join("<span class=\"separator\">, </span>") %}
                         <!-- {% set categoryLinks = post.categories | map(c => "<a href=\'#{c.url}\'>#{c.name}</a>") | join("<span class=\"separator\">, </span>") %} -->
 
-                        {{ categoryLinks | trans }}
+                        <!-- {{ categoryLinks | trans }} -->
 
                         {% else %}
                         Uncategorized

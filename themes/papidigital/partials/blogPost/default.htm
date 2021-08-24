@@ -27,7 +27,7 @@
                         {% for tag in post.categories %}
                         <a href="{{tag.url}}"> {{tag.name}} </a>
                         
-                        {{loop.last}} - <span class=\"separator\">, </span>
+                        {{if loop.last is true }} - <span class=\"separator\">, </span>
 
                         {% endfor %}
 

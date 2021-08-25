@@ -114,9 +114,9 @@ return [
         ],
 
         'media' => [
-            'disk'   => 'local',
+            'disk'   => 's3',
             'folder' => 'media',
-            'path'   => '/storage/app/media',
+            'path'   => 'https://s3-us-west-1.amazonaws.com/papidigital-website',
         ],
 
         'resources' => [

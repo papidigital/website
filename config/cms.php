@@ -212,27 +212,27 @@ return [
     | the path for the media disk.
     */
 
-    // 'storage' => [
+    'storage' => [
 
-    //     'uploads' => [
-    //         'disk'            => env('STORAGE_DISK_TYPE', 'local'),
-    //         'folder'          => 'uploads',
-    //         'path'            => env('STORAGE_PATH').'/uploads',
-    //         'temporaryUrlTTL' => 3600,
-    //     ],
+        'uploads' => [
+            'disk'            => env('STORAGE_DISK_TYPE', 'local'),
+            'folder'          => 'uploads',
+            'path'            => env('STORAGE_PATH').'/uploads',
+            'temporaryUrlTTL' => 3600,
+        ],
 
-    //     'media' => [
-    //         'disk'   => env('STORAGE_DISK_TYPE', 'local'),
-    //         'folder' => 'media',
-    //         'path'   => env('STORAGE_PATH', '/storage/app').'/media',
-    //     ],
+        'media' => [
+            'disk'   => env('STORAGE_DISK_TYPE', 'local'),
+            'folder' => 'media',
+            'path'   => env('STORAGE_PATH', '/storage/app').'/media',
+        ],
 
-    //     'resized' => [
-    //         'disk'   => env('STORAGE_DISK_TYPE', 'local'),
-    //         'folder' => 'resized',
-    //         'path'   => env('STORAGE_PATH', '/storage/app').'/resized',
-    //     ],
+        'resized' => [
+            'disk'   => env('STORAGE_DISK_TYPE', 'local'),
+            'folder' => 'resized',
+            'path'   => env('STORAGE_PATH', '/storage/app').'/resized',
+        ],
 
-    // ],
+    ],
 
 ];

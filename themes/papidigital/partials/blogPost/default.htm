@@ -5,7 +5,7 @@
     {% if post.featured_images.count %}
     <div class="article-featured-image papidigital-hero-banner">
         {% for image in post.featured_images|slice(0, 1) %}
-        {{image.path}}
+        <!-- {{image.path}} -->
         <img class="img-fluid" data-src="{{ image.filename }}" src="{{ image.path }}" alt="{{ image.description != null ? image.description : image.filename }}" title="{{ image.title != null ? image.title : post.title }}">
         {% endfor %}
     </div>

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ac2f4aefd04fe7abedfaa00e997fb3f7",
+    "content-hash": "2400bb037edf59958eb0c77f69c1c67f",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -2551,6 +2551,18 @@
                 "october cms"
             ],
             "time": "2021-08-10T00:18:58+00:00"
+        },
+        {
+            "name": "october/drivers-plugin",
+            "version": "v1.1.3",
+            "dist": {
+                "type": "zip",
+                "url": "https://gateway.octobercms.com/composer/dist/october/drivers-plugin/october-drivers-plugin.zip"
+            },
+            "require": {
+                "composer/installers": "~1.0"
+            },
+            "type": "october-plugin"
         },
         {
             "name": "october/editor",
@@ -8076,5 +8088,5 @@
         "php": ">=7.3"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.1.0"
 }

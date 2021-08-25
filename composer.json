@@ -10,7 +10,8 @@
         "php": ">=7.3",
         "october/rain": "^2.0",
         "laravel/framework": "^6.0",
-        "october/all": "^2.0"
+        "october/all": "^2.0",
+        "october/drivers-plugin": "^1.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^8.0|^9.0",

@@ -23,7 +23,7 @@
                         <span class=\"date-separator\">|</span>
                         {% if post.categories.count %}
                         <!-- {% set categoryLinks = post.categories | map(c => "") | join("<span class=\"separator\">, </span>") %} -->
-                        {% set categoryLinks = "<strong>nada</strong>" %}
+                        <!-- {% set categoryLinks = "<strong>nada</strong>" %} -->
 
                         {% for tag in post.categories %}
                         <a href="{{tag.url}}"> {{tag.name}} </a>

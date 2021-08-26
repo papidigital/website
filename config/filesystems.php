@@ -44,10 +44,17 @@ return [
     'disks' => [
 
         'local' => [
-            'driver' => 'local',
-            'root' => storage_path('app'),
-            'url' => '/storage/app',
+            'driver' => 's3',
+            'key'    => 'AKIA4YCIEA5ZMCMX6375',
+            'secret' => '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',
+            'region' => 'us-west-1',
+            'bucket' => 'papidigital-website',
         ],
+        // 'local' => [
+        //     'driver' => 'local',
+        //     'root' => storage_path('app'),
+        //     'url' => '/storage/app',
+        // ],
 
         's3' => [
             'driver' => 's3',

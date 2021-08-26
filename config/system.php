@@ -109,7 +109,7 @@ return [
 
         'uploads' => [
             'disk'            => 's3',
-            'folder'          => 'uploads2',
+            'folder'          => 'uploads',
             'path'            => 'https://s3-us-west-1.amazonaws.com/papidigital-website',
             'temporaryUrlTTL' => 3600,
         ],

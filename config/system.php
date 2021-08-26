@@ -108,11 +108,17 @@ return [
     'storage' => [
 
         'uploads' => [
-            'disk'            => env('STORAGE_DISK_TYPE', 'local'),
+            'disk'            => 's3',
             'folder'          => 'uploads',
-            'path'            => env('STORAGE_PATH').'/uploads',
+            'path'            => 'https://s3-us-west-1.amazonaws.com/papidigital-website',
             'temporaryUrlTTL' => 3600,
         ],
+        // 'uploads' => [
+        //     'disk'            => env('STORAGE_DISK_TYPE', 'local'),
+        //     'folder'          => 'uploads',
+        //     'path'            => env('STORAGE_PATH').'/uploads',
+        //     'temporaryUrlTTL' => 3600,
+        // ],
 
         'media' => [
             'disk'   => env('STORAGE_DISK_TYPE', 'local'),

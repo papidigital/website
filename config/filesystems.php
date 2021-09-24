@@ -43,14 +43,6 @@ return [
 
     'disks' => [
 
-        // 'local' => [
-        //     'driver' => 's3',
-        //     'key'    => 'AKIA4YCIEA5ZMCMX6375',
-        //     'secret' => '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',
-        //     'region' => 'us-west-1',
-        //     'bucket' => 'papidigital-website',
-        // ],
-
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),
@@ -64,13 +56,6 @@ return [
             'region' => 'us-west-1',
             'bucket' => 'papidigital-website',
         ],
-        // 's3' => [
-        //     'driver' => 's3',
-        //     'key'    => env('S3_KEY', ''),
-        //     'secret' => env('S3_SECRET', ''),
-        //     'region' => env('S3_REGION', ''),
-        //     'bucket' => env('S3_BUCKET', ''),
-        // ],
 
         'rackspace' => [
             'driver' => 'rackspace',
@@ -81,6 +66,10 @@ return [
             'region' => 'IAD',
         ],
 
+        'log' => [
+            'driver' => 'local',
+           		 'root' => storage_path(),
+            ],
     ],
 
 ];

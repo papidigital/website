@@ -113,6 +113,7 @@ return [
             'path'            => 'https://s3-us-west-1.amazonaws.com/papidigital-website',
             'temporaryUrlTTL' => 3600,
         ],
+        
         // 'uploads' => [
         //     'disk'            => env('STORAGE_DISK_TYPE', 'local'),
         //     'folder'          => 'uploads',
@@ -121,10 +122,16 @@ return [
         // ],
 
         'media' => [
-            'disk'   => env('STORAGE_DISK_TYPE', 'local'),
+            'disk'   => 's3',
             'folder' => 'media',
-            'path'   => env('STORAGE_PATH', '/storage/app').'/media',
+            'path' => 'https://s3-us-west-1.amazonaws.com/papidigital-website',
         ],
+
+        // 'media' => [
+        //     'disk'   => env('STORAGE_DISK_TYPE', 'local'),
+        //     'folder' => 'media',
+        //     'path'   => env('STORAGE_PATH', '/storage/app').'/media',
+        // ],
 
         'resized' => [
             'disk'   => env('STORAGE_DISK_TYPE', 'local'),

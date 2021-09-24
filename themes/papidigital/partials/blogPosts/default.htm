@@ -40,11 +40,12 @@
     <div class="no-data">{{ blogPosts.noPostsMessage }}</div>
     {% endfor %}
 
+
 <div class="col-md-12 row justify-content-center mt-4">
     <nav aria-label="Page navigation example">
+        
+        {% if posts.lastPage > 1 %}
         <ul class="pagination">
-
-            {% if posts.lastPage > 1 %}
             <li class="page-item">
                 {% if posts.currentPage > 1 %}
                 <a class="page-link" href="{{ this.page.baseFileName | page({ (blogPosts.pageParam): (posts.currentPage-1) }) }}" aria-label="Previous">
@@ -54,19 +55,24 @@
             </li>
             {% endif %}
 
-        {% for page in 1..posts.lastPage %}
-        <li class="page-item"><a class="page-link" href="{{ this.page.baseFileName | page({ (blogPosts.pageParam): (posts.currentPage-1) }) }}">1</a></li>
-        {% endfor %}
-        
-        <li class="page-item"><a class="page-link {{ posts.currentPage == page ? 'active' : null }}" href="{{ this.page.baseFileName | page({ (blogPosts.pageParam): page }) }}">2</a></li>
-        <li class="page-item"><a class="page-link" href="{{ this.page.baseFileName | page({ (blogPosts.pageParam): (posts.currentPage+1) }) }}">3</a></li>
-        <li class="page-item">
-            <a class="page-link" href="#" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-            <span class="sr-only">Next</span>
-            </a>
-        </li>
+            {% for page in 1..posts.lastPage %}
+            <li class="page-item"><a class="page-link" href="{{ this.page.baseFileName | page({ (blogPosts.pageParam): (posts.currentPage-1) }) }}">{{ page }}</a></li>
+            {% endfor %}
+            
+            <li class="page-item"><a class="page-link {{ posts.currentPage == page ? 'active' : null }}" href="{{ this.page.baseFileName | page({ (blogPosts.pageParam): page }) }}">2</a></li>
+            <li class="page-item"><a class="page-link" href="{{ this.page.baseFileName | page({ (blogPosts.pageParam): (posts.currentPage+1) }) }}">3</a></li>
+            
+            {% if posts.lastPage > posts.currentPage %}
+            <li class="page-item">
+                <a class="page-link" href="{{ this.page.baseFileName | page({ (blogPosts.pageParam): (posts.currentPage+1) }) }}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Next</span>
+                </a>
+            </li>
+            {% endif %}
+
         </ul>
+        {% endif %}
     </nav>
 </div>
 

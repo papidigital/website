@@ -1269,7 +1269,7 @@ a {
 .page-link {
   color: #CA3D3D;
 }
-.page-link.active{
+.page-item.active{
   /* z-index: 3;
   color: #fff; */
   background-color: #CA3D3D;

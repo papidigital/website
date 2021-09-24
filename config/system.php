@@ -124,7 +124,8 @@ return [
         'media' => [
             'disk'   => 's3',
             'folder' => 'media',
-            'path' => 'https://s3-us-west-1.amazonaws.com/papidigital-website',
+            'path' => 'https://s3-us-west-1.amazonaws.com/papidigital-website/media',
+            'temporaryUrlTTL' => 3600,
         ],
 
         // 'media' => [

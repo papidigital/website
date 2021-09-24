@@ -1265,3 +1265,7 @@ a {
     padding: 0 3rem 1rem 3rem
   }
 }
+
+.page-link {
+  color: #CA3D3D;
+}

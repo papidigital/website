@@ -57,7 +57,7 @@
 
 
             {% for page in 1..posts.lastPage %}
-            <li class="page-item"><a class="page-link {{ posts.currentPage == page ? 'active' : null }}" href="{{ this.page.baseFileName | page({ (blogPosts.pageParam): page }) }}">2</a></li>
+            <li class="page-item"><a class="page-link {{ posts.currentPage == page ? 'active' : null }}" href="{{ this.page.baseFileName | page({ (blogPosts.pageParam): page }) }}">{{page}}</a></li>
             {% endfor %}
           
             {% if posts.lastPage > posts.currentPage %}

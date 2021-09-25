@@ -55,7 +55,7 @@
             </li>
             {% endif %}
 
-            {% for page in 1..posts %}
+            {% for page in 1..posts.page %}
                 <li class="page-item {{ posts.currentPage == page ? 'active' : null }}">
                     <a class="page-link" href="{{ this.page.baseFileName | page({ (podcastEpisodes.pageParam): page }) }}">ddsdasdsa{{ page }}</a>
                 </li>

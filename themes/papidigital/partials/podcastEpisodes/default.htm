@@ -34,7 +34,7 @@
 
     {% for page in 1..posts.lastPage %}
     <li class="{{ posts.currentPage == page ? 'active' : null }}">
-        <a href="{{ this.page.baseFileName | page({ (podcastEpisodes.pageParam): page }) }}">{{ page }}</a>
+        <a href="{{ this.page.baseFileName | page({ (podcastEpisodes.pageParam): page }) }}">{{ page }}dasda</a>
     </li>
     {% endfor %}
 

@@ -10,9 +10,11 @@ priority = 0.1
 <!-- As of now let's keep it simple because we don't have a lot of case studies. Make the Donnie clickable
 and case study to the menu and link it to Donnie.. -->
 
-<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@latest/dist/js/splide.min.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@2.4.21/dist/js/splide.min.js"></script>
 
 <!-- or the reference on CDN -->
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@2.4.21/dist/css/splide.min.css"> -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@2.4.21/dist/css/splide.min.css">
 
 <article class="case-study">
@@ -186,6 +188,7 @@ and case study to the menu and link it to Donnie.. -->
                                             </div>
                                         </div>
                                     </div> -->
+
                                 </div>
                             </div>
                         </section>
@@ -351,7 +354,6 @@ and case study to the menu and link it to Donnie.. -->
     var i = 0;
     for (var j = videos.length; i < j; i++) {
         videos[i].addEventListener("play", stopOthers, false);
-        console.log('hey');
     }
 })();
 

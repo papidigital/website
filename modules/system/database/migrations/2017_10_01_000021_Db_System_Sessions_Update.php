@@ -13,9 +13,9 @@ class DbSystemSessionsUpdate extends Migration
     public function up()
     {
         Schema::table('sessions', function (Blueprint $table) {
-            $table->unsignedInteger('user_id')->nullable();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
+            // $table->unsignedInteger('user_id')->nullable();
+            // $table->string('ip_address', 45)->nullable();
+            // $table->text('user_agent')->nullable();
         });
     }
 

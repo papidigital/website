@@ -24,14 +24,13 @@
     // OVERLOADED MODULE
     // =================
 
-    var overloaded_init = FilterWidget.prototype.init;
+    var overloadedInit = FilterWidget.prototype.init;
 
     FilterWidget.prototype.init = function () {
-        overloaded_init.apply(this)
+        overloadedInit.apply(this)
 
         this.initFilterNumber()
     }
-
 
     // NEW MODULE
     // =================
@@ -51,7 +50,6 @@
             $(event.relatedTarget).on('click', '#controlFilterPopoverNum [data-filter-action="clear"]', function (e) {
                 e.preventDefault()
                 e.stopPropagation()
-
                 self.filterByNumber(true)
             })
         })
@@ -73,10 +71,15 @@
                 scopeName = $scope.data('scope-name')
 
             // Ignore if already opened
-            if ($scope.hasClass('filter-scope-open')) return
+            if ($scope.hasClass('filter-scope-open')) {
+                return
+            }
 
             // Ignore if another popover is opened
-            if (null !== self.activeScopeName) return
+            if (null !== self.activeScopeName) {
+                return
+            }
+
             self.$activeScope = $scope
             self.activeScopeName = scopeName
             self.isActiveScopeDirty = false
@@ -96,31 +99,31 @@
      * Get popover number template
      */
     FilterWidget.prototype.getPopoverNumberTemplate = function () {
-        return '                                                                                                        \
-                <form id="filterPopoverNumber-{{ scopeName }}">                                                         \
-                    <input type="hidden" name="scopeName" value="{{ scopeName }}" />                                    \
-                    <div id="controlFilterPopoverNum" class="control-filter-popover control-filter-box-popover --range">\
-                        <div class="filter-search loading-indicator-container size-input-text">                         \
-                            <div class="field-number">                                                                  \
-                                <input                                                                                  \
-                                    type="number"                                                                       \
-                                    name="number"                                                                       \
-                                    value="{{ number }}"                                                                \
-                                    class="form-control align-right"                                                    \
-                                    autocomplete="off"                                                                  \
-                                    placeholder="{{ number_placeholder }}" />                                           \
-                            </div>                                                                                      \
-                            <div class="filter-buttons">                                                                \
-                                <button class="btn btn-block btn-primary" data-filter-action="filter">                  \
-                                    {{ filter_button_text }}                                                            \
-                                </button>                                                                               \
-                                <button class="btn btn-block btn-secondary" data-filter-action="clear">                 \
-                                    {{ reset_button_text }}                                                             \
-                                </button>                                                                               \
-                            </div>                                                                                      \
-                        </div>                                                                                          \
-                    </div>                                                                                              \
-                </form>                                                                                                 \
+        return '                                                                                                          \
+                <form>                                                                                                    \
+                    <input type="hidden" name="scopeName" value="{{ scopeName }}" />                                      \
+                    <div id="controlFilterPopoverNum" class="control-filter-popover control-filter-box-popover is-range"> \
+                        <div class="filter-search loading-indicator-container size-input-text">                           \
+                            <div class="field-number">                                                                    \
+                                <input                                                                                    \
+                                    type="number"                                                                         \
+                                    name="number"                                                                         \
+                                    value="{{ number }}"                                                                  \
+                                    class="form-control align-right"                                                      \
+                                    autocomplete="off"                                                                    \
+                                    placeholder="{{ number_placeholder }}" />                                             \
+                            </div>                                                                                        \
+                            <div class="filter-buttons">                                                                  \
+                                <button class="btn btn-block btn-primary" data-filter-action="filter">                    \
+                                    {{ filter_button_text }}                                                              \
+                                </button>                                                                                 \
+                                <button class="btn btn-block btn-secondary" data-filter-action="clear">                   \
+                                    {{ reset_button_text }}                                                               \
+                                </button>                                                                                 \
+                            </div>                                                                                        \
+                        </div>                                                                                            \
+                    </div>                                                                                                \
+                </form>                                                                                                   \
             '
     }
 
@@ -129,15 +132,15 @@
      */
     FilterWidget.prototype.getPopoverNumberRangeTemplate = function () {
         return '                                                                                                            \
-                <form id="filterPopoverNumberRange-{{ scopeName }}">                                                        \
+                <form>                                                                                                      \
                     <input type="hidden" name="scopeName" value="{{ scopeName }}" />                                        \
-                    <div id="controlFilterPopoverNum" class="control-filter-popover control-filter-box-popover --range">    \
+                    <div id="controlFilterPopoverNum" class="control-filter-popover control-filter-box-popover is-range">   \
                         <div class="filter-search loading-indicator-container size-input-text">                             \
                             <div class="field-number">                                                                      \
                                 <div class="right-align">                                                                   \
                                     <input                                                                                  \
                                         type="number"                                                                       \
-                                        name="number"                                                                       \
+                                        name="number_min"                                                                       \
                                         value="{{ number }}"                                                                \
                                         class="form-control align-right"                                                    \
                                         autocomplete="off"                                                                  \
@@ -149,7 +152,7 @@
                                     <input                                                                                  \
                                         type="number"                                                                       \
                                         {{ maxNumber }}                                                                     \
-                                        name="number"                                                                       \
+                                        name="number_max"                                                                       \
                                         value="{{ number }}"                                                                \
                                         class="form-control align-right"                                                    \
                                         autocomplete="off"                                                                  \
@@ -191,7 +194,7 @@
             modal: false,
             highlightModalTarget: true,
             closeOnPageClick: true,
-            placement: 'bottom',
+            placement: 'bottom'
         })
     }
 
@@ -217,7 +220,7 @@
             modal: false,
             highlightModalTarget: true,
             closeOnPageClick: true,
-            placement: 'bottom',
+            placement: 'bottom'
         })
     }
 
@@ -241,7 +244,7 @@
                 defaultValue = data.numbers[index] ? data.numbers[index] : ''
             }
 
-            numberinput.value = '' !== defaultValue ? defaultValue : '';
+            numberinput.value = '' !== defaultValue ? defaultValue : ''
         })
     }
 
@@ -256,18 +259,20 @@
             if (numbers.length > 1) {
                 numbers[1] = numbers[1] && numbers[1].match(numberRegex) ? numbers[1] : null
 
-                if(numbers[0] || numbers[1]) {
+                if (numbers[0] || numbers[1]) {
                     var min = numbers[0] ? numbers[0] : '∞',
                         max = numbers[1] ? numbers[1] : '∞'
 
                     $setting.text(min + ' → ' + max)
-                } else {
+                }
+                else {
                     reset = true
                 }
             }
-            else if(numbers[0]) {
+            else if (numbers[0]) {
                 $setting.text(numbers[0])
-            } else {
+            }
+            else {
                 reset = true
             }
         }
@@ -275,10 +280,11 @@
             reset = true
         }
 
-        if(reset) {
-            $setting.text(this.getLang('filter.numbers.all', 'all'));
+        if (reset) {
+            $setting.text(this.getLang('filter.numbers.all', 'all'))
             $scope.removeClass('active')
-        } else {
+        }
+        else {
             $scope.addClass('active')
         }
     }
@@ -299,9 +305,9 @@
         this.scopeValues[this.activeScopeName] = {
             numbers: numbers
         }
-        this.isActiveScopeDirty = true;
+
+        this.isActiveScopeDirty = true
         this.$activeScope.data('oc.popover').hide()
     }
-
 
 }(window.jQuery);

@@ -1,16 +1,17 @@
 <?php namespace System\Classes;
 
+use Log;
 use View;
 use Config;
+use System;
 use Cms\Classes\Theme;
 use Cms\Classes\Router;
 use Cms\Classes\Controller as CmsController;
 use October\Rain\Exception\ErrorHandler as ErrorHandlerBase;
 use October\Rain\Exception\SystemException;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
- * System Error Handler, this class handles application exception events.
+ * ErrorHandler handles application exception events
  *
  * @package october\system
  * @author Alexey Bobkov, Samuel Georges
@@ -20,19 +21,30 @@ class ErrorHandler extends ErrorHandlerBase
     /**
      * @inheritDoc
      */
-    // public function handleException(Exception $proposedException)
+    // public function handleException(\Exception $proposedException)
     // {
     //     // The Twig runtime error is not very useful
     //     if (
     //         $proposedException instanceof \Twig\Error\RuntimeError &&
     //         ($previousException = $proposedException->getPrevious()) &&
-    //         (!$previousException instanceof CmsException)
+    //         (!$previousException instanceof \Cms\Classes\CmsException)
     //     ) {
     //         $proposedException = $previousException;
     //     }
-
     //     return parent::handleException($proposedException);
     // }
+
+    /**
+     * We are about to display an error page to the user,
+     * if it is an SystemException, this event should be logged.
+     * @return void
+     */
+    public function beforeHandleError($exception)
+    {
+        if ($exception instanceof SystemException) {
+            Log::error($exception);
+        }
+    }
 
     /**
      * Looks up an error page using the CMS route "/error". If the route does not
@@ -45,8 +57,10 @@ class ErrorHandler extends ErrorHandlerBase
             return null;
         }
 
-        if (class_exists(Theme::class) && in_array('Cms', Config::get('cms.loadModules', []))) {
-            $theme = Theme::getActiveTheme();
+        if (
+            System::hasModule('Cms') &&
+            ($theme = Theme::getActiveTheme())
+        ) {
             $router = new Router($theme);
 
             // Use the default view if no "/error" URL is found.
@@ -57,12 +71,13 @@ class ErrorHandler extends ErrorHandlerBase
             // Route to the CMS error page.
             $controller = new CmsController($theme);
             $result = $controller->run('/error');
-        } else {
+        }
+        else {
             $result = View::make('system::error');
         }
 
         // Extract content from response object
-        if ($result instanceof Response) {
+        if ($result instanceof \Symfony\Component\HttpFoundation\Response) {
             $result = $result->getContent();
         }
 

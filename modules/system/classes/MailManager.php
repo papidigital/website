@@ -1,16 +1,17 @@
 <?php namespace System\Classes;
 
-use Twig;
+use App;
 use Markdown;
 use System\Models\MailPartial;
 use System\Models\MailTemplate;
 use System\Models\MailBrandSetting;
 use System\Helpers\View as ViewHelper;
-use System\Twig\MailPartialTokenParser;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 /**
- * This class manages Mail sending functions
+ * MailManager manages Mail sending functions
+ *
+ * @method static MailManager instance()
  *
  * @package october\system
  * @author Alexey Bobkov, Samuel Georges
@@ -50,12 +51,28 @@ class MailManager
     protected $isHtmlRenderMode = false;
 
     /**
-     * @var bool Internal marker for booting custom twig extensions.
+     * addContentFromEvent handles adding content from the `mailer.beforeAddContent` event
      */
-    protected $isTwigStarted = false;
+    public function addContentFromEvent($message, $view = null, $plain = null, $raw = null, $data = [])
+    {
+        // Dual views have been supplied, this is Laravel implementation
+        if ($view !== null && $plain !== null) {
+            return false;
+        }
+
+        // When "plain-text only" email is sent, $view is null, this sets the flag appropriately
+        $plainOnly = $view === null;
+
+        if ($raw === null) {
+            return $this->addContentToMailer($message, $view ?: $plain, $data, $plainOnly);
+        }
+        else {
+            return $this->addRawContentToMailer($message, $raw, $data, $plainOnly);
+        }
+    }
 
     /**
-     * Same as `addContentToMailer` except with raw content.
+     * addRawContentToMailer is the same as `addContentToMailer` except with raw content
      *
      * @return bool
      */
@@ -71,8 +88,8 @@ class MailManager
     }
 
     /**
-     * This function hijacks the `addContent` method of the `October\Rain\Mail\Mailer`
-     * class, using the `mailer.beforeAddContent` event.
+     * addContentToMailer function hijacks the `addContent` method of the
+     * `October\Rain\Mail\Mailer` class, using the `mailer.beforeAddContent` event.
      *
      * @param \Illuminate\Mail\Message $message
      * @param string $code
@@ -82,6 +99,10 @@ class MailManager
      */
     public function addContentToMailer($message, $code, $data, $plainOnly = false)
     {
+        if (!is_string($code)) {
+            return false;
+        }
+
         if (isset($this->templateCache[$code])) {
             $template = $this->templateCache[$code];
         }
@@ -99,7 +120,8 @@ class MailManager
     }
 
     /**
-     * Internal method used to share logic between `addRawContentToMailer` and `addContentToMailer`
+     * addContentToMailerInternal is an internal method used to share logic
+     * between `addRawContentToMailer` and `addContentToMailer`
      *
      * @param \Illuminate\Mail\Message $message
      * @param string $template
@@ -109,11 +131,6 @@ class MailManager
      */
     protected function addContentToMailerInternal($message, $template, $data, $plainOnly = false)
     {
-        /*
-         * Start twig transaction
-         */
-        $this->startTwig();
-
         /*
          * Inject global view variables
          */
@@ -128,7 +145,7 @@ class MailManager
         $swiftMessage = $message->getSwiftMessage();
 
         if (empty($swiftMessage->getSubject())) {
-            $message->subject(Twig::parse($template->subject, $data));
+            $message->subject($this->parseTwig($template->subject, $data));
         }
 
         $data += [
@@ -150,11 +167,6 @@ class MailManager
         $text = $this->renderTextTemplate($template, $data);
 
         $message->addPart($text, 'text/plain');
-
-        /*
-         * End twig transaction
-         */
-        $this->stopTwig();
     }
 
     //
@@ -162,8 +174,7 @@ class MailManager
     //
 
     /**
-     * Render the Markdown template into HTML.
-     *
+     * render the Markdown template into HTML
      * @param  string  $content
      * @param  array  $data
      * @return string
@@ -174,13 +185,16 @@ class MailManager
             return '';
         }
 
-        $html = $this->renderTwig($content, $data);
+        $html = $this->parseTwig($content, $data);
 
         $html = Markdown::parseSafe($html);
 
         return $html;
     }
 
+    /**
+     * renderTemplate
+     */
     public function renderTemplate($template, $data = [])
     {
         $this->isHtmlRenderMode = true;
@@ -194,7 +208,7 @@ class MailManager
         if ($template->layout) {
             $disableAutoInlineCss = array_get($template->layout->options, 'disable_auto_inline_css', $disableAutoInlineCss);
 
-            $html = $this->renderTwig($template->layout->content_html, [
+            $html = $this->parseTwig($template->layout->content_html, [
                 'content' => $html,
                 'css' => $template->layout->content_css,
                 'brandCss' => $css
@@ -222,13 +236,16 @@ class MailManager
             return '';
         }
 
-        $text = $this->renderTwig($content, $data);
+        $text = $this->parseTwig($content, $data);
 
         $text = html_entity_decode(preg_replace("/[\r\n]{2,}/", "\n\n", $text), ENT_QUOTES, 'UTF-8');
 
         return $text;
     }
 
+    /**
+     * renderTextTemplate
+     */
     public function renderTextTemplate($template, $data = [])
     {
         $this->isHtmlRenderMode = false;
@@ -242,7 +259,7 @@ class MailManager
         $text = $this->renderText($templateText, $data);
 
         if ($template->layout) {
-            $text = $this->renderTwig($template->layout->content_text, [
+            $text = $this->parseTwig($template->layout->content_text, [
                 'content' => $text
             ] + (array) $data);
         }
@@ -250,6 +267,9 @@ class MailManager
         return $text;
     }
 
+    /**
+     * renderPartial
+     */
     public function renderPartial($code, array $params = [])
     {
         if (!$partial = MailPartial::findOrMakePartial($code)) {
@@ -267,60 +287,17 @@ class MailManager
             return '';
         }
 
-        return $this->renderTwig($content, $params);
+        return $this->parseTwig($content, $params);
     }
 
     /**
-     * Internal helper for rendering Twig
+     * parseTwig parses Twig using the mailer environment
      */
-    protected function renderTwig($content, $data = [])
+    protected function parseTwig($contents, $vars = [])
     {
-        if ($this->isTwigStarted) {
-            return Twig::parse($content, $data);
-        }
-
-        $this->startTwig();
-
-        $result = Twig::parse($content, $data);
-
-        $this->stopTwig();
-
-        return $result;
-    }
-
-    /**
-     * Temporarily registers mail based token parsers with Twig.
-     * @return void
-     */
-    protected function startTwig()
-    {
-        if ($this->isTwigStarted) {
-            return;
-        }
-
-        $this->isTwigStarted = true;
-
-        $markupManager = MarkupManager::instance();
-        $markupManager->beginTransaction();
-        $markupManager->registerTokenParsers([
-            new MailPartialTokenParser
-        ]);
-    }
-
-    /**
-     * Indicates that we are finished with Twig.
-     * @return void
-     */
-    protected function stopTwig()
-    {
-        if (!$this->isTwigStarted) {
-            return;
-        }
-
-        $markupManager = MarkupManager::instance();
-        $markupManager->endTransaction();
-
-        $this->isTwigStarted = false;
+        $twig = App::make('twig.environment.mailer');
+        $template = $twig->createTemplate($contents);
+        return $template->render($vars);
     }
 
     //

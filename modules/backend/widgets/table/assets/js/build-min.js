@@ -21,9 +21,8 @@ this.clickHandler=this.onClick.bind(this)
 this.keydownHandler=this.onKeydown.bind(this)
 this.documentClickHandler=this.onDocumentClick.bind(this)
 this.toolbarClickHandler=this.onToolbarClick.bind(this)
-if(this.options.postback&&this.options.clientDataSourceClass=='client'){if(!this.options.postbackHandlerName){var formHandler=this.$el.closest('form').data('request')
-this.options.postbackHandlerName=formHandler||'onSave'}
-this.formSubmitHandler=this.onFormSubmit.bind(this)}
+if(this.options.postback&&this.options.clientDataSourceClass=='client')
+this.formSubmitHandler=this.onFormSubmit.bind(this)
 this.navigation=null
 this.search=null
 this.recordsAddedOrDeleted=0
@@ -286,7 +285,7 @@ if(!this.validate()){ev.preventDefault()
 return}
 var fieldName=this.options.fieldName.indexOf('[')>-1?this.options.fieldName+'[TableData]':this.options.fieldName+'TableData'
 data.options.data[fieldName]=this.dataSource.getAllData()}}
-Table.prototype.onToolbarClick=function(ev){var target=this.getEventTarget(ev),cmd=target.getAttribute('data-cmd')
+Table.prototype.onToolbarClick=function(ev){var target=this.getEventTarget(ev,'BUTTON'),cmd=target.getAttribute('data-cmd')
 if(!cmd){return}
 switch(cmd){case'record-add':case'record-add-below':this.addRecord('below')
 break
@@ -384,7 +383,7 @@ if(dataContainer.value!=value){dataContainer.value=value
 this.markCellRowDirty(cellElement)
 this.notifyRowProcessorsOnChange(cellElement)
 if(suppressEvents===undefined||!suppressEvents){this.$el.trigger('oc.tableCellChanged',[this.getCellColumnName(cellElement),value,this.getCellRowIndex(cellElement)])}}}
-Table.DEFAULTS={clientDataSourceClass:'client',keyColumn:'id',recordsPerPage:false,data:null,postback:true,postbackHandlerName:null,adding:true,deleting:true,toolbar:true,searching:false,rowSorting:false,height:false,dynamicHeight:false}
+Table.DEFAULTS={clientDataSourceClass:'client',keyColumn:'id',recordsPerPage:false,data:null,postback:true,postbackHandlerName:'onSave',adding:true,deleting:true,toolbar:true,searching:false,rowSorting:false,height:false,dynamicHeight:false}
 var old=$.fn.table
 $.fn.table=function(option){var args=Array.prototype.slice.call(arguments,1),result=undefined
 this.each(function(){var $this=$(this)
@@ -804,8 +803,7 @@ this.itemMouseMoveHandler=null
 this.itemListElement=null
 this.cachedOptionPromises=null
 BaseProto.dispose.call(this)}
-DropdownProcessor.prototype.unregisterListHandlers=function(){if(this.itemListElement)
-{this.itemListElement.removeEventListener('click',this.itemClickHandler)
+DropdownProcessor.prototype.unregisterListHandlers=function(){if(this.itemListElement){this.itemListElement.removeEventListener('click',this.itemClickHandler)
 this.itemListElement.removeEventListener('keydown',this.itemKeyDownHandler)
 this.itemListElement.removeEventListener('mousemove',this.itemMouseMoveHandler)}}
 DropdownProcessor.prototype.renderCell=function(value,cellContentContainer){var viewContainer=this.createViewContainer(cellContentContainer,'...')
@@ -832,7 +830,7 @@ this.itemListElement.addEventListener('click',this.itemClickHandler)
 this.itemListElement.addEventListener('keydown',this.itemKeyDownHandler)
 this.itemListElement.addEventListener('mousemove',this.itemMouseMoveHandler)
 this.itemListElement.setAttribute('class','table-control-dropdown-list')
-this.itemListElement.style.width=cellContentContainer.offsetWidth+'px'
+this.itemListElement.style.width=cellContentContainer.offsetWidth+2+'px'
 this.itemListElement.style.left=containerPosition.left+'px'
 this.itemListElement.style.top=containerPosition.top-2+cellContentContainer.offsetHeight+'px'
 this.fetchOptions(cellElement,function renderCellFetchOptions(options){var listElement=document.createElement('ul')
@@ -865,9 +863,8 @@ if(!this.cachedOptionPromises[cachingKey]){var requestData={column:this.columnNa
 this.cachedOptionPromises[cachingKey]=this.tableObj.$el.request(handlerName,{data:requestData})}
 this.cachedOptionPromises[cachingKey].done(function onDropDownLoadOptionsSuccess(data){onSuccess(data.options)}).always(function onDropDownLoadOptionsAlways(){viewContainer.setAttribute('class','')})}}
 DropdownProcessor.prototype.createOptionsCachingKey=function(row){var cachingKey='non-dependent',dependsOn=this.columnConfiguration.dependsOn
-if(dependsOn){if(typeof dependsOn=='object'){for(var i=0,len=dependsOn.length;i<len;i++)
-cachingKey+=dependsOn[i]+this.tableObj.getRowCellValueByColumnName(row,dependsOn[i])}else
-cachingKey=dependsOn+this.tableObj.getRowCellValueByColumnName(row,dependsOn)}
+if(dependsOn){if(typeof dependsOn=='object'){for(var i=0,len=dependsOn.length;i<len;i++){cachingKey+=dependsOn[i]+this.tableObj.getRowCellValueByColumnName(row,dependsOn[i])}}
+else{cachingKey=dependsOn+this.tableObj.getRowCellValueByColumnName(row,dependsOn)}}
 return cachingKey}
 DropdownProcessor.prototype.getAbsolutePosition=function(element){var top=document.body.scrollTop,left=0
 do{top+=element.offsetTop||0;top-=element.scrollTop||0;left+=element.offsetLeft||0;element=element.offsetParent;}while(element)
@@ -878,19 +875,21 @@ DropdownProcessor.prototype.findSelectedItem=function(){if(this.itemListElement)
 return this.itemListElement.querySelector('ul li.selected')
 return null}
 DropdownProcessor.prototype.setSelectedItem=function(item){if(!this.itemListElement)
-return null;if(item.tagName=='LI'&&this.itemListElement.contains(item)){this.itemListElement.querySelectorAll('ul li').forEach(function(option){option.removeAttribute('class');});item.setAttribute('class','selected');}
+return null
+if(item.tagName=='LI'&&this.itemListElement.contains(item)){this.itemListElement.querySelectorAll('ul li').forEach(function(option){option.removeAttribute('class')})
+item.setAttribute('class','selected');}
 this.tableObj.setCellValue(this.activeCell,item.getAttribute('data-value'))
 this.setViewContainerValue(this.activeCell,item.textContent)}
 DropdownProcessor.prototype.findFocusedItem=function(){if(this.itemListElement)
 return this.itemListElement.querySelector('ul li:focus')
 return null}
 DropdownProcessor.prototype.onItemClick=function(ev){var target=this.tableObj.getEventTarget(ev)
-if(target.tagName=='LI'){target.focus();this.updateCellFromFocusedItem(target)
+if(target.tagName=='LI'){target.focus()
+this.updateCellFromFocusedItem(target)
 this.hideDropdown()}}
 DropdownProcessor.prototype.onItemKeyDown=function(ev){if(!this.itemListElement)
 return
-if(ev.key==='ArrowDown'||ev.key==='ArrowUp')
-{var focused=this.findFocusedItem(),newFocusedItem=focused.nextElementSibling
+if(ev.key==='ArrowDown'||ev.key==='ArrowUp'){var focused=this.findFocusedItem(),newFocusedItem=focused.nextElementSibling
 if(ev.key==='ArrowUp')
 newFocusedItem=focused.previousElementSibling
 if(newFocusedItem){newFocusedItem.focus()}
@@ -908,15 +907,18 @@ this.searchByTextInput(ev,true);}
 DropdownProcessor.prototype.onItemMouseMove=function(ev){if(!this.itemListElement)
 return
 var target=this.tableObj.getEventTarget(ev)
-if(target.tagName=='LI'){target.focus();}}
+if(target.tagName=='LI'){target.focus()}}
 DropdownProcessor.prototype.onKeyDown=function(ev){if(!this.itemListElement)
 return
-if((ev.key==='(Space character)'||ev.key==='Spacebar'||ev.key===' ')&&!this.searching){this.showDropdown()}else if(ev.key==='ArrowDown'||ev.key==='ArrowUp'){var selected=this.findSelectedItem(),newSelectedItem;if(!selected){if(ev.key==='ArrowUp'){return false}
-newSelectedItem=this.itemListElement.querySelector('ul li:first-child')}else{newSelectedItem=selected.nextElementSibling
+if((ev.key==='(Space character)'||ev.key==='Spacebar'||ev.key===' ')&&!this.searching){this.showDropdown()}
+else if(ev.key==='ArrowDown'||ev.key==='ArrowUp'){var selected=this.findSelectedItem(),newSelectedItem;if(!selected){if(ev.key==='ArrowUp'){return false}
+newSelectedItem=this.itemListElement.querySelector('ul li:first-child')}
+else{newSelectedItem=selected.nextElementSibling
 if(ev.key==='ArrowUp')
 newSelectedItem=selected.previousElementSibling}
 if(newSelectedItem){this.setSelectedItem(newSelectedItem);}
-return false}else{this.searchByTextInput(ev);}}
+return false}
+else{this.searchByTextInput(ev);}}
 DropdownProcessor.prototype.onRowValueChanged=function(columnName,cellElement){if(!this.columnConfiguration.dependsOn)
 return
 var dependsOnColumn=false,dependsOn=this.columnConfiguration.dependsOn
@@ -932,12 +934,21 @@ viewContainer=null})}
 DropdownProcessor.prototype.elementBelongsToProcessor=function(element){if(!this.itemListElement)
 return false
 return this.tableObj.parentContainsElement(this.itemListElement,element)}
-DropdownProcessor.prototype.searchByTextInput=function(ev,focusOnly){if(focusOnly===undefined){focusOnly=false;}
-var character=ev.key;if(character.length===1||character==='Space'){if(!this.searching){this.searching=true;this.searchQuery='';}
-this.searchQuery+=(character==='Space')?' ':character;var validItem=null;var query=this.searchQuery;this.itemListElement.querySelectorAll('ul li').forEach(function(item){if(validItem===null&&item.dataset.value&&item.dataset.value.toLowerCase().indexOf(query.toLowerCase())===0){validItem=item;}});if(validItem){if(focusOnly===true){validItem.focus();}else{this.setSelectedItem(validItem);}
-if(this.searchInterval){clearTimeout(this.searchInterval);}
-this.searchInterval=setTimeout(this.cancelTextSearch.bind(this),1000);}else{this.cancelTextSearch();}}}
-DropdownProcessor.prototype.cancelTextSearch=function(){this.searching=false;this.searchQuery=null;this.searchInterval=null;}
+DropdownProcessor.prototype.searchByTextInput=function(ev,focusOnly){if(focusOnly===undefined){focusOnly=false}
+var character=ev.key
+if(character.length===1||character==='Space'){if(!this.searching){this.searching=true
+this.searchQuery=''}
+this.searchQuery+=(character==='Space')?' ':character
+var validItem=null;var query=this.searchQuery
+this.itemListElement.querySelectorAll('ul li').forEach(function(item){if(validItem===null&&item.dataset.value&&item.dataset.value.toLowerCase().indexOf(query.toLowerCase())===0){validItem=item}})
+if(validItem){if(focusOnly===true){validItem.focus()}
+else{this.setSelectedItem(validItem)}
+if(this.searchInterval){clearTimeout(this.searchInterval)}
+this.searchInterval=setTimeout(this.cancelTextSearch.bind(this),1000)}
+else{this.cancelTextSearch()}}}
+DropdownProcessor.prototype.cancelTextSearch=function(){this.searching=false
+this.searchQuery=null
+this.searchInterval=null}
 $.oc.table.processor.dropdown=DropdownProcessor;}(window.jQuery);+function($){"use strict";if($.oc.table===undefined)
 throw new Error("The $.oc.table namespace is not defined. Make sure that the table.js script is loaded.");if($.oc.table.processor===undefined)
 throw new Error("The $.oc.table.processor namespace is not defined. Make sure that the table.processor.base.js script is loaded.");var Base=$.oc.table.processor.string,BaseProto=Base.prototype

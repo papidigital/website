@@ -16,7 +16,10 @@
 }
 
 .pika-single {
-    border-radius: @border-radius-base;
+    border: @popup-border!important;
+    background: white;
+    border-radius: 8px;
+
     font-size: 12px;
     margin-top: 5px;
     z-index: @zindex-datepicker;
@@ -24,7 +27,7 @@
     width: 310px;
 
     &.is-bound {
-        .box-shadow(@overlay-box-shadow);
+        box-shadow: @box-shadow-z2;
     }
 
     abbr {
@@ -74,8 +77,9 @@
 
 .clockpicker-popover {
     z-index: @zindex-datepicker;
-    .box-shadow(@overlay-box-shadow);
-    border-radius: @border-radius-base;
+    box-shadow: @box-shadow-z2;
+    border-radius: 8px;
+    border: @popup-border!important;
 
     .popover-title {
         font-size: 20px;

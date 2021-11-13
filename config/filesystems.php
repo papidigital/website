@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => 'local',
+    'default' => 's3',
 
     /*
     |--------------------------------------------------------------------------
@@ -45,27 +45,31 @@ return [
 
         'local' => [
             'driver' => 'local',
-            'root'   => storage_path('app'),
-            'url'    => '/storage/app',
+            'root' => storage_path('app'),
+            'url' => '/storage/app',
         ],
 
         's3' => [
             'driver' => 's3',
-            'key'    => env('S3_KEY', ''),
-            'secret' => env('S3_SECRET', ''),
-            'region' => env('S3_REGION', ''),
-            'bucket' => env('S3_BUCKET', ''),
+            'key'    => 'AKIA4YCIEA5ZMCMX6375',
+            'secret' => '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',
+            'region' => 'us-west-1',
+            'bucket' => 'papidigital-website',
         ],
 
         'rackspace' => [
-            'driver'    => 'rackspace',
-            'username'  => 'your-username',
-            'key'       => 'your-key',
+            'driver' => 'rackspace',
+            'username' => 'your-username',
+            'key' => 'your-key',
             'container' => 'your-container',
-            'endpoint'  => 'https://identity.api.rackspacecloud.com/v2.0/',
-            'region'    => 'IAD',
+            'endpoint' => 'https://identity.api.rackspacecloud.com/v2.0/',
+            'region' => 'IAD',
         ],
 
+        'log' => [
+            'driver' => 'local',
+           		 'root' => storage_path(),
+            ],
     ],
 
 ];

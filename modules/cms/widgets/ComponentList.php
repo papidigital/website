@@ -88,7 +88,7 @@ class ComponentList extends WidgetBase
             foreach ($components as $componentInfo) {
                 $className = $componentInfo->className;
                 $alias = $componentInfo->alias;
-                $component = App::make($className);
+                $component = App::make($className, [null, []]);
 
                 if ($component->isHidden) {
                     continue;
@@ -102,7 +102,7 @@ class ComponentList extends WidgetBase
                     'description'    => ComponentHelpers::getComponentDescription($component),
                     'plugin'         => $pluginName,
                     'propertyConfig' => ComponentHelpers::getComponentsPropertyConfig($component),
-                    'propertyValues' => ComponentHelpers::getComponentPropertyValues($component, $alias),
+                    'propertyValues' => ComponentHelpers::getComponentPropertyValues($component),
                     'className'      => get_class($component),
                     'pluginIcon'     => $pluginIcon,
                     'alias'          => $alias,

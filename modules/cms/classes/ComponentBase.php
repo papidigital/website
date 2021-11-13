@@ -7,7 +7,7 @@ use October\Rain\Extension\Extendable;
 use BadMethodCallException;
 
 /**
- * Component base class
+ * ComponentBase class
  *
  * @package october\cms
  * @author Alexey Bobkov, Samuel Georges
@@ -93,18 +93,18 @@ abstract class ComponentBase extends Extendable
 
         $className = Str::normalizeClassName(get_called_class());
         $this->dirName = strtolower(str_replace('\\', '/', $className));
-        $this->assetPath = Config::get('cms.pluginsPath', '/plugins').dirname(dirname($this->dirName));
+        $this->assetPath = $this->getComponentAssetPath();
 
         parent::__construct();
     }
 
     /**
-     * Returns information about this component, including name and description.
+     * componentDetails returns information about this component, including name and description
      */
     abstract public function componentDetails();
 
     /**
-     * Returns the absolute component path.
+     * getPath returns the absolute component path
      */
     public function getPath()
     {
@@ -161,7 +161,7 @@ abstract class ComponentBase extends Extendable
          *
          *     Event::listen('cms.component.beforeRunAjaxHandler', function ((\Cms\Classes\ComponentBase) $component, (string) $handler) {
          *         if (strpos($handler, '::')) {
-         *             list($componentAlias, $handlerName) = explode('::', $handler);
+         *             [$componentAlias, $handlerName] = explode('::', $handler);
          *             if ($componentAlias === $this->getBackendWidgetAlias()) {
          *                 return $this->backendControllerProxy->runAjaxHandler($handler);
          *             }
@@ -172,7 +172,7 @@ abstract class ComponentBase extends Extendable
          *
          *     $this->controller->bindEvent('component.beforeRunAjaxHandler', function ((string) $handler) {
          *         if (strpos($handler, '::')) {
-         *             list($componentAlias, $handlerName) = explode('::', $handler);
+         *             [$componentAlias, $handlerName] = explode('::', $handler);
          *             if ($componentAlias === $this->getBackendWidgetAlias()) {
          *                 return $this->backendControllerProxy->runAjaxHandler($handler);
          *             }
@@ -284,7 +284,7 @@ abstract class ComponentBase extends Extendable
      */
     public function paramName($name, $default = null)
     {
-        if (($extName = $this->propertyName($name)) && substr($extName, 0, 1) == ':') {
+        if (($extName = $this->propertyName($name)) && substr($extName, 0, 1) === ':') {
             return substr($extName, 1);
         }
 
@@ -325,5 +325,23 @@ abstract class ComponentBase extends Extendable
     public function __toString()
     {
         return $this->alias;
+    }
+
+    //
+    // Internals
+    //
+
+    /**
+     * getComponentAssetPath returns the public directory for the component assets
+     */
+    protected function getComponentAssetPath(): string
+    {
+        $assetUrl = Config::get('system.plugins_asset_url');
+
+        if ($assetUrl === null) {
+            $assetUrl = Config::get('app.asset_url').'/plugins';
+        }
+
+        return $assetUrl . dirname(dirname($this->dirName));
     }
 }

@@ -1,12 +1,13 @@
 <?php namespace Cms\Classes;
 
 use Lang;
-use BackendAuth;
 use ApplicationException;
+use October\Rain\Router\Helper as RouterHelper;
 use October\Rain\Filesystem\Definitions as FileDefinitions;
+use ValidationException;
 
 /**
- * The CMS page class.
+ * Page class for the CMS.
  *
  * @package october\cms
  * @author Alexey Bobkov, Samuel Georges
@@ -45,20 +46,17 @@ class Page extends CmsCompoundObject
      */
     public $rules = [
         'title' => 'required',
-        'url'   => ['required', 'regex:/^\/[a-z0-9\/\:_\-\*\[\]\+\?\|\.\^\\\$]*$/i']
+        'url'   => 'required',
     ];
 
     /**
-     * Creates an instance of the object and associates it with a CMS theme.
-     * @param array $attributes
+     * beforeValidate applies custom validation rules
      */
-    public function __construct(array $attributes = [])
+    public function beforeValidate()
     {
-        parent::__construct($attributes);
-
-        $this->customMessages = [
-            'url.regex' => 'cms::lang.page.invalid_url',
-        ];
+        if (!RouterHelper::validateUrl($this->getAttribute('url'))) {
+            throw new ValidationException(['url' => Lang::get('cms::lang.page.invalid_url')]);
+        }
     }
 
     /**
@@ -198,12 +196,6 @@ class Page extends CmsCompoundObject
             }
 
             $page = self::loadCached($theme, $item->reference);
-
-            // Remove hidden CMS pages from menus when backend user is logged out
-            if ($page && $page->is_hidden && !BackendAuth::getUser()) {
-                return;
-            }
-
             $controller = Controller::getController() ?: new Controller;
             $pageUrl = $controller->pageUrl($item->reference, [], false);
 

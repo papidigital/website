@@ -9,7 +9,7 @@ use October\Rain\Router\Router as RainRouter;
 use October\Rain\Router\Helper as RouterHelper;
 
 /**
- * The router parses page URL patterns and finds pages by URLs.
+ * Router parses page URL patterns and finds pages by URLs.
  *
  * The page URL format is explained below.
  * <pre>/blog/post/:post_id</pre>
@@ -99,11 +99,11 @@ class Router
             $fileName = null;
             $urlList = [];
 
-            $cacheable = Config::get('cms.enableRoutesCache');
+            $cacheable = Config::get('cms.enable_route_cache');
             if ($cacheable) {
                 $fileName = $this->getCachedUrlFileName($url, $urlList);
                 if (is_array($fileName)) {
-                    list($fileName, $this->parameters) = $fileName;
+                    [$fileName, $this->parameters] = $fileName;
                 }
             }
 
@@ -127,7 +127,7 @@ class Router
                             : $fileName;
 
                         $key = $this->getUrlListCacheKey();
-                        $expiresAt = now()->addMinutes(Config::get('cms.urlCacheTtl', 1));
+                        $expiresAt = now()->addMinutes(Config::get('cms.url_cache_ttl', 1));
                         Cache::put(
                             $key,
                             base64_encode(serialize($urlList)),
@@ -180,7 +180,7 @@ class Router
 
     /**
      * Autoloads the URL map only allowing a single execution.
-     * @return array Returns the URL map.
+     * @return October\Rain\Router\Router Returns the URL map.
      */
     protected function getRouterObject()
     {
@@ -221,14 +221,14 @@ class Router
      * Loads the URL map - a list of page file names and corresponding URL patterns.
      * The URL map can is cached. The clearUrlMap() method resets the cache. By default
      * the map is updated every time when a page is saved in the back-end, or
-     * when the interval defined with the cms.urlCacheTtl expires.
+     * when the interval defined with the cms.url_cache_ttl expires.
      * @return boolean Returns true if the URL map was loaded from the cache. Otherwise returns false.
      */
     protected function loadUrlMap()
     {
         $key = $this->getCacheKey('page-url-map');
 
-        $cacheable = Config::get('cms.enableRoutesCache');
+        $cacheable = Config::get('cms.enable_route_cache');
         if ($cacheable) {
             $cached = Cache::get($key, false);
         }
@@ -252,7 +252,7 @@ class Router
 
             $this->urlMap = $map;
             if ($cacheable) {
-                $expiresAt = now()->addMinutes(Config::get('cms.urlCacheTtl', 1));
+                $expiresAt = now()->addMinutes(Config::get('cms.url_cache_ttl', 10));
                 Cache::put($key, base64_encode(serialize($map)), $expiresAt);
             }
 
@@ -302,14 +302,15 @@ class Router
 
     /**
      * Returns a routing parameter.
-     * @param  string $name
-     * @param  string|null $default
-     * @return string|null
+     * @return array
      */
-    public function getParameter(string $name, string $default = null)
+    public function getParameter($name, $default = null)
     {
-        $value = $this->parameters[$name] ?? '';
-        return $value !== '' ? $value : $default;
+        if (isset($this->parameters[$name]) && ($this->parameters[$name] === '0' || !empty($this->parameters[$name]))) {
+            return $this->parameters[$name];
+        }
+
+        return $default;
     }
 
     /**

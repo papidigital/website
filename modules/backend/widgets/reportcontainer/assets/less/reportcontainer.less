@@ -22,8 +22,8 @@
                     position: absolute;
                     left: 15px;
                     top: 13px;
-                    .opacity(0);
-                    .transition(opacity 0.2s);
+                    opacity: 0;
+                    transition: opacity 0.2s;
                     font-size: 14px;
                     cursor: move;
 
@@ -39,7 +39,7 @@
                     width: 15px;
                     height: 15px;
                     color: @color-report-widget-control-inactive;
-                    .opacity(1);
+                    opacity: 1;
                     outline: none;
 
                     &:hover {
@@ -91,8 +91,8 @@
                     padding-left: 18px;
                 }
 
-                .drag-handle { 
-                    .opacity(1);
+                .drag-handle {
+                    opacity: 1;
                 }
             }
 
@@ -107,7 +107,7 @@
             &.width-9 {width: 74.97%;}
             &.width-10 {width: 83.3%;}
             &.width-11 {width: 91.63%;}
-            &.width-12 {width: 100%;}			
+            &.width-12 {width: 100%;}
 
             &.dragged {
                 .transition-duration(0s) !important;
@@ -190,7 +190,7 @@
     .report-container {
         ul .item {
             // The breakpoint should be defined in the CSS and JS,
-            // otherwise some widgets can't calculate the width properly, 
+            // otherwise some widgets can't calculate the width properly,
             // as the JS is applied too late.
             width: 100% !important;
         }

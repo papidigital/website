@@ -2,6 +2,7 @@
 
 use Lang;
 use Config;
+use System;
 use BackendAuth;
 use System\Models\Parameter;
 use System\Models\LogSetting;
@@ -56,16 +57,14 @@ class Status extends ReportWidgetBase
 
     protected function loadData()
     {
-        $manager = UpdateManager::instance();
-
         $this->vars['canUpdate'] = BackendAuth::getUser()->hasAccess('system.manage_updates');
-        $this->vars['updates']   = $manager->check();
-        $this->vars['warnings']  = $this->getSystemWarnings();
+        $this->vars['updates'] = UpdateManager::instance()->check();
+        $this->vars['warnings'] = $this->getSystemWarnings();
         $this->vars['coreBuild'] = Parameter::get('system::core.build');
 
-        $this->vars['eventLog']      = EventLog::count();
-        $this->vars['eventLogMsg']   = LogSetting::get('log_events', false) ? false : true;
-        $this->vars['requestLog']    = RequestLog::count();
+        $this->vars['eventLog'] = EventLog::count();
+        $this->vars['eventLogMsg'] = LogSetting::get('log_events', false) ? false : true;
+        $this->vars['requestLog'] = RequestLog::count();
         $this->vars['requestLogMsg'] = LogSetting::get('log_requests', false) ? false : true;
 
         $this->vars['appBirthday'] = PluginVersion::orderBy('created_at')->value('created_at');
@@ -81,7 +80,7 @@ class Status extends ReportWidgetBase
     {
         $warnings = [];
 
-        $missingDependencies = PluginManager::instance()->findMissingDependencies();
+        $missingPlugins = PluginManager::instance()->findMissingDependencies();
 
         $writablePaths = [
             temp_path(),
@@ -95,16 +94,12 @@ class Status extends ReportWidgetBase
             storage_path('cms/combiner'),
         ];
 
-        if (in_array('Cms', Config::get('cms.loadModules', []))) {
+        if (System::hasModule('Cms')) {
             $writablePaths[] = themes_path();
         }
 
         if (Config::get('app.debug', true)) {
             $warnings[] = Lang::get('backend::lang.warnings.debug');
-        }
-
-        if (Config::get('develop.decompileBackendAssets', false)) {
-            $warnings[] = Lang::get('backend::lang.warnings.decompileBackendAssets');
         }
 
         $requiredExtensions = [
@@ -127,13 +122,8 @@ class Status extends ReportWidgetBase
             }
         }
 
-        foreach ($missingDependencies as $pluginCode => $plugin) {
-            foreach ($plugin as $missingPluginCode) {
-                $warnings[] = Lang::get('system::lang.updates.update_warnings_plugin_missing', [
-                    'code' => '<strong>' . $missingPluginCode . '</strong>',
-                    'parent_code' => '<strong>' . $pluginCode . '</strong>'
-                ]);
-            }
+        foreach ($missingPlugins as $pluginCode) {
+            $warnings[] = Lang::get('backend::lang.warnings.plugin_missing', ['name' => '<strong>'.$pluginCode.'</strong>']);
         }
 
         return $warnings;

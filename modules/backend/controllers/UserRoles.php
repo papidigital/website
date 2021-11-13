@@ -78,7 +78,7 @@ class UserRoles extends Controller
         return [
             'permissions' => [
                 'tab' => 'backend::lang.user.permissions',
-                'type' => 'Backend\FormWidgets\PermissionEditor',
+                'type' => \Backend\FormWidgets\PermissionEditor::class,
                 'mode' => 'checkbox'
             ]
         ];

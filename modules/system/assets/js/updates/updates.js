@@ -1,157 +1,136 @@
 /*
- * Updates class
- *
- * Dependences:
- * - Waterfall plugin (waterfall.js)
+ * Update List page
  */
 
 +function ($) { "use strict";
 
-    var UpdateProcess = function () {
-
-        // Init
-        this.init()
+    var UpdateList = function () {
+        this.init();
     }
 
-    UpdateProcess.prototype.init = function() {
-        var self = this
-        this.activeStep = null
-        this.updateSteps = null
+    UpdateList.prototype.init = function() {
+        var self = this;
+
+        $(document).ready(function() {
+            self.checkForUpdates(true);
+        });
     }
 
-    UpdateProcess.prototype.check = function() {
-        var $form = $('#updateForm'),
-            self = this
+    UpdateList.prototype.checkForUpdates = function(useCache) {
+        var self = this;
 
-        $form.request('onCheckForUpdates').done(function() {
-            self.evalConfirmedUpdates()
-        })
+        $('[data-plugin-latest-code], [data-core-latest-version]')
+            .text('')
+            .addClass('oc-loading')
+            .closest('tr')
+            .removeClass('positive important')
+        ;
 
-        $form.on('change', '[data-important-update-select]', function() {
-            var $el = $(this),
-                selectedValue = $el.val(),
-                $updateItem = $el.closest('.update-item')
-
-            $updateItem.removeClass('item-danger item-muted item-success')
-
-            if (selectedValue == 'confirm') {
-                $updateItem.addClass('item-success')
+        $.request('onCompareVersions', {
+            data: {
+                force: useCache ? 0 : 1
             }
-            else if (selectedValue == 'ignore' || selectedValue == 'skip') {
-                $updateItem.addClass('item-muted')
+        }).done(function(data) {
+            self.updateCoreVersion(data);
+            self.updatePluginVersions(data);
+        });
+    }
+
+    UpdateList.prototype.updatePluginVersions = function(data) {
+        $('[data-plugin-current-code]').each(function() {
+            var pluginCode = $(this).data('plugin-current-code'),
+                $current = $(this),
+                $latest = $('[data-plugin-latest-code="'+pluginCode+'"]:first');
+
+            var latestVer = data.plugins ? data.plugins[pluginCode] : null,
+                currentVer = $current.data('plugin-current-version');
+
+            if (latestVer) {
+                $latest.removeClass('oc-loading').text(latestVer);
+
+                var hasUpdates;
+                try {
+                    hasUpdates = version_compare(latestVer, currentVer) > 0;
+                }
+                catch(err) {
+                    hasUpdates = 0;
+                }
+
+                if (hasUpdates) {
+                    $current.closest('tr').addClass('positive important');
+                }
             }
             else {
-                $updateItem.addClass('item-danger')
+                $latest.removeClass('oc-loading').text(currentVer);
             }
-
-            self.evalConfirmedUpdates()
         })
     }
 
-    UpdateProcess.prototype.evalConfirmedUpdates = function() {
-        var $form = $('#updateForm'),
-            hasConfirmed = false
+    UpdateList.prototype.updateCoreVersion = function(data) {
+        var $current = $('[data-core-current-version]:first'),
+            $latest = $('[data-core-latest-version]:first');
 
-        $('[data-important-update-select]', $form).each(function() {
-            if ($(this).val() == '') {
-                hasConfirmed = true
-            }
-        })
+        var currentVer = $current.data('core-current-version'),
+            latestVer = data.core;
 
-        if (hasConfirmed) {
-            $('#updateListUpdateButton').prop('disabled', true)
-            $('#updateListImportantLabel').show()
+        $latest.removeClass('oc-loading').text(latestVer ? latestVer : currentVer);
+
+        var hasUpdates;
+        try {
+            hasUpdates = version_compare(latestVer, currentVer) > 0;
         }
-        else {
-            $('#updateListUpdateButton').prop('disabled', false)
-            $('#updateListImportantLabel').hide()
+        catch(err) {
+            hasUpdates = 0;
+        }
+
+        if (hasUpdates) {
+            $('[data-core-has-updates]:first').show();
+            $('[data-core-no-updates]:first').hide();
+            $('[data-update-message]:first').show();
         }
     }
 
-    UpdateProcess.prototype.execute = function(steps) {
-        this.updateSteps = steps
-        this.runUpdate()
+    if ($.oc === undefined) {
+        $.oc = {};
     }
 
-    UpdateProcess.prototype.runUpdate = function(fromStep) {
-        $.waterfall.apply(this, this.buildEventChain(this.updateSteps, fromStep))
-            .fail(function(reason){
-                var
-                    template = $('#executeFailed').html(),
-                    html = Mustache.to_html(template, { reason: reason })
-
-                $('#executeActivity').hide()
-                $('#executeStatus').html(html)
-            })
-    }
-
-    UpdateProcess.prototype.retryUpdate = function() {
-        $('#executeActivity').show()
-        $('#executeStatus').html('')
-
-        this.runUpdate(this.activeStep)
-    }
-
-    UpdateProcess.prototype.buildEventChain = function(steps, fromStep) {
-        var self = this,
-            eventChain = [],
-            skipStep = fromStep ? true : false
-
-        $.each(steps, function(index, step){
-
-            if (step == fromStep) {
-                skipStep = false
-            }
-
-            if (skipStep) {
-                return true // Continue
-            }
-
-            eventChain.push(function(){
-                var deferred = $.Deferred()
-
-                self.activeStep = step
-                self.setLoadingBar(true, step.label)
-
-                $.request('onExecuteStep', {
-                    data: step,
-                    success: function(data){
-                        setTimeout(function() { deferred.resolve() }, 600)
-
-                        if (step.code == 'completeUpdate' || step.code == 'completeInstall')
-                            this.success(data)
-                        else
-                            self.setLoadingBar(false)
-                    },
-                    error: function(data){
-                        self.setLoadingBar(false)
-                        deferred.reject(data.responseText)
-                    }
-                })
-
-                return deferred
-            })
-        })
-
-        return eventChain
-    }
-
-    UpdateProcess.prototype.setLoadingBar = function(state, message) {
-        var loadingBar = $('#executeLoadingBar'),
-            messageDiv = $('#executeMessage')
-
-        if (state)
-            loadingBar.removeClass('bar-loaded')
-        else
-            loadingBar.addClass('bar-loaded')
-
-        if (message)
-            messageDiv.text(message)
-    }
-
-    if ($.oc === undefined)
-        $.oc = {}
-
-    $.oc.updateProcess = new UpdateProcess;
+    $.oc.updateList = new UpdateList;
 
 }(window.jQuery);
+
+// Port of PHP version_compare
+function version_compare(a, b) {
+    if (a === b) {
+       return 0;
+    }
+
+    var a_components = a+''.split('.');
+    var b_components = b+''.split('.');
+
+    var len = Math.min(a_components.length, b_components.length);
+
+    // Loop while the components are equal
+    for (var i = 0; i < len; i++) {
+        // A bigger than B
+        if (parseInt(a_components[i]) > parseInt(b_components[i])) {
+            return 1;
+        }
+
+        // B bigger than A
+        if (parseInt(a_components[i]) < parseInt(b_components[i])) {
+            return -1;
+        }
+    }
+
+    // If one's a prefix of the other, the longer one is greater
+    if (a_components.length > b_components.length) {
+        return 1;
+    }
+
+    if (a_components.length < b_components.length) {
+        return -1;
+    }
+
+    // Otherwise they are the same
+    return 0;
+}

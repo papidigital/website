@@ -228,7 +228,7 @@ class CmsException extends ApplicationException
      */
     public function applyMask(Exception $exception)
     {
-        if ($this->code == 100 || $this->processCompoundObject($exception) === false) {
+        if ($this->code === 100 || $this->processCompoundObject($exception) === false) {
             parent::applyMask($exception);
             return;
         }

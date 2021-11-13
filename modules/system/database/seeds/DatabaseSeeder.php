@@ -5,7 +5,6 @@ use Eloquent;
 
 class DatabaseSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -13,8 +12,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        Eloquent::unguarded(function () {
-            $this->call('System\Database\Seeds\SeedSetupMailLayouts');
-        });
+        Eloquent::unguard();
+
+        $this->call('System\Database\Seeds\SeedSetupMailLayouts');
+
+        Eloquent::reguard();
     }
 }

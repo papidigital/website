@@ -12,8 +12,7 @@ use ApplicationException;
 use BackendAuth;
 
 /**
- * Filter Widget
- * Renders a container used for filtering things.
+ * Filter Widget renders a container used for filtering things
  *
  * @package october\backend
  * @author Alexey Bobkov, Samuel Georges
@@ -85,7 +84,7 @@ class Filter extends WidgetBase
     }
 
     /**
-     * Prepares the view data
+     * prepareVars for display
      */
     public function prepareVars()
     {
@@ -109,6 +108,7 @@ class Filter extends WidgetBase
                 }
 
                 break;
+
             case 'daterange':
                 if ($scope->value && is_array($scope->value) && count($scope->value) === 2 &&
                     $scope->value[0] && $scope->value[0] instanceof Carbon &&
@@ -117,7 +117,7 @@ class Filter extends WidgetBase
                     $after = $scope->value[0]->format('Y-m-d H:i:s');
                     $before = $scope->value[1]->format('Y-m-d H:i:s');
 
-                    if (strcasecmp($after, '0000-00-00 00:00:00') > 0) {
+                    if (strcasecmp($after, '0000-01-01 00:00:00') > 0) {
                         $params['afterStr'] = Backend::dateTime($scope->value[0], ['formatAlias' => 'dateMin']);
                         $params['after']    = $after;
                     }
@@ -135,20 +135,19 @@ class Filter extends WidgetBase
                         $params['before']    = null;
                     }
                 }
-
                 break;
+
             case 'number':
                 if (is_numeric($scope->value)) {
                     $params['number'] = $scope->value;
                 }
-
                 break;
 
             case 'numberrange':
                 if (
-                    $scope->value
-                    && (is_array($scope->value) && count($scope->value) === 2)
-                    && (isset($scope->value[0]) || isset($scope->value[1]))
+                    $scope->value &&
+                    (is_array($scope->value) && count($scope->value) === 2) &&
+                    (isset($scope->value[0]) || isset($scope->value[1]))
                 ) {
                     $min = $scope->value[0];
                     $max = $scope->value[1];
@@ -159,13 +158,11 @@ class Filter extends WidgetBase
                     $params['maxStr'] = $max ?? '∞';
                     $params['max'] = $max ?? null;
                 }
-
                 break;
 
             case 'text':
                 $params['value'] = $scope->value;
                 $params['size'] = array_get($scope->config, 'size', 10);
-
                 break;
         }
 
@@ -184,7 +181,9 @@ class Filter extends WidgetBase
         }
 
         $dependsOn = is_array($scope->dependsOn) ? $scope->dependsOn : [$scope->dependsOn];
+
         $dependsOn = htmlspecialchars(json_encode($dependsOn), ENT_QUOTES, 'UTF-8');
+
         return $dependsOn;
     }
 
@@ -228,7 +227,7 @@ class Filter extends WidgetBase
                 $dates = $this->datesFromAjax($data['dates'] ?? null);
 
                 if (!empty($dates)) {
-                    list($date) = $dates;
+                    [$date] = $dates;
                 }
                 else {
                     $date = null;
@@ -242,7 +241,7 @@ class Filter extends WidgetBase
                 $dates = $this->datesFromAjax($data['dates'] ?? null);
 
                 if (!empty($dates)) {
-                    list($after, $before) = $dates;
+                    [$after, $before] = $dates;
 
                     $dates = [$after, $before];
                 }
@@ -258,7 +257,7 @@ class Filter extends WidgetBase
                 $numbers = $this->numbersFromAjax($data['numbers'] ?? null);
 
                 if (!empty($numbers)) {
-                    list($number) = $numbers;
+                    [$number] = $numbers;
                 }
                 else {
                     $number = null;
@@ -272,7 +271,7 @@ class Filter extends WidgetBase
                 $numbers = $this->numbersFromAjax($data['numbers'] ?? null);
 
                 if (!empty($numbers)) {
-                    list($min, $max) = $numbers;
+                    [$min, $max] = $numbers;
 
                     $numbers = [$min, $max];
                 }
@@ -333,37 +332,38 @@ class Filter extends WidgetBase
     //
 
     /**
-     * Returns the available options a scope can use, either from the
-     * model relation or from a supplied array. Optionally apply a search
-     * constraint to the options.
-     * @param  string $scope
-     * @param  string $searchQuery
-     * @return array
+     * getAvailableOptions returns the available options a scope can use, either from the
+     * model relation or from a supplied array. Optionally apply a search constraint
+     * to the options
      */
-    protected function getAvailableOptions($scope, $searchQuery = null)
+    protected function getAvailableOptions(FilterScope $scope, string $searchQuery = null): array
     {
+        $available = [];
+
         if ($scope->options) {
-            return $this->getOptionsFromArray($scope, $searchQuery);
+            $available = $this->getOptionsFromArray($scope, $searchQuery);
+        }
+        else {
+            $nameColumn = $this->getScopeNameFrom($scope);
+            $options = $this->getOptionsFromModel($scope, $searchQuery);
+
+            foreach ($options as $option) {
+                $available[$option->getKey()] = $option->{$nameColumn};
+            }
         }
 
-        $available = [];
-        $nameColumn = $this->getScopeNameFrom($scope);
-        $options = $this->getOptionsFromModel($scope, $searchQuery);
-        foreach ($options as $option) {
-            $available[$option->getKey()] = $option->{$nameColumn};
+        if ($scope->emptyOption) {
+            $available = ['' => Lang::get($scope->emptyOption)] + $available;
         }
 
         return $available;
     }
 
     /**
-     * Removes any already selected options from the available options, returns
-     * a newly built array.
-     * @param  array  $activeKeys
-     * @param  array  $availableOptions
-     * @return array
+     * filterActiveOptions removes any already selected options from the available options,
+     * returns a newly built array
      */
-    protected function filterActiveOptions(array $activeKeys, array &$availableOptions)
+    protected function filterActiveOptions(array $activeKeys, array &$availableOptions): array
     {
         $active = [];
         foreach ($availableOptions as $id => $option) {
@@ -388,11 +388,7 @@ class Filter extends WidgetBase
 
         $query = $model->newQuery();
 
-        /*
-         * The 'group' scope has trouble supporting more than 500 records at a time
-         * @todo Introduce a more advanced version with robust list support.
-         */
-        $query->limit(500);
+        $query->limit(200);
 
         /**
          * @event backend.filter.extendQuery
@@ -418,10 +414,21 @@ class Filter extends WidgetBase
         $this->fireSystemEvent('backend.filter.extendQuery', [$query, $scope]);
 
         if (!$searchQuery) {
-            return $query->get();
+            // If scope has active filter(s) run additional query and merge it with base query
+            if ($scope->value) {
+                $modelIds = array_keys($scope->value);
+                $activeOptions = $model::findMany($modelIds);
+            }
+
+            $modelOptions = isset($activeOptions)
+                ? $query->get()->merge($activeOptions)
+                : $query->get();
+
+            return $modelOptions;
         }
 
         $searchFields = [$model->getKeyName(), $this->getScopeNameFrom($scope)];
+
         return $query->searchWhere($searchQuery, $searchFields)->get();
     }
 
@@ -450,7 +457,8 @@ class Filter extends WidgetBase
 
             if (!empty($scope->dependsOn)) {
                 $options = $model->$methodName($this->getScopes());
-            } else {
+            }
+            else {
                 $options = $model->$methodName();
             }
         }
@@ -627,9 +635,7 @@ class Filter extends WidgetBase
                         'maxDate'   => '2099-12-31',
                         'firstDay'  => 0,
                         'yearRange' => 10,
-                        'ignoreTimezone' => false,
                     ];
-
                     break;
             }
 
@@ -748,7 +754,7 @@ class Filter extends WidgetBase
 
             case 'daterange':
                 if (is_array($scope->value) && count($scope->value) > 1) {
-                    list($after, $before) = array_values($scope->value);
+                    [$after, $before] = array_values($scope->value);
 
                     if ($after && $after instanceof Carbon && $before && $before instanceof Carbon) {
                         /*
@@ -795,7 +801,7 @@ class Filter extends WidgetBase
 
             case 'numberrange':
                 if (is_array($scope->value) && count($scope->value) > 1) {
-                    list($min, $max) = array_values($scope->value);
+                    [$min, $max] = array_values($scope->value);
 
                     if (isset($min) || isset($max)) {
                         /*
@@ -827,7 +833,6 @@ class Filter extends WidgetBase
                         ':value' => Db::getPdo()->quote($scope->value),
                     ])));
                 }
-
                 /*
                  * Scope
                  */
@@ -853,7 +858,7 @@ class Filter extends WidgetBase
                      */
                     if (is_array($scopeConditions)) {
                         $conditionNum = is_array($value) ? 0 : $value - 1;
-                        list($scopeConditions) = array_slice($scopeConditions, $conditionNum);
+                        [$scopeConditions] = array_slice($scopeConditions, $conditionNum);
                     }
 
                     if (is_array($value)) {
@@ -963,11 +968,9 @@ class Filter extends WidgetBase
     //
 
     /**
-     * Convert a key/pair array to a named array {id: 1, name: 'Foobar'}
-     * @param  array $options
-     * @return array
+     * optionsToAjax converts a key/pair array to a named array {id: 1, name: 'Foobar'}
      */
-    protected function optionsToAjax($options)
+    protected function optionsToAjax(array $options): array
     {
         $processed = [];
         foreach ($options as $id => $result) {
@@ -977,9 +980,7 @@ class Filter extends WidgetBase
     }
 
     /**
-     * Convert a named array to a key/pair array
-     * @param  array $options
-     * @return array
+     * optionsFromAjax converts a named array to a key/pair array
      */
     protected function optionsFromAjax($options)
     {
@@ -995,6 +996,7 @@ class Filter extends WidgetBase
             }
             $processed[$id] = array_get($option, 'name');
         }
+
         return $processed;
     }
 
@@ -1015,17 +1017,21 @@ class Filter extends WidgetBase
                 if (preg_match($dateRegex, $ajaxDates)) {
                     $dates = [$ajaxDates];
                 }
-            } else {
+            }
+            else {
                 foreach ($ajaxDates as $i => $date) {
                     if (preg_match($dateRegex, $date)) {
                         $dates[] = Carbon::createFromFormat('Y-m-d H:i:s', $date);
-                    } elseif (empty($date)) {
+                    }
+                    elseif (empty($date)) {
                         if ($i == 0) {
-                            $dates[] = Carbon::createFromFormat('Y-m-d H:i:s', '0000-00-00 00:00:00');
-                        } else {
+                            $dates[] = Carbon::createFromFormat('Y-m-d H:i:s', '0000-01-01 00:00:00');
+                        }
+                        else {
                             $dates[] = Carbon::createFromFormat('Y-m-d H:i:s', '2999-12-31 23:59:59');
                         }
-                    } else {
+                    }
+                    else {
                         $dates = [];
                         break;
                     }
@@ -1037,9 +1043,7 @@ class Filter extends WidgetBase
 
     /**
      * Convert an array from the posted numbers
-     *
      * @param  array $dates
-     *
      * @return array
      */
     protected function numbersFromAjax($ajaxNumbers)
@@ -1050,11 +1054,13 @@ class Filter extends WidgetBase
         if (!empty($ajaxNumbers)) {
             if (!is_array($ajaxNumbers) && preg_match($numberRegex, $ajaxNumbers)) {
                 $numbers = [$ajaxNumbers];
-            } else {
+            }
+            else {
                 foreach ($ajaxNumbers as $i => $number) {
                     if (preg_match($numberRegex, $number)) {
                         $numbers[] = $number;
-                    } else {
+                    }
+                    else {
                         $numbers[] = null;
                     }
                 }
@@ -1065,8 +1071,8 @@ class Filter extends WidgetBase
     }
 
     /**
+     * Return filter date format
      * @param mixed $scope
-     *
      * @return string
      */
     protected function getFilterDateFormat($scope)

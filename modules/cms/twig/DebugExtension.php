@@ -1,17 +1,23 @@
 <?php namespace Cms\Twig;
 
+use Cms\Classes\Controller;
+use Cms\Classes\ComponentBase;
 use Twig\Template as TwigTemplate;
 use Twig\Extension\AbstractExtension as TwigExtension;
 use Twig\Environment as TwigEnvironment;
 use Twig\TwigFunction as TwigSimpleFunction;
-use Cms\Classes\Controller;
-use Cms\Classes\ComponentBase;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
-use Symfony\Component\VarDumper\Dumper\HtmlDumper;
+use October\Rain\Support\Debug\HtmlDumper;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use October\Rain\Database\Model;
 
+/**
+ * DebugExtension for twig
+ *
+ * @package october\cms
+ * @author Alexey Bobkov, Samuel Georges
+ */
 class DebugExtension extends TwigExtension
 {
     const PAGE_CAPTION = 'Page variables';
@@ -56,7 +62,7 @@ class DebugExtension extends TwigExtension
      * Creates the extension instance.
      * @param \Cms\Classes\Controller $controller The CMS controller object.
      */
-    public function __construct(Controller $controller)
+    public function __construct(Controller $controller = null)
     {
         $this->controller = $controller;
     }
@@ -178,7 +184,7 @@ class DebugExtension extends TwigExtension
     protected function makeTableHeader($caption)
     {
         if (is_array($caption)) {
-            list($caption, $subcaption) = $caption;
+            [$caption, $subcaption] = $caption;
         }
 
         $output = [];

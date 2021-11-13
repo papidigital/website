@@ -2,7 +2,6 @@
 
 use Db;
 use Input;
-use Request;
 use Response;
 use Validator;
 use Backend\Widgets\Form;
@@ -35,37 +34,37 @@ class FileUpload extends FormWidgetBase
     //
 
     /**
-     * @var string Prompt text to display for the upload button.
+     * @var int imageWidth for preview
      */
-    public $prompt;
+    public $imageWidth = 190;
 
     /**
-     * @var int Preview image width
+     * @var int imageHeight for preview
      */
-    public $imageWidth;
+    public $imageHeight = 190;
 
     /**
-     * @var int Preview image height
-     */
-    public $imageHeight;
-
-    /**
-     * @var mixed Collection of acceptable file types.
+     * @var mixed fileTypes accpetd
      */
     public $fileTypes = false;
 
     /**
-     * @var mixed Collection of acceptable mime types.
+     * @var mixed mimeTypes accepted
      */
     public $mimeTypes = false;
 
     /**
-     * @var mixed Max file size.
+     * @var mixed maxFilesize allowed
      */
     public $maxFilesize;
 
     /**
-     * @var array Options used for generating thumbnails.
+     * @var mixed maxFiles allowed
+     */
+    public $maxFiles;
+
+    /**
+     * @var array thumbOptions used for generating thumbnails
      */
     public $thumbOptions = [
         'mode'      => 'crop',
@@ -73,12 +72,14 @@ class FileUpload extends FormWidgetBase
     ];
 
     /**
-     * @var boolean Allow the user to set a caption.
+     * @var boolean useCaption allows the user to set a caption
      */
     public $useCaption = true;
 
     /**
-     * @var boolean Automatically attaches the uploaded file on upload if the parent record exists instead of using deferred binding to attach on save of the parent record. Defaults to false.
+     * @var boolean attachOnUpload automatically attaches the uploaded file on upload
+     * if the parent record exists instead of using deferred binding to attach on save
+     * of the parent record. Defaults to false.
      */
     public $attachOnUpload = false;
 
@@ -104,11 +105,9 @@ class FileUpload extends FormWidgetBase
         $this->maxFilesize = $this->getUploadMaxFilesize();
 
         $this->fillFromConfig([
-            'prompt',
-            'imageWidth',
-            'imageHeight',
             'fileTypes',
             'maxFilesize',
+            'maxFiles',
             'mimeTypes',
             'thumbOptions',
             'useCaption',
@@ -132,7 +131,7 @@ class FileUpload extends FormWidgetBase
     }
 
     /**
-     * Prepares the view data
+     * prepareVars for viewing purposes
      */
     protected function prepareVars()
     {
@@ -156,15 +155,14 @@ class FileUpload extends FormWidgetBase
         $this->vars['imageWidth'] = $this->imageWidth;
         $this->vars['acceptedFileTypes'] = $this->getAcceptedFileTypes(true);
         $this->vars['maxFilesize'] = $this->maxFilesize;
+        $this->vars['maxFiles'] = $this->maxFiles;
         $this->vars['cssDimensions'] = $this->getCssDimensions();
         $this->vars['cssBlockDimensions'] = $this->getCssDimensions('block');
         $this->vars['useCaption'] = $this->useCaption;
-        $this->vars['prompt'] = $this->getPromptText();
     }
 
     /**
-     * Get the file record for this request, returns false if none available
-     *
+     * getFileRecord for this request, returns false if none available
      * @return System\Models\File|false
      */
     protected function getFileRecord()
@@ -179,9 +177,8 @@ class FileUpload extends FormWidgetBase
     }
 
     /**
-     * Get the instantiated config Form widget
-     *
-     * @return void
+     * getConfigFormWidget used for configuration values
+     * @return object
      */
     public function getConfigFormWidget()
     {
@@ -200,6 +197,9 @@ class FileUpload extends FormWidgetBase
         return $this->configFormWidget = $widget;
     }
 
+    /**
+     * getFileList
+     */
     protected function getFileList()
     {
         $list = $this
@@ -220,7 +220,7 @@ class FileUpload extends FormWidgetBase
     }
 
     /**
-     * Returns the display mode for the file upload. Eg: file-multi, image-single, etc.
+     * getDisplayMode for the file upload. Eg: file-multi, image-single, etc
      * @return string
      */
     protected function getDisplayMode()
@@ -238,24 +238,7 @@ class FileUpload extends FormWidgetBase
     }
 
     /**
-     * Returns the escaped and translated prompt text to display according to the type.
-     * @return string
-     */
-    protected function getPromptText()
-    {
-        if ($this->prompt === null) {
-            $isMulti = ends_with($this->getDisplayMode(), 'multi');
-            $this->prompt = $isMulti
-                ? 'backend::lang.fileupload.upload_file'
-                : 'backend::lang.fileupload.default_prompt';
-        }
-
-        return str_replace('%s', '<i class="icon-upload"></i>', e(trans($this->prompt)));
-    }
-
-    /**
-     * Returns the CSS dimensions for the uploaded image,
-     * uses auto where no dimension is provided.
+     * getCssDimensions for the uploaded image, uses auto where no dimension is provided
      * @param string $mode
      * @return string
      */
@@ -290,8 +273,8 @@ class FileUpload extends FormWidgetBase
     }
 
     /**
-     * Returns the specified accepted file types, or the default
-     * based on the mode. Image mode will return:
+     * getAcceptedFileTypes returns the specified accepted file types, or the
+     * default based on the mode. Image mode will return:
      * - jpg,jpeg,bmp,png,gif,svg
      * @return string
      */
@@ -300,8 +283,11 @@ class FileUpload extends FormWidgetBase
         $types = $this->fileTypes;
 
         if ($types === false) {
-            $isImage = starts_with($this->getDisplayMode(), 'image');
-            $types = implode(',', FileDefinitions::get($isImage ? 'imageExtensions' : 'defaultExtensions'));
+            $definitionCode = starts_with($this->getDisplayMode(), 'image')
+                ? 'image_extensions'
+                : 'default_extensions';
+
+            $types = implode(',', FileDefinitions::get($definitionCode));
         }
 
         if (!$types || $types == '*') {
@@ -330,7 +316,7 @@ class FileUpload extends FormWidgetBase
     }
 
     /**
-     * Removes a file attachment.
+     * onRemoveAttachment removes a file attachment
      */
     public function onRemoveAttachment()
     {
@@ -341,7 +327,7 @@ class FileUpload extends FormWidgetBase
     }
 
     /**
-     * Sorts file attachments.
+     * onSortAttachments sorts file attachments
      */
     public function onSortAttachments()
     {
@@ -355,11 +341,11 @@ class FileUpload extends FormWidgetBase
     }
 
     /**
-     * Loads the configuration form for an attachment, allowing title and description to be set.
+     * onLoadAttachmentConfig loads the configuration form for an attachment,
+     * allowing title and description to be set
      */
     public function onLoadAttachmentConfig()
     {
-        $fileModel = $this->getRelationModel();
         if ($file = $this->getFileRecord()) {
             $file = $this->decorateFileAttributes($file);
 
@@ -376,7 +362,7 @@ class FileUpload extends FormWidgetBase
     }
 
     /**
-     * Commit the changes of the attachment configuration form.
+     * onSaveAttachmentConfig commits the changes of the attachment configuration form
      */
     public function onSaveAttachmentConfig()
     {
@@ -390,7 +376,10 @@ class FileUpload extends FormWidgetBase
                     }
                 });
 
-                return ['displayName' => $file->title ?: $file->file_name];
+                return [
+                    'displayName' => $file->title ?: $file->file_name,
+                    'description' => trim($file->description)
+                ];
             }
 
             throw new ApplicationException('Unable to find file, it may no longer exist');
@@ -418,7 +407,7 @@ class FileUpload extends FormWidgetBase
     }
 
     /**
-     * Upload handler for the server-side processing of uploaded files
+     * onUpload handler for the server-side processing of uploaded files
      */
     public function onUpload()
     {
@@ -489,7 +478,7 @@ class FileUpload extends FormWidgetBase
     }
 
     /**
-     * Adds the bespoke attributes used internally by this widget.
+     * decorateFileAttributes adds the bespoke attributes used internally by this widget
      * - thumbUrl
      * - pathUrl
      * @return System\Models\File
@@ -509,7 +498,7 @@ class FileUpload extends FormWidgetBase
     }
 
     /**
-     * Return max upload filesize in Mb
+     * getUploadMaxFilesize returns max upload filesize in MB
      * @return integer
      */
     protected function getUploadMaxFilesize()

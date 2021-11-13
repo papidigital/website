@@ -13,8 +13,7 @@ up and running.
 7. Staying in the project directory, execute `vagrant ssh`; you should now be in the terminal of the vagrant server
 8. Execute the following commands in the order they appear
    - `cd code`
-   - `php72`
-   - `php artisan october:up`
+   - `php73`
 9. October CMS should now be installed and ready to go. Take note of the admin password to login to the backend.
 10. Go to `papidigital.local/thebackdoor` in your browser to login. `admin` is the username and the password was generated at the previous step
 11. Navigate to the `Settings` page and change the Front-end Theme to Papi Digital

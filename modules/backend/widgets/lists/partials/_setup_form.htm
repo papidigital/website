@@ -10,6 +10,7 @@
             <ul>
                 <?php foreach ($columns as $key => $column): ?>
                     <li>
+                        <span class="drag-handle"></span>
                         <div class="checkbox custom-checkbox">
                             <input
                                 type="hidden"
@@ -22,7 +23,7 @@
                                 <?= $column->invisible ? '' : 'checked="checked"' ?>
                                 type="checkbox" />
                             <label
-                                class="choice"
+                                class="choice storm-icon-pseudo"
                                 for="<?= $this->getId('setupCheckbox-'.$column->columnName) ?>">
                                     <?= e(trans($column->label)) ?>
                             </label>
@@ -50,14 +51,6 @@
     <div class="modal-footer">
         <button
             type="button"
-            class="btn btn-link pull-left"
-            data-request="<?= $this->getEventHandler('onResetSetup') ?>"
-            data-dismiss="popup"
-            data-stripe-load-indicator>
-            <?= e(trans('backend::lang.form.reset_default')) ?>
-        </button>
-        <button
-            type="button"
             class="btn btn-primary"
             data-request="<?= $this->getEventHandler('onApplySetup') ?>"
             data-dismiss="popup"
@@ -69,6 +62,15 @@
             class="btn btn-default"
             data-dismiss="popup">
             <?= e(trans('backend::lang.form.cancel')) ?>
+        </button>
+
+        <button
+            type="button"
+            class="btn btn-link pull-right p-r-0"
+            data-request="<?= $this->getEventHandler('onResetSetup') ?>"
+            data-dismiss="popup"
+            data-stripe-load-indicator>
+            <?= e(trans('backend::lang.form.reset_default')) ?>
         </button>
     </div>
 <?= Form::close() ?>

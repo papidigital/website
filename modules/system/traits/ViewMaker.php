@@ -1,17 +1,15 @@
 <?php namespace System\Traits;
 
+use Html;
 use File;
 use Lang;
 use Block;
-use SystemException;
-use Exception;
-use Throwable;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Config;
+use SystemException;
+use Throwable;
 
 /**
- * View Maker Trait
- * Adds view based methods to a class
+ * ViewMaker Trait adds view based methods to a class
  *
  * @package october\system
  * @author Alexey Bobkov, Samuel Georges
@@ -19,49 +17,53 @@ use Config;
 trait ViewMaker
 {
     /**
-     * @var array A list of variables to pass to the page.
+     * @var array vars is a list of variables to pass to the page
      */
     public $vars = [];
 
     /**
-     * @var string|array Specifies a path to the views directory.
+     * @var string|array viewPath specifies a path to the views directory
      */
     protected $viewPath;
 
     /**
-     * @var string Specifies a path to the layout directory.
+     * @var string layoutPath specifies a path to the layout directory
      */
     protected $layoutPath;
 
     /**
-     * @var string Layout to use for the view.
+     * @var string layout to use for the view
      */
     public $layout;
 
     /**
-     * @var bool Prevents the use of a layout.
+     * @var bool suppressLayout prevents the use of a layout
      */
     public $suppressLayout = false;
 
     /**
-     * Prepends a path on the available view path locations.
+     * addViewPath prepends a path on the available view path locations
      * @param string|array $path
      * @return void
      */
-    public function addViewPath($path)
+    public function addViewPath($path, $append = false)
     {
         $this->viewPath = (array) $this->viewPath;
 
         if (is_array($path)) {
-            $this->viewPath = array_merge($path, $this->viewPath);
+            $this->viewPath = $append
+                ? array_merge($this->viewPath, $path)
+                : array_merge($path, $this->viewPath);
         }
         else {
-            array_unshift($this->viewPath, $path);
+            $append
+                ? array_push($this->viewPath, $path)
+                : array_unshift($this->viewPath, $path);
         }
     }
 
     /**
-     * Returns the active view path locations.
+     * getViewPaths returns the active view path locations
      * @return array
      */
     public function getViewPaths()
@@ -70,7 +72,7 @@ trait ViewMaker
     }
 
     /**
-     * Render a partial file contents located in the views folder.
+     * makePartial renders a partial file contents located in the views folder
      * @param string $partial The view to load.
      * @param array $params Parameter variables to pass to the view.
      * @param bool $throwException Throw an exception if the partial is not found.
@@ -98,38 +100,42 @@ trait ViewMaker
     }
 
     /**
-     * Loads a view with the name specified. Applies layout if its name is provided by the parent object.
-     * The view file must be situated in the views directory, and has the extension "htm".
+     * makeView loads a view with the name specified. Applies layout if its name is provided
+     * by the parent object. The view file must be situated in the views directory, and has
+     * the extension "htm"
      * @param string $view Specifies the view name, without extension. Eg: "index".
      * @return string
      */
     public function makeView($view)
     {
         $viewPath = $this->getViewPath(strtolower($view) . '.htm');
+
         $contents = $this->makeFileContents($viewPath);
+
         return $this->makeViewContent($contents);
     }
 
     /**
-     * Renders supplied contents inside a layout.
+     * makeViewContent renders supplied contents inside a layout
      * @param string $contents The inner contents as a string.
      * @param string $layout Specifies the layout name.
      * @return string
      */
     public function makeViewContent($contents, $layout = null)
     {
-        if ($this->suppressLayout || $this->layout == '') {
+        if ($this->suppressLayout || !$this->layout) {
             return $contents;
         }
 
         // Append any undefined block content to the body block
         Block::set('undefinedBlock', $contents);
         Block::append('body', Block::get('undefinedBlock'));
+
         return $this->makeLayout($layout);
     }
 
     /**
-     * Render a layout.
+     * makeLayout renders a layout
      * @param string $name Specifies the layout name.
      * If this parameter is omitted, the $layout property will be used.
      * @param array $params Parameter variables to pass to the view.
@@ -139,7 +145,7 @@ trait ViewMaker
     public function makeLayout($name = null, $params = [], $throwException = true)
     {
         $layout = $name ?? $this->layout;
-        if ($layout == '') {
+        if (!$layout) {
             return '';
         }
 
@@ -157,7 +163,7 @@ trait ViewMaker
     }
 
     /**
-     * Renders a layout partial
+     * makeLayoutPartial renders a layout partial
      * @param string $partial The view to load.
      * @param array $params Parameter variables to pass to the view.
      * @return string The layout partial contents
@@ -173,8 +179,8 @@ trait ViewMaker
     }
 
     /**
-     * Locates a file based on its definition. The file name can be prefixed with a
-     * symbol (~|$) to return in context of the application or plugin base path,
+     * getViewPath locates a file based on its definition. The file name can be prefixed
+     * with a symbol (~|$) to return in context of the application or plugin base path,
      * otherwise it will be returned in context of this object view path.
      * @param string $fileName File to load.
      * @param mixed $viewPath Explicitly define a view path.
@@ -193,7 +199,7 @@ trait ViewMaker
         $fileName = File::symbolizePath($fileName);
 
         if (File::isLocalPath($fileName) ||
-            (!Config::get('cms.restrictBaseDir', true) && realpath($fileName) !== false)
+            (!Config::get('system.restrict_base_dir', true) && realpath($fileName) !== false)
         ) {
             return $fileName;
         }
@@ -213,8 +219,7 @@ trait ViewMaker
     }
 
     /**
-     * Includes a file path using output buffering.
-     * Ensures that vars are available.
+     * makeFileContents includes a file path using output buffering
      * @param string $filePath Absolute path to the view file.
      * @param array $extraParams Parameters that should be available to the view.
      * @return string
@@ -223,7 +228,7 @@ trait ViewMaker
     {
         if (!strlen($filePath) ||
             !File::isFile($filePath) ||
-            (!File::isLocalPath($filePath) && Config::get('cms.restrictBaseDir', true))
+            (!File::isLocalPath($filePath) && Config::get('system.restrict_base_dir', true))
         ) {
             return '';
         }
@@ -246,25 +251,17 @@ trait ViewMaker
         try {
             include $filePath;
         }
-        catch (Exception $e) {
-            $this->handleViewException($e, $obLevel);
-        }
         catch (Throwable $e) {
-            $this->handleViewException(new FatalThrowableError($e), $obLevel);
+            $this->handleViewException($e, $obLevel);
         }
 
         return ob_get_clean();
     }
 
     /**
-     * Handle a view exception.
-     *
-     * @param  \Exception  $e
-     * @param  int  $obLevel
-     * @return void
-     *
+     * handleViewException handles a view exception
      */
-    protected function handleViewException($e, $obLevel)
+    protected function handleViewException(Throwable $e, int $obLevel): void
     {
         while (ob_get_level() > $obLevel) {
             ob_end_clean();
@@ -274,7 +271,7 @@ trait ViewMaker
     }
 
     /**
-     * Guess the package path for the called class.
+     * guessViewPath guesses the package path for the called class
      * @param string $suffix An extra path to attach to the end
      * @param bool $isPublic Returns public path instead of an absolute one
      * @return string
@@ -286,7 +283,7 @@ trait ViewMaker
     }
 
     /**
-     * Guess the package path from a specified class.
+     * guessViewPathFrom guesses the package path from a specified class
      * @param string $class Class to guess path from.
      * @param string $suffix An extra path to attach to the end
      * @param bool $isPublic Returns public path instead of an absolute one
@@ -297,6 +294,7 @@ trait ViewMaker
         $classFolder = strtolower(class_basename($class));
         $classFile = realpath(dirname(File::fromClass($class)));
         $guessedPath = $classFile ? $classFile . '/' . $classFolder . $suffix : null;
+
         return $isPublic ? File::localToPublic($guessedPath) : $guessedPath;
     }
 }

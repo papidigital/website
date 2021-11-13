@@ -50,24 +50,19 @@ The API allows to change elements' visibility or status (enabled/disabled) basin
 
 Example code:
 
-```html
-<input type="button" class="btn disabled"
-    data-trigger-action="enable"
-    data-trigger="#cblist input[type=checkbox]"
-    data-trigger-condition="checked" ... >
-```
+    <input type="button" class="btn disabled"
+        data-trigger-action="enable"
+        data-trigger="#cblist input[type=checkbox]"
+        data-trigger-condition="checked" ... >
 
 Multiple actions are supported:
 
-```html
-data-trigger-action="hide|empty"
-```
+    data-trigger-action="hide|empty"
 
-Multie value conditions are supported:
+Multiple value conditions are supported:
 
-```html
-data-trigger-condition="value[foo][bar]"
-```
+    data-trigger-condition="value[foo][bar]"
+
 
 ### Supported events
 
@@ -76,10 +71,8 @@ data-trigger-condition="value[foo][bar]"
 
 ### JavaScript API
 
-```html
-$('#mybutton').triggerOn({
-    triggerCondition: 'checked',
-    trigger: '#cblist input[type=checkbox]',
-    triggerAction: 'enable' 
-})
-```
+    $('#mybutton').triggerOn({
+        triggerCondition: 'checked',
+        trigger: '#cblist input[type=checkbox]',
+        triggerAction: 'enable'
+    })

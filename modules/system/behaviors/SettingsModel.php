@@ -1,9 +1,9 @@
 <?php namespace System\Behaviors;
 
-use App;
-use Artisan;
-use Cache;
 use Log;
+use Cache;
+use System;
+use Artisan;
 use Exception;
 use System\Classes\ModelBehavior;
 
@@ -12,7 +12,7 @@ use System\Classes\ModelBehavior;
  *
  * Add this the model class definition:
  *
- *     public $implement = ['System.Behaviors.SettingsModel'];
+ *     public $implement = [\System\Behaviors\SettingsModel::class];
  *     public $settingsCode = 'author_plugin_code';
  *     public $settingsFields = 'fields.yaml';
  *
@@ -73,7 +73,9 @@ class SettingsModel extends ModelBehavior
             return self::$instances[$this->recordCode];
         }
 
-        if (!$item = $this->getSettingsRecord()) {
+        if (!System::hasDatabase() ||
+            (!$item = $this->getSettingsRecord())
+        ) {
             $this->model->initSettingsData();
             $item = $this->model;
         }
@@ -99,11 +101,11 @@ class SettingsModel extends ModelBehavior
      */
     public function isConfigured()
     {
-        return App::hasDatabase() && $this->getSettingsRecord() !== null;
+        return System::hasDatabase() && $this->getSettingsRecord() !== null;
     }
 
     /**
-     * Returns the raw Model record that stores the settings.
+     * getSettingsRecord returns the raw Model record that stores the settings.
      * @return Model
      */
     public function getSettingsRecord()
@@ -122,7 +124,7 @@ class SettingsModel extends ModelBehavior
     public function set($key, $value = null)
     {
         $data = is_array($key) ? $key : [$key => $value];
-        $obj = self::instance();
+        $obj = $this->instance();
         $obj->fill($data);
         return $obj->save();
     }
@@ -208,7 +210,8 @@ class SettingsModel extends ModelBehavior
 
         try {
             Artisan::call('queue:restart');
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             Log::warning($e->getMessage());
         }
     }

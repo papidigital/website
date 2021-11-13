@@ -1,73 +1,108 @@
 <?php namespace Backend\Classes;
 
 /**
- * Class SideMenuItem
+ * SideMenuItem
  *
- * @package Backend\Classes
+ * @package october\backend
+ * @author Alexey Bobkov, Samuel Georges
  */
 class SideMenuItem
 {
     /**
-     * @var string
+     * @var string code
      */
     public $code;
 
     /**
-     * @var string
+     * @var string owner
      */
     public $owner;
 
     /**
-     * @var string
+     * @var string label
      */
     public $label;
 
     /**
-     * @var null|string
+     * @var null|string icon
      */
     public $icon;
 
     /**
-     * @var null|string
+     * @var null|string iconSvg
      */
     public $iconSvg;
 
     /**
-     * @var string
+     * @var string url
      */
     public $url;
 
     /**
-     * @var null|int|callable
+     * @var null|int|callable counter
      */
     public $counter;
 
     /**
-     * @var null|string
+     * @var null|string counterLabel
      */
     public $counterLabel;
 
     /**
-     * @var null|string
-     */
-     public $badge;
-
-    /**
-     * @var int
+     * @var int order
      */
     public $order = -1;
 
     /**
-     * @var array
+     * @var array attributes
      */
     public $attributes = [];
 
     /**
-     * @var array
+     * @var array permissions
      */
     public $permissions = [];
 
     /**
+     * @var string itemType
+     */
+    public $itemType;
+
+    /**
+     * @var string buttonActiveOn
+     */
+    public $buttonActiveOn;
+
+    /**
+     * @var array customData
+     */
+    public $customData = [];
+
+    /**
+     * useConfig
+     */
+    public function useConfig(array $data): SideMenuItem
+    {
+        $this->code = $data['code'] ?? $this->code;
+        $this->owner = $data['owner'] ?? $this->owner;
+        $this->label = $data['label'] ?? $this->label;
+        $this->url = $data['url'] ?? $this->url;
+        $this->icon = $data['icon'] ?? $this->icon;
+        $this->iconSvg = $data['iconSvg'] ?? $this->iconSvg;
+        $this->counter = $data['counter'] ?? $this->counter;
+        $this->counterLabel = $data['counterLabel'] ?? $this->counterLabel;
+        $this->attributes = $data['attributes'] ?? $this->attributes;
+        $this->permissions = $data['permissions'] ?? $this->permissions;
+        $this->order = $data['order'] ?? $this->order;
+        $this->itemType = $data['itemType'] ?? $this->itemType;
+        $this->buttonActiveOn = $data['buttonActiveOn'] ?? $this->buttonActiveOn;
+        $this->customData = $data['customData'] ?? $this->customData;
+
+        return $this;
+    }
+
+    /**
+     * addAttribute
      * @param null|string|int $attribute
      * @param null|string|array $value
      */
@@ -76,14 +111,16 @@ class SideMenuItem
         $this->attributes[$attribute] = $value;
     }
 
+    /**
+     * removeAttribute
+     */
     public function removeAttribute($attribute)
     {
         unset($this->attributes[$attribute]);
     }
 
     /**
-     * @param string $permission
-     * @param array $definition
+     * addPermission
      */
     public function addPermission(string $permission, array $definition)
     {
@@ -91,33 +128,12 @@ class SideMenuItem
     }
 
     /**
+     * removePermission
      * @param string $permission
      * @return void
      */
     public function removePermission(string $permission)
     {
         unset($this->permissions[$permission]);
-    }
-
-    /**
-     * @param array $data
-     * @return static
-     */
-    public static function createFromArray(array $data)
-    {
-        $instance = new static();
-        $instance->code = $data['code'];
-        $instance->owner = $data['owner'];
-        $instance->label = $data['label'];
-        $instance->url = $data['url'];
-        $instance->icon = $data['icon'] ?? null;
-        $instance->iconSvg = $data['iconSvg'] ?? null;
-        $instance->counter = $data['counter'] ?? null;
-        $instance->counterLabel = $data['counterLabel'] ?? null;
-        $instance->attributes = $data['attributes'] ?? $instance->attributes;
-        $instance->badge = $data['badge'] ?? null;
-        $instance->permissions = $data['permissions'] ?? $instance->permissions;
-        $instance->order = $data['order'] ?? $instance->order;
-        return $instance;
     }
 }

@@ -5,7 +5,7 @@
     position: relative;
     border: 2px solid @color-form-field-border;
     .border-radius(@border-radius-base);
-    textarea { .opacity(0); }
+    textarea { opacity: 0; }
 
     &.editor-focus { border: 2px solid @color-form-field-border-focus; }
 
@@ -71,7 +71,7 @@
                 .text-hide();
             }
             > i {
-                .opacity(1);
+                opacity: 1;
                 display: block;
                 &:before {
                     font-size: 15px;
@@ -79,7 +79,7 @@
             }
             &:hover, &:focus {
                 > i {
-                    .opacity(1);
+                    opacity: 1;
                     color: #fff;
                 }
             }

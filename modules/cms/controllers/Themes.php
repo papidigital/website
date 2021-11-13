@@ -1,7 +1,9 @@
 <?php namespace Cms\Controllers;
 
 use File;
+use Lang;
 use Flash;
+use System;
 use Backend;
 use Redirect;
 use BackendMenu;
@@ -13,8 +15,8 @@ use Cms\Classes\Theme as CmsTheme;
 use Cms\Classes\ThemeManager;
 use System\Classes\SettingsManager;
 use Backend\Classes\Controller;
-use Exception;
 use Backend\Widgets\Form;
+use Exception;
 
 /**
  * Theme selector controller
@@ -26,7 +28,7 @@ use Backend\Widgets\Form;
 class Themes extends Controller
 {
     /**
-     * @var array Permissions required to view this page.
+     * @var array requiredPermissions to view this page
      */
     public $requiredPermissions = [
         'cms.manage_themes',
@@ -34,7 +36,7 @@ class Themes extends Controller
     ];
 
     /**
-     * Constructor.
+     * __construct
      */
     public function __construct()
     {
@@ -66,11 +68,22 @@ class Themes extends Controller
     public function index()
     {
         $this->bodyClass = 'compact-container';
+
+        $this->vars['themes'] = CmsTheme::allAvailable();
     }
 
     public function index_onSetActiveTheme()
     {
-        CmsTheme::setActiveTheme(post('theme'));
+        $themeCode = post('theme');
+
+        // For the frontend
+        CmsTheme::setActiveTheme($themeCode);
+
+        // For the backend
+        CmsTheme::setEditTheme($themeCode);
+
+        // Load page action vars
+        $this->pageAction();
 
         return [
             '#theme-list' => $this->makePartial('theme_list')
@@ -174,7 +187,7 @@ class Themes extends Controller
         $widgetConfig->arrayName = 'Theme';
         $widgetConfig->context = 'create';
 
-        return $this->makeWidget('Backend\Widgets\Form', $widgetConfig);
+        return $this->makeWidget(\Backend\Widgets\Form::class, $widgetConfig);
     }
 
     //
@@ -193,23 +206,17 @@ class Themes extends Controller
     {
         $theme = $this->findThemeObject();
         $newDirName = trim(post('new_dir_name'));
-        $sourcePath = $theme->getPath();
-        $destinationPath = themes_path().'/'.$newDirName;
 
         if (!preg_match('/^[a-z0-9\_\-]+$/i', $newDirName)) {
             throw new ValidationException(['new_dir_name' => trans('cms::lang.theme.dir_name_invalid')]);
         }
 
-        if (File::isDirectory($destinationPath)) {
+        if (!ThemeManager::instance()->duplicateTheme($theme->getDirName(), $newDirName)) {
             throw new ValidationException(['new_dir_name' => trans('cms::lang.theme.dir_name_taken')]);
         }
 
-        File::copyDirectory($sourcePath, $destinationPath);
-        $newTheme = CmsTheme::load($newDirName);
-        $newName = $newTheme->getConfigValue('name') . ' - Copy';
-        $newTheme->writeConfig(['name' => $newName]);
-
         Flash::success(trans('cms::lang.theme.duplicate_theme_success'));
+
         return Redirect::refresh();
     }
 
@@ -265,6 +272,10 @@ class Themes extends Controller
 
     public function index_onLoadImportForm()
     {
+        if (System::checkSafeMode()) {
+            throw new ApplicationException(Lang::get('cms::lang.cms_object.safe_mode_enabled'));
+        }
+
         $theme = $this->findThemeObject();
         $this->vars['widget'] = $this->makeImportFormWidget($theme);
         $this->vars['themeDir'] = $theme->getDirName();
@@ -274,6 +285,10 @@ class Themes extends Controller
 
     public function index_onImport()
     {
+        if (System::checkSafeMode()) {
+            throw new ApplicationException(Lang::get('cms::lang.cms_object.safe_mode_enabled'));
+        }
+
         $theme = $this->findThemeObject();
         $widget = $this->makeImportFormWidget($theme);
 

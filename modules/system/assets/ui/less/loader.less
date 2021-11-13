@@ -5,6 +5,26 @@
 @import "global.less";
 
 //
+// Basic Loader
+// --------------------------------------------------
+
+a.oc-loading, button.oc-loading, span.oc-loading {
+    &:after {
+        content: '';
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: .4em;
+        height: 1em;
+        width: 1em;
+        animation: spin 0.8s infinite linear;
+        border: .2em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        opacity: .5;
+    }
+}
+
+//
 // Loading indicator
 // --------------------------------------------------
 
@@ -30,6 +50,10 @@
         margin-top: -20px;
         left: 0;
         display: block;
+    }
+
+    &.is-transparent {
+        background-color: transparent;
     }
 }
 
@@ -196,7 +220,7 @@ html.cssanimations {
     }
 
     &.bar-loaded {
-        .opacity(0);
+        opacity: 0;
         .transition-delay(.3s);
 
         .progress-bar {
@@ -238,15 +262,15 @@ html.cssanimations {
 
     .stripe-loaded {
         width: 0;
-        .opacity(0);
+        opacity: 0;
     }
 
     &.loaded {
-        .opacity(0);
+        opacity: 0;
         .transition(opacity .4s linear);
         .transition-delay(.3s);
         .stripe-loaded {
-            .opacity(1);
+            opacity: 1;
             .transition(width .3s linear);
             width: 100% !important;
         }

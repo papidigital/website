@@ -1,9 +1,6 @@
 <?php namespace Backend\FormWidgets;
 
-use BackendAuth;
-use Backend\Classes\FormField;
-use System\Classes\MediaLibrary;
-use Backend\Classes\FormWidgetBase;
+use Media\FormWidgets\MediaFinder as MediaMediaFinder;
 
 /**
  * Media Finder
@@ -16,111 +13,20 @@ use Backend\Classes\FormWidgetBase;
  *
  * @package october\backend
  * @author Alexey Bobkov, Samuel Georges
+ * @deprecated Use Media\FormWidgets\MediaFinder. Remove if year >= 2023.
  */
-class MediaFinder extends FormWidgetBase
+class MediaFinder extends MediaMediaFinder
 {
-    //
-    // Configurable properties
-    //
-
     /**
-     * @var string Prompt to display if no record is selected.
+     * Constructor.
      */
-    public $prompt = 'backend::lang.mediafinder.default_prompt';
-
-    /**
-     * @var string Display mode for the selection. Values: file, image.
-     */
-    public $mode = 'file';
-
-    /**
-     * @var int Preview image width
-     */
-    public $imageWidth;
-
-    /**
-     * @var int Preview image height
-     */
-    public $imageHeight;
-
-    //
-    // Object properties
-    //
-
-    /**
-     * @inheritDoc
-     */
-    protected $defaultAlias = 'media';
-
-    /**
-     * @inheritDoc
-     */
-    public function init()
+    public function __construct()
     {
-        $this->fillFromConfig([
-            'mode',
-            'prompt',
-            'imageWidth',
-            'imageHeight'
-        ]);
+        traceLog('FormWidget Backend\FormWidgets\MediaFinder has been deprecated, use ' . MediaMediaFinder::class . ' instead.');
 
-        $user = BackendAuth::getUser();
+        $this->assetPath = '/modules/media/formwidgets/mediafinder/assets';
+        $this->viewPath = base_path('/modules/media/formwidgets/mediafinder/partials');
 
-        if ($this->formField->disabled
-            || $this->formField->readOnly
-            || !$user
-            || !$user->hasAccess('media.manage_media')
-        ) {
-            $this->previewMode = true;
-        }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function render()
-    {
-        $this->prepareVars();
-
-        return $this->makePartial('mediafinder');
-    }
-
-    /**
-     * Prepares the list data
-     */
-    public function prepareVars()
-    {
-        $value = $this->getLoadValue();
-        $isImage = $this->mode === 'image';
-
-        $this->vars['value'] = $value;
-        $this->vars['imageUrl'] = $isImage && $value ? MediaLibrary::url($value) : '';
-        $this->vars['imageExists'] = $isImage && $value ? MediaLibrary::instance()->exists($value) : '';
-        $this->vars['field'] = $this->formField;
-        $this->vars['prompt'] = str_replace('%s', '<i class="icon-folder"></i>', trans($this->prompt));
-        $this->vars['mode'] = $this->mode;
-        $this->vars['imageWidth'] = $this->imageWidth;
-        $this->vars['imageHeight'] = $this->imageHeight;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getSaveValue($value)
-    {
-        if ($this->formField->disabled || $this->formField->hidden) {
-            return FormField::NO_SAVE_DATA;
-        }
-
-        return $value;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function loadAssets()
-    {
-        $this->addJs('js/mediafinder.js', 'core');
-        $this->addCss('css/mediafinder.css', 'core');
+        parent::__construct(...func_get_args());
     }
 }

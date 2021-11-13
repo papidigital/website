@@ -13,6 +13,7 @@
      */
     $(document).render(function(){
         var formatSelectOption = function(state) {
+            // Escape HTML
             var text = $('<span>').text(state.text).html()
 
             if (!state.id) {
@@ -96,21 +97,25 @@
                             options = []
 
                         delete(data.result)
-                        if (results[0] && typeof(results[0]) === 'object') { // Pass through Select2 format
+
+                        // Select2 format
+                        if (results[0] && typeof(results[0]) === 'object') {
                             options = results
                         }
-                        else { // Key-value map
+                        // Build key-value map
+                        else {
                             for (var i in results) {
                                 if (results.hasOwnProperty(i)) {
                                     options.push({
                                         id: i,
-                                        text: results[i],
+                                        text: results[i]
                                     })
                                 }
                             }
                         }
 
                         data.results = options
+
                         return data
                     },
                     dataType: 'json'
@@ -127,12 +132,13 @@
                  */
                 if ($element.hasClass('select-no-dropdown')) {
                     extraOptions.selectOnClose = true
-                    extraOptions.closeOnSelect = true
+                    extraOptions.closeOnSelect = false
                     extraOptions.minimumInputLength = 1
 
                     $element.on('select2:closing', function() {
-                        if ($('.select2-dropdown.select-no-dropdown:first .select2-results__option--highlighted').length > 0) {
-                            $('.select2-dropdown.select-no-dropdown:first .select2-results__option--highlighted').removeClass('select2-results__option--highlighted')
+                        var highlightedEls = $('.select2-dropdown.select-no-dropdown:first .select2-results__option--highlighted')
+                        if (highlightedEls.length > 0) {
+                            highlightedEls.removeClass('select2-results__option--highlighted')
                             $('.select2-dropdown.select-no-dropdown:first .select2-results__option:first').addClass('select2-results__option--highlighted')
                         }
                     })

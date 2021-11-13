@@ -123,7 +123,7 @@ trait ResponseMaker
         }
 
         if (is_string($contents)) {
-            $contents = Response::make($contents, $this->getStatusCode());
+            $contents = Response::make($contents, $this->getStatusCode(), ['Content-Type' => 'text/html']);
         }
 
         $responseHeaders = $this->getResponseHeaders();

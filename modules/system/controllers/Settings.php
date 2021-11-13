@@ -2,8 +2,6 @@
 
 use Lang;
 use Flash;
-use Config;
-use Request;
 use Backend;
 use BackendMenu;
 use System\Classes\SettingsManager;
@@ -21,17 +19,17 @@ use Exception;
 class Settings extends Controller
 {
     /**
-     * @var WidgetBase Reference to the widget object.
+     * @var WidgetBase formWidget reference to the widget object
      */
     protected $formWidget;
 
     /**
-     * @var array Permissions required to view this page.
+     * @var array requiredPermissions to view this page
      */
     public $requiredPermissions = [];
 
     /**
-     * Constructor.
+     * __construct
      */
     public function __construct()
     {
@@ -46,13 +44,19 @@ class Settings extends Controller
         BackendMenu::setContext('October.System', 'system', 'settings');
     }
 
+    /**
+     * index action
+     */
     public function index()
     {
         $this->pageTitle = 'system::lang.settings.menu_label';
         $this->vars['items'] = SettingsManager::instance()->listItems('system');
-        $this->bodyClass = 'compact-container sidenav-tree-root';
+        $this->bodyClass = 'compact-container sidenav-tree-expanded';
     }
 
+    /**
+     * mysettings action
+     */
     public function mysettings()
     {
         BackendMenu::setContextSideMenu('mysettings');
@@ -65,6 +69,9 @@ class Settings extends Controller
     // Generated Form
     //
 
+    /**
+     * update action
+     */
     public function update($author, $plugin, $code = null)
     {
         SettingsManager::setContext($author.'.'.$plugin, $code);
@@ -92,6 +99,9 @@ class Settings extends Controller
         }
     }
 
+    /**
+     * update_onSave AJAX handler
+     */
     public function update_onSave($author, $plugin, $code = null)
     {
         $item = $this->findSettingItem($author, $plugin, $code);
@@ -118,6 +128,9 @@ class Settings extends Controller
         }
     }
 
+    /**
+     * update_onResetDefault AJAX handler
+     */
     public function update_onResetDefault($author, $plugin, $code = null)
     {
         $item = $this->findSettingItem($author, $plugin, $code);
@@ -130,7 +143,7 @@ class Settings extends Controller
     }
 
     /**
-     * Render the form.
+     * formRender renders the form
      */
     public function formRender($options = [])
     {
@@ -142,24 +155,8 @@ class Settings extends Controller
     }
 
     /**
-     * Returns the form widget used by this behavior.
-     *
-     * @return \Backend\Widgets\Form
-     */
-    public function formGetWidget()
-    {
-        if (is_null($this->formWidget)) {
-            $item = $this->findSettingItem();
-            $model = $this->createModel($item);
-            $this->initWidgets($model);
-        }
-
-        return $this->formWidget;
-    }
-
-    /**
-     * Prepare the widgets used by this action
-     * Model $model
+     * initWidgets prepare the widgets used by this action
+     * @param Model $model
      */
     protected function initWidgets($model)
     {
@@ -168,7 +165,7 @@ class Settings extends Controller
         $config->arrayName = class_basename($model);
         $config->context = 'update';
 
-        $widget = $this->makeWidget('Backend\Widgets\Form', $config);
+        $widget = $this->makeWidget(\Backend\Widgets\Form::class, $config);
         $widget->bindToController();
         $this->formWidget = $widget;
     }
@@ -187,22 +184,10 @@ class Settings extends Controller
     }
 
     /**
-     * Locates a setting item for a module or plugin.
-     *
-     * If none of the parameters are provided, they will be auto-guessed from the URL.
-     *
-     * @param string|null $author
-     * @param string|null $plugin
-     * @param string|null $code
-     *
-     * @return array
+     * Locates a setting item for a module or plugin
      */
-    protected function findSettingItem($author = null, $plugin = null, $code = null)
+    protected function findSettingItem($author, $plugin, $code)
     {
-        if (is_null($author) || is_null($plugin)) {
-            [$author, $plugin, $code] = $this->guessSettingItem();
-        }
-
         $manager = SettingsManager::instance();
 
         $moduleOwner = $author;
@@ -216,24 +201,5 @@ class Settings extends Controller
         }
 
         return $item;
-    }
-
-    /**
-     * Guesses the requested setting item from the current URL segments provided by the Request object.
-     *
-     * @return array
-     */
-    protected function guessSettingItem()
-    {
-        $segments = Request::segments();
-
-        if (!empty(Config::get('cms.backendUri', 'backend'))) {
-            array_splice($segments, 0, 4);
-        } else {
-            array_splice($segments, 0, 3);
-        }
-
-        // Ensure there's at least 3 segments
-        return array_pad($segments, 3, null);
     }
 }

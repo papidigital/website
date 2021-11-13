@@ -27,7 +27,7 @@ class ComponentHelpers
                 'title'                 => Lang::get('cms::lang.component.alias'),
                 'description'           => Lang::get('cms::lang.component.alias_description'),
                 'type'                  => 'string',
-                'validationPattern'     => '^(@)?[a-zA-Z]+[0-9a-z\_]*$',
+                'validationPattern'     => '^[a-zA-Z]+[0-9a-z\_]*$',
                 'validationMessage'     => Lang::get('cms::lang.component.validation_message'),
                 'required'              => true,
                 'showExternalParam'     => false
@@ -85,17 +85,24 @@ class ComponentHelpers
     /**
      * Returns a component property values.
      * @param mixed $component The component object
+     * @param boolean $returnArray Returns array if TRUE. Returns JSON string otherwise.
      * @return mixed
      */
-    public static function getComponentPropertyValues($component)
+    public static function getComponentPropertyValues($component, $returnArray = false)
     {
         $result = [];
 
         $result['oc.alias'] = $component->alias;
 
         $properties = $component->defineProperties();
-        foreach ($properties as $name => $params) {
-            $result[$name] = $component->property($name);
+        if (is_array($properties)) {
+            foreach ($properties as $name => $params) {
+                $result[$name] = $component->property($name);
+            }
+        }
+
+        if ($returnArray) {
+            return $result;
         }
 
         return json_encode($result);

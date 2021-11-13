@@ -44,12 +44,12 @@ class ColorPicker extends FormWidgetBase
     public $showAlpha = false;
 
     /**
-     * @var bool If true, the color picker is set to read-only mode
+     * @var bool readOnly if true, the color picker is set to read-only mode
      */
     public $readOnly = false;
 
     /**
-     * @var bool If true, the color picker is set to disabled mode
+     * @var bool disabled if true, the color picker is set to disabled mode
      */
     public $disabled = false;
 
@@ -86,7 +86,7 @@ class ColorPicker extends FormWidgetBase
     }
 
     /**
-     * Prepares the list data
+     * prepareVars for display
      */
     public function prepareVars()
     {

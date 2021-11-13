@@ -48,7 +48,7 @@
             var $el = $(this),
                 checked = $el.is(':checked')
 
-            $('.list-checkbox input[type="checkbox"]', body).prop('checked', checked)
+            $('.list-checkbox input[type="checkbox"]', body).prop('checked', checked).trigger('change')
             if (checked)
                 $('tr', body).addClass('active')
             else

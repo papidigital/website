@@ -4,10 +4,11 @@ use Ini;
 use Lang;
 use Cache;
 use Config;
+use System;
 use Cms\Twig\Loader as TwigLoader;
+use Cms\Twig\DebugExtension;
 use Cms\Twig\Extension as CmsTwigExtension;
 use Cms\Components\ViewBag;
-use Cms\Helpers\Cms as CmsHelpers;
 use System\Twig\Extension as SystemTwigExtension;
 use October\Rain\Halcyon\Processors\SectionParser;
 use Twig\Source as TwigSource;
@@ -25,12 +26,12 @@ use ApplicationException;
 class CmsCompoundObject extends CmsObject
 {
     /**
-     * @var array Initialized components defined in the template file.
+     * @var array components defined in the template file
      */
     public $components = [];
 
     /**
-     * @var array INI settings defined in the template file. Not to be confused
+     * @var array settings defined in the template file. Not to be confused
      * with the attribute called settings. In this array, components are bumped
      * to their own array inside the 'components' key.
      */
@@ -39,7 +40,7 @@ class CmsCompoundObject extends CmsObject
     ];
 
     /**
-     * @var array Contains the view bag properties.
+     * @var array viewBag contains the view bag properties.
      * This property is used by the page editor internally.
      */
     public $viewBag = [];
@@ -82,8 +83,7 @@ class CmsCompoundObject extends CmsObject
     protected $viewBagCache = false;
 
     /**
-     * Triggered after the object is loaded.
-     * @return void
+     * afterFetch event
      */
     public function afterFetch()
     {
@@ -93,8 +93,7 @@ class CmsCompoundObject extends CmsObject
     }
 
     /**
-     * Triggered when the model is saved.
-     * @return void
+     * beforeSave event
      */
     public function beforeSave()
     {
@@ -103,13 +102,25 @@ class CmsCompoundObject extends CmsObject
 
     /**
      * Create a new Collection instance.
-     *
-     * @param  array  $models
      * @return \October\Rain\Halcyon\Collection
      */
     public function newCollection(array $models = [])
     {
         return new CmsObjectCollection($models);
+    }
+
+    /**
+     * toArray returns an array representation of the object
+     * @return array
+     */
+    public function toArray()
+    {
+        $result = [];
+        foreach ($this->fillable as $property) {
+            $result[$property] = $this->$property;
+        }
+
+        return $result;
     }
 
     /**
@@ -144,7 +155,9 @@ class CmsCompoundObject extends CmsObject
      */
     protected function checkSafeMode()
     {
-        if (CmsHelpers::safeModeEnabled() && $this->isDirty('code') && strlen(trim($this->code))) {
+        $safeMode = System::checkSafeMode();
+
+        if ($safeMode && $this->isDirty('code') && strlen(trim($this->code))) {
             throw new ApplicationException(Lang::get('cms::lang.cms_object.safe_mode_enabled'));
         }
     }
@@ -176,7 +189,7 @@ class CmsCompoundObject extends CmsObject
     }
 
     /**
-     * Parse component sections.
+     * parseComponentSettings parses component sections
      * Replace the multiple component sections with a single "components"
      * element in the $settings property.
      * @return void
@@ -185,15 +198,11 @@ class CmsCompoundObject extends CmsObject
     {
         $this->settings = $this->getSettingsAttribute();
 
-        $manager = ComponentManager::instance();
         $components = [];
         foreach ($this->settings as $setting => $value) {
             if (!is_array($value)) {
                 continue;
             }
-
-            $settingParts = explode(' ', $setting);
-            $settingName = $settingParts[0];
 
             $components[$setting] = $value;
             unset($this->settings[$setting]);
@@ -235,7 +244,7 @@ class CmsCompoundObject extends CmsObject
         foreach ($this->settings['components'] as $sectionName => $values) {
             $result = $sectionName;
 
-            if ($sectionName == $componentName) {
+            if ($sectionName === $componentName) {
                 return $result;
             }
 
@@ -243,13 +252,13 @@ class CmsCompoundObject extends CmsObject
             if (count($parts) > 1) {
                 $sectionName = trim($parts[0]);
 
-                if ($sectionName == $componentName) {
+                if ($sectionName === $componentName) {
                     return $result;
                 }
             }
 
             $sectionName = $componentManager->resolve($sectionName);
-            if ($sectionName == $componentName) {
+            if ($sectionName === $componentName) {
                 return $result;
             }
         }
@@ -316,7 +325,7 @@ class CmsCompoundObject extends CmsObject
 
         self::$objectComponentPropertyMap = $objectComponentMap;
 
-        $expiresAt = now()->addMinutes(Config::get('cms.parsedPageCacheTTL', 10));
+        $expiresAt = now()->addMinutes(Config::get('cms.template_cache_ttl', 1440));
         Cache::put($key, base64_encode(serialize($objectComponentMap)), $expiresAt);
 
         if (array_key_exists($componentName, $objectComponentMap[$objectCode])) {
@@ -406,8 +415,12 @@ class CmsCompoundObject extends CmsObject
     {
         $loader = new TwigLoader();
         $twig = new TwigEnvironment($loader, []);
-        $twig->addExtension(new CmsTwigExtension());
+        $twig->addExtension(new CmsTwigExtension);
         $twig->addExtension(new SystemTwigExtension);
+
+        if (System::checkDebugMode()) {
+            $twig->addExtension(new DebugExtension);
+        }
 
         $stream = $twig->tokenize(new TwigSource($markup === false ? $this->markup : $markup, 'getTwigNodeTree'));
         return $twig->parse($stream);

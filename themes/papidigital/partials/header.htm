@@ -1,3 +1,4 @@
+==
 <nav class="navbar navbar-expand-md navbar-light">
     <a class="navbar-brand" href="{{ 'home'|page }}">
         <img src="{{ 'assets/images/papi-logo/papi-logo@2x.png'|theme }}" width="261" height="60" />
@@ -8,15 +9,14 @@
     <div class="collapse navbar-collapse" id="navbarNav" >
         <ul class="navbar-nav ml-auto">
             <li class="nav-item dropdown">
-                <a class="nav-link {% if this.page.id == 'strategy' or this.page.id == 'production' or this.page.id == 'distribution' %}active{% endif %} dropdown-toggle"
+                <a class="nav-link {% if this.page.id == 'podcast-marketing' or this.page.id == 'ecommerce' %}active{% endif %} dropdown-toggle"
                    href="#" id="navbarDropdown"
                    role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     services
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item {% if this.page.id == 'strategy' %}active{% endif %}" href="{{ 'strategy'|page }}">strategy</a>
-                    <a class="dropdown-item {% if this.page.id == 'production' %}active{% endif %}" href="{{ 'production'|page }}">production</a>
-                    <a class="dropdown-item {% if this.page.id == 'distribution' %}active{% endif %}" href="{{ 'distribution'|page }}">distribution</a>
+                    <a class="dropdown-item {% if this.page.id == 'podcast-marketing' %}active{% endif %}" href="{{ 'podcast-marketing'|page }}">Podcast Marketing</a>
+                    <a class="dropdown-item {% if this.page.id == 'ecommerce' %}active{% endif %}" href="{{ 'ecommerce'|page }}">ecommerce marketing</a>
                 </div>
             </li>
             <li class="nav-item">

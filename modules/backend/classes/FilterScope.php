@@ -91,6 +91,11 @@ class FilterScope
      */
     public $config;
 
+    /**
+     * @var string emptyOption is an optional label for an intentional empty selection.
+     */
+    public $emptyOption;
+
     public function __construct($scopeName, $label)
     {
         $this->scopeName = $scopeName;
@@ -134,6 +139,7 @@ class FilterScope
             'scope',
             'cssClass',
             'nameFrom',
+            'emptyOption',
             'descriptionFrom',
             'disabled',
         ];

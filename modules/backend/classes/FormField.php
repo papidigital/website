@@ -2,12 +2,14 @@
 
 use Str;
 use Html;
+use Lang;
 use October\Rain\Database\Model;
 use October\Rain\Html\Helper as HtmlHelper;
+use SystemException;
+use Exception;
 
 /**
- * Form Field definition
- * A translation of the form field configuration
+ * FormField definition is a translation of the form field configuration
  *
  * @package october\backend
  * @author Alexey Bobkov, Samuel Georges
@@ -85,6 +87,11 @@ class FormField
      * @var string Specifies a side. Possible values: auto, left, right, full.
      */
     public $span = 'full';
+
+    /**
+     * @var string spanClass is used by the row span type for a custom css class.
+     */
+    public $spanClass = '';
 
     /**
      * @var string Specifies a size. Possible values: tiny, small, large, huge, giant.
@@ -200,9 +207,10 @@ class FormField
      * Sets a side of the field on a form.
      * @param string $value Specifies a side. Possible values: left, right, full
      */
-    public function span($value = 'full')
+    public function span($value = 'full', $spanClass = '')
     {
         $this->span = $value;
+        $this->spanClass = $spanClass;
         return $this;
     }
 
@@ -303,7 +311,7 @@ class FormField
             $this->options($config['options']);
         }
         if (isset($config['span'])) {
-            $this->span($config['span']);
+            $this->span($config['span'], $config['spanClass'] ?? '');
         }
         if (isset($config['size'])) {
             $this->size($config['size']);
@@ -425,15 +433,6 @@ class FormField
         $result = array_get($this->attributes, $position, []);
         $result = $this->filterAttributes($result, $position);
 
-        // Field is required, so add the "required" attribute
-        if ($position === 'field' && $this->required && (!isset($result['required']) || $result['required'])) {
-            $result['required'] = '';
-        }
-        // The "required" attribute is set and falsy, so unset it
-        elseif ($position === 'field' && isset($result['required']) && !$result['required']) {
-            unset($result['required']);
-        }
-
         return $htmlBuild ? Html::attributes($result) : $result;
     }
 
@@ -451,14 +450,14 @@ class FormField
         $attributes = $this->filterTriggerAttributes($attributes, $position);
         $attributes = $this->filterPresetAttributes($attributes, $position);
 
-        if ($position == 'field' && $this->disabled) {
+        if ($position === 'field' && $this->disabled) {
             $attributes = $attributes + ['disabled' => 'disabled'];
         }
 
-        if ($position == 'field' && $this->readOnly) {
+        if ($position === 'field' && $this->readOnly) {
             $attributes = $attributes + ['readonly' => 'readonly'];
 
-            if ($this->type == 'checkbox' || $this->type == 'switch') {
+            if ($this->type === 'checkbox' || $this->type === 'switch') {
                 $attributes = $attributes + ['onclick' => 'return false;'];
             }
         }
@@ -485,12 +484,12 @@ class FormField
         $triggerMulti = '';
 
         // Apply these to container
-        if (in_array($triggerAction, ['hide', 'show']) && $position != 'container') {
+        if (in_array($triggerAction, ['hide', 'show']) && $position !== 'container') {
             return $attributes;
         }
 
         // Apply these to field/input
-        if (in_array($triggerAction, ['enable', 'disable', 'empty']) && $position != 'field') {
+        if (in_array($triggerAction, ['enable', 'disable', 'empty']) && $position !== 'field') {
             return $attributes;
         }
 
@@ -534,7 +533,7 @@ class FormField
      */
     protected function filterPresetAttributes($attributes, $position = 'field')
     {
-        if (!$this->preset || $position != 'field') {
+        if (!$this->preset || $position !== 'field') {
             return $attributes;
         }
 
@@ -652,14 +651,22 @@ class FormField
     }
 
     /**
-     * Returns the final model and attribute name of a nested attribute. Eg:
+     * resolveModelAttribute returns the final model and attribute name of a nested attribute. Eg:
      *
-     *     list($model, $attribute) = $this->resolveAttribute('person[phone]');
+     *     [$model, $attribute] = $this->resolveAttribute('person[phone]');
      *
      * @param  string $attribute.
      * @return array
      */
     public function resolveModelAttribute($model, $attribute = null)
+    {
+        return $this->resolveModelAttributeInternal($model, $attribute);
+    }
+
+    /**
+     * resolveModelAttributeInternal is an internal method resolver for resolveModelAttribute
+     */
+    protected function resolveModelAttributeInternal($model, $attribute = null, $objectOnly = false)
     {
         if ($attribute === null) {
             $attribute = $this->valueFrom ?: $this->fieldName;
@@ -669,6 +676,10 @@ class FormField
         $last = array_pop($parts);
 
         foreach ($parts as $part) {
+            if ($objectOnly && !is_object($model->{$part})) {
+                continue;
+            }
+
             $model = $model->{$part};
         }
 
@@ -698,7 +709,7 @@ class FormField
          */
         foreach ($keyParts as $key) {
             if ($result instanceof Model && $result->hasRelation($key)) {
-                if ($key == $lastField) {
+                if ($key === $lastField) {
                     $result = $result->getRelationValue($key) ?: $default;
                 }
                 else {
@@ -720,5 +731,105 @@ class FormField
         }
 
         return $result;
+    }
+
+    /**
+     * getOptionsFromModel looks at the model for defined options.
+     */
+    public function getOptionsFromModel($model, $fieldOptions, $data)
+    {
+        /*
+         * Deprecated method - remove if year >= 2023
+         */
+        if (is_array($fieldOptions) && is_callable($fieldOptions)) {
+            traceLog('Defining options as an array is deprecated. Please use a string in format ClassName::method instead');
+            $fieldOptions = call_user_func($fieldOptions, $model, $this);
+        }
+
+        /*
+         * Refer to the model method or any of its behaviors
+         */
+        if (!is_array($fieldOptions) && !$fieldOptions) {
+            try {
+                [$model, $attribute] = $this->resolveModelAttributeInternal($model, $this->fieldName, true);
+            }
+            catch (Exception $ex) {
+                throw new SystemException(Lang::get('backend::lang.field.options_method_invalid_model', [
+                    'model' => get_class($model),
+                    'field' => $this->fieldName
+                ]));
+            }
+
+            $methodName = 'get'.studly_case($attribute).'Options';
+            if (
+                !$this->objectMethodExists($model, $methodName) &&
+                !$this->objectMethodExists($model, 'getDropdownOptions')
+            ) {
+                throw new SystemException(Lang::get('backend::lang.field.options_method_not_exists', [
+                    'model'  => get_class($model),
+                    'method' => $methodName,
+                    'field'  => $this->fieldName
+                ]));
+            }
+
+            if ($this->objectMethodExists($model, $methodName)) {
+                $fieldOptions = $model->$methodName($this->value, $data);
+            }
+            else {
+                $fieldOptions = $model->getDropdownOptions($attribute, $this->value, $data);
+            }
+        }
+        /*
+         * Field options are an explicit method reference
+         */
+        elseif (is_string($fieldOptions)) {
+            // Calling via ClassName::method
+            if (strpos($fieldOptions, '::') !== false) {
+                $options = explode('::', $fieldOptions);
+                if (
+                    count($options) === 2 &&
+                    class_exists($options[0]) &&
+                    method_exists($options[0], $options[1])
+                ) {
+                    $result = $options[0]::{$options[1]}($model, $this);
+                    if (!is_array($result)) {
+                        throw new SystemException(Lang::get('backend::lang.field.options_static_method_invalid_value', [
+                            'class' => $options[0],
+                            'method' => $options[1]
+                        ]));
+                    }
+                    return $result;
+                }
+            }
+
+            // Calling via $model->method
+            if (!$this->objectMethodExists($model, $fieldOptions)) {
+                throw new SystemException(Lang::get('backend::lang.field.options_method_not_exists', [
+                    'model'  => get_class($model),
+                    'method' => $fieldOptions,
+                    'field'  => $this->fieldName
+                ]));
+            }
+
+            $fieldOptions = $model->$fieldOptions($this->value, $this->fieldName, $data);
+        }
+
+        return $fieldOptions;
+    }
+
+    /**
+     * Internal helper for method existence checks.
+     *
+     * @param  object $object
+     * @param  string $method
+     * @return boolean
+     */
+    protected function objectMethodExists($object, $method)
+    {
+        if (method_exists($object, 'methodExists')) {
+            return $object->methodExists($method);
+        }
+
+        return method_exists($object, $method);
     }
 }

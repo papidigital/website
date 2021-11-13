@@ -6,7 +6,9 @@ use BackendAuth;
 use SystemException;
 
 /**
- * Manages the system settings.
+ * SettingsManager manages the system settings
+ *
+ * @method static SettingsManager instance()
  *
  * @package october\system
  * @author Alexey Bobkov, Samuel Georges
@@ -34,17 +36,17 @@ class SettingsManager
     const CATEGORY_NOTIFICATIONS = 'system::lang.system.categories.notifications';
 
     /**
-     * @var array Cache of registration callbacks.
+     * @var array callbacks for registration
      */
     protected $callbacks = [];
 
     /**
-     * @var array List of registered items.
+     * @var array items registered
      */
     protected $items;
 
     /**
-     * @var array Grouped collection of all items, by category.
+     * @var array groupedItems by category
      */
     protected $groupedItems;
 
@@ -54,18 +56,19 @@ class SettingsManager
     protected $contextOwner;
 
     /**
-     * @var string Active item code.
+     * @var string contextItemCode for active item
      */
     protected $contextItemCode;
 
     /**
-     * @var array Settings item defaults.
+     * @var array itemDefaults for settings
      */
     protected static $itemDefaults = [
         'code'        => null,
         'label'       => null,
         'category'    => null,
         'icon'        => null,
+        'iconSvg'     => null,
         'url'         => null,
         'permissions' => [],
         'order'       => 500,
@@ -79,13 +82,16 @@ class SettingsManager
     protected $pluginManager;
 
     /**
-     * Initialize this singleton.
+     * init initializes this singleton
      */
     protected function init()
     {
         $this->pluginManager = PluginManager::instance();
     }
 
+    /**
+     * loadItems
+     */
     protected function loadItems()
     {
         /*
@@ -141,7 +147,13 @@ class SettingsManager
          */
         $catItems = [];
         foreach ($this->items as $code => $item) {
-            $category = $item->category ?: self::CATEGORY_MISC;
+            // For YAML, eg: CATEGORY_SYSTEM
+            if (defined("static::{$item->category}")) {
+                $category = constant("static::{$item->category}");
+            }
+            else {
+                $category = $item->category ?: self::CATEGORY_MISC;
+            }
             if (!isset($catItems[$category])) {
                 $catItems[$category] = [];
             }
@@ -219,7 +231,8 @@ class SettingsManager
      * setting item codes, specific for the plugin/module. Each element in the
      * array should be an associative array with the following keys:
      * - label - specifies the settings label localization string key, required.
-     * - icon - an icon name from the Font Awesome icon collection, required.
+     * - icon - an icon name from the Font Awesome icon collection, required if iconSvg is not provided.
+     * - iconSvg - path to a SVG icon file.
      * - url - the back-end relative URL the setting item should point to.
      * - class - the back-end relative URL the setting item should point to.
      * - permissions - an array of permissions the back-end user should have, optional.
@@ -276,7 +289,7 @@ class SettingsManager
             $uri = [];
 
             if (strpos($owner, '.') !== null) {
-                list($author, $plugin) = explode('.', $owner);
+                [$author, $plugin] = explode('.', $owner);
                 $uri[] = strtolower($author);
                 $uri[] = strtolower($plugin);
             }
@@ -314,7 +327,7 @@ class SettingsManager
     }
 
     /**
-     * Sets the navigation context.
+     * setContext sets the navigation context
      * @param string $owner Specifies the setting items owner plugin or module in the format Vendor.Module.
      * @param string $code Specifies the settings item code.
      */
@@ -323,6 +336,7 @@ class SettingsManager
         $instance = self::instance();
 
         $instance->contextOwner = strtolower($owner);
+
         $instance->contextItemCode = strtolower($code);
     }
 
@@ -356,7 +370,7 @@ class SettingsManager
         $code = strtolower($code);
 
         foreach ($this->items as $item) {
-            if (strtolower($item->owner) == $owner && strtolower($item->code) == $code) {
+            if (strtolower($item->owner) === $owner && strtolower($item->code) === $code) {
                 return $item;
             }
         }
@@ -375,7 +389,7 @@ class SettingsManager
         if (!$user) {
             return $items;
         }
-        
+
         $items = array_filter($items, function ($item) use ($user) {
             if (!$item->permissions || !count($item->permissions)) {
                 return true;

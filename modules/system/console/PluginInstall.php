@@ -1,12 +1,14 @@
 <?php namespace System\Console;
 
+use System;
 use Illuminate\Console\Command;
 use System\Classes\UpdateManager;
+use October\Rain\Process\Composer as ComposerProcess;
 use Symfony\Component\Console\Input\InputArgument;
-use System\Classes\PluginManager;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
- * Console command to install a new plugin.
+ * PluginInstall installs a new plugin.
  *
  * This adds a new plugin by requesting it from the October marketplace.
  *
@@ -15,55 +17,125 @@ use System\Classes\PluginManager;
  */
 class PluginInstall extends Command
 {
-
     /**
-     * The console command name.
-     * @var string
+     * @var string name of console command
      */
     protected $name = 'plugin:install';
 
     /**
-     * The console command description.
-     * @var string
+     * @var string description of the console command
      */
-    protected $description = 'Install a plugin from the October marketplace.';
+    protected $description = 'Install a plugin from the October marketplace or custom source.';
 
     /**
-     * Execute the console command.
-     * @return void
+     * handle executes the console command
      */
     public function handle()
     {
-        $pluginName = $this->argument('name');
-        $manager = UpdateManager::instance()->setNotesOutput($this->output);
+        $name = $this->argument('name');
 
-        $pluginDetails = $manager->requestPluginDetails($pluginName);
+        $this->output->writeln("<info>Installing Plugin: {$name}</info>");
 
-        $code = array_get($pluginDetails, 'code');
-        $hash = array_get($pluginDetails, 'hash');
+        if ($src = $this->option('from')) {
+            $this->output->writeln("<info>Added Repo: {$src}</info>");
+            $composerCode = System::octoberToComposerCode(
+                $name,
+                'plugin',
+                (bool) $this->option('oc')
+            );
 
-        $this->output->writeln(sprintf('<info>Downloading plugin: %s</info>', $code));
-        $manager->downloadPlugin($code, $hash, true);
+            $this->addRepoFromSource($composerCode, $src);
+        }
+        else {
+            $info = UpdateManager::instance()->requestPluginDetails($name);
+            $composerCode = array_get($info, 'composer_code');
+        }
 
-        $this->output->writeln(sprintf('<info>Unpacking plugin: %s</info>', $code));
-        $manager->extractPlugin($code, $hash);
+        // Splice in version
+        $requirePackage = $composerCode;
+        if ($requireVersion = $this->option('want')) {
+            $requirePackage .= ':'.$requireVersion;
+        }
 
-        /*
-         * Migrate plugin
-         */
-        $this->output->writeln(sprintf('<info>Migrating plugin...</info>', $code));
-        PluginManager::instance()->loadPlugins();
-        $manager->updatePlugin($code);
+        // Composer install
+        $this->comment("Executing: composer require {$requirePackage}");
+        $this->output->newLine();
+
+        $composer = new ComposerProcess;
+        $composer->setCallback(function($message) { echo $message; });
+        $composer->require($requirePackage);
+
+        if ($composer->lastExitCode() !== 0) {
+            if ($src = $this->option('from')) {
+                $this->output->writeln("<info>Reverted repo change</info>");
+                $this->removeRepoFromSource($composerCode);
+            }
+
+            $this->output->error('Install failed. Check output above');
+            exit(1);
+        }
+
+        $this->output->success("Plugin '${name}' installed");
+
+        // Run migrations
+        if (!$this->option('no-migrate')) {
+            $this->comment('Please migrate the database with the following command');
+            $this->output->newLine();
+            $this->line("* php artisan october:migrate");
+            $this->output->newLine();
+        }
     }
 
     /**
-     * Get the console command arguments.
-     * @return array
+     * addRepoFromSource adds a plugin to composer's repositories
+     */
+    protected function addRepoFromSource($composerCode, $src)
+    {
+        if (file_exists(base_path($src))) {
+            if (file_exists(base_path($src . '/.git'))) {
+                $srcType = 'git';
+            }
+            else {
+                $srcType = 'path';
+            }
+        }
+        else {
+            $srcType = 'git';
+        }
+
+        $composer = new ComposerProcess;
+        $composer->addRepository($composerCode, $srcType, $src);
+    }
+
+    /**
+     * removeRepoFromSource removes a plugin from composer's repo
+     */
+    protected function removeRepoFromSource($composerCode)
+    {
+        $composer = new ComposerProcess;
+        $composer->removeRepository($composerCode);
+    }
+
+    /**
+     * getArguments get the console command arguments
      */
     protected function getArguments()
     {
         return [
             ['name', InputArgument::REQUIRED, 'The name of the plugin. Eg: AuthorName.PluginName'],
+        ];
+    }
+
+    /**
+     * getOptions get the console command options
+     */
+    protected function getOptions()
+    {
+        return [
+            ['oc', null, InputOption::VALUE_NONE, 'Package uses the oc- prefix.'],
+            ['from', 'f', InputOption::VALUE_REQUIRED, 'Provide a custom source.'],
+            ['want', 'w', InputOption::VALUE_REQUIRED, 'Provide a custom version.'],
+            ['no-migrate', null, InputOption::VALUE_NONE, 'Do not run migration after install.'],
         ];
     }
 }

@@ -2,13 +2,14 @@
 
 use Lang;
 use Model;
+use Event;
 use Cms\Classes\Theme as CmsTheme;
 use System\Classes\CombineAssets;
-use Exception;
 use System\Models\File;
+use Exception;
 
 /**
- * Customization data used by a theme
+ * ThemeData for theme customization
  *
  * @package october\cms
  * @author Alexey Bobkov, Samuel Georges
@@ -23,17 +24,17 @@ class ThemeData extends Model
     public $table = 'cms_theme_data';
 
     /**
-     * @var array Guarded fields
+     * @var array guarded fields
      */
     protected $guarded = [];
 
     /**
-     * @var array Fillable fields
+     * @var array fillable fields
      */
     protected $fillable = [];
 
     /**
-     * @var array List of attribute names which are json encoded and decoded from the database.
+     * @var array jsonable attribute names that are json encoded and decoded from the database
      */
     protected $jsonable = ['data'];
 
@@ -82,11 +83,9 @@ class ThemeData extends Model
     }
 
     /**
-     * Returns a cached version of this model, based on a Theme object.
-     * @param $theme Cms\Classes\Theme
-     * @return self
+     * forTheme returns a cached version of this model, based on a Theme object
      */
-    public static function forTheme($theme)
+    public static function forTheme(CmsTheme $theme): ThemeData
     {
         $dirName = $theme->getDirName();
         if ($themeData = array_get(self::$instances, $dirName)) {
@@ -94,11 +93,11 @@ class ThemeData extends Model
         }
 
         try {
-            $themeData = self::firstOrCreate(['theme' => $dirName]);
+            $themeData = static::createThemeDataModel()->firstOrCreate(['theme' => $dirName]);
         }
         catch (Exception $ex) {
             // Database failed
-            $themeData = new self(['theme' => $dirName]);
+            $themeData = static::createThemeDataModel(['theme' => $dirName]);
         }
 
         return self::$instances[$dirName] = $themeData;
@@ -121,7 +120,7 @@ class ThemeData extends Model
                 continue;
             }
 
-            if ($field['type'] === 'repeater') {
+            if (in_array($field['type'], ['repeater', 'nestedform'])) {
                 $this->jsonable[] = $id;
             }
             elseif ($field['type'] === 'fileupload') {
@@ -220,8 +219,7 @@ class ThemeData extends Model
     }
 
     /**
-     * Applies asset variables to the combiner filters that support it.
-     * @return void
+     * applyAssetVariablesToCombinerFilters that support it
      */
     public static function applyAssetVariablesToCombinerFilters($filters)
     {
@@ -245,7 +243,8 @@ class ThemeData extends Model
     }
 
     /**
-     * Generate a cache key for the combiner, this allows variables to bust the cache.
+     * getCombinerCacheKey generates a cache key for the combiner, this allows variables to
+     * bust the cache.
      * @return string
      */
     public static function getCombinerCacheKey()
@@ -258,5 +257,29 @@ class ThemeData extends Model
         $customData = $theme->getCustomData();
 
         return (string) $customData->updated_at ?: '';
+    }
+
+    /**
+     * createThemeDataModel is an opportunity to override the theme data model
+     */
+    public static function createThemeDataModel(array $attributes = []): ThemeData
+    {
+        /**
+         * @event cms.theme.createThemeDataModel
+         * Overrides the theme data model used by the system, which must inherit the main model
+         *
+         * Example usage:
+         *
+         *     Event::listen('cms.theme.createThemeDataModel', function (array $attributes) {
+         *         return new MyCustomThemeDataModel($attributes);
+         *     });
+         */
+        if ($newModel = Event::fire('cms.theme.createThemeDataModel', [$attributes], true)) {
+            if ($newModel instanceof ThemeData) {
+                return $newModel;
+            }
+        }
+
+        return new static($attributes);
     }
 }

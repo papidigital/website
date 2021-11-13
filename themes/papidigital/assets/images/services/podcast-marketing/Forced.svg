@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="171.492" height="164.521" viewBox="0 0 171.492 164.521">
+  <g id="Group_68" data-name="Group 68" transform="translate(-2859.925 -423.042)">
+    <path id="Path_85" data-name="Path 85" d="M2951.823,455.561c-20.216,0-36.6,16.744-36.6,37.4s16.388,37.4,36.6,37.4,36.605-16.743,36.605-37.4S2972.04,455.561,2951.823,455.561Zm20.84,40.829-29.726,17.533a3.878,3.878,0,0,1-5.817-3.431V475.425a3.879,3.879,0,0,1,5.817-3.431l29.726,17.534A4.005,4.005,0,0,1,2972.663,496.39Z" transform="translate(-6.152 -2.784)" fill="#cc3d38"/>
+    <rect id="Rectangle_51" data-name="Rectangle 51" width="23.162" height="68.609" rx="11.581" transform="translate(2883.257 515.454)" fill="none" stroke="#cc3d38" stroke-linejoin="round" stroke-width="7"/>
+    <path id="Path_86" data-name="Path 86" d="M2881.557,589.923s-21.632,0-21.632-28.852,21.632-28.852,21.632-28.852" transform="translate(0 -11.313)" fill="#cc3d38"/>
+    <path id="Path_87" data-name="Path 87" d="M3012.152,594.692h0a11.581,11.581,0,0,0,11.58-11.58V537.664a11.581,11.581,0,0,0-11.58-11.58h0a11.581,11.581,0,0,0-11.581,11.58v45.447A11.581,11.581,0,0,0,3012.152,594.692Z" transform="translate(-15.648 -10.63)" fill="none" stroke="#cc3d38" stroke-linejoin="round" stroke-width="7"/>
+    <path id="Path_88" data-name="Path 88" d="M3028.546,589.923s21.632,0,21.632-28.852-21.632-28.852-21.632-28.852" transform="translate(-18.761 -11.313)" fill="#cc3d38"/>
+    <path id="Path_89" data-name="Path 89" d="M3014.657,534.3V497.129a66.588,66.588,0,0,0-66.588-66.587h0a66.587,66.587,0,0,0-66.587,66.587V534.3" transform="translate(-2.398)" fill="none" stroke="#cc3d38" stroke-linejoin="round" stroke-width="7"/>
+    <path id="Path_90" data-name="Path 90" d="M3006.3,462.745a66.552,66.552,0,0,0-57.035-32.2h0a66.552,66.552,0,0,0-57.034,32.2" transform="translate(-3.594)" fill="none" stroke="#cc3d38" stroke-linecap="round" stroke-linejoin="round" stroke-width="15"/>
+    <line id="Line_13" data-name="Line 13" y2="23.253" transform="translate(2928.464 544.985)" fill="none" stroke="#cc3d38" stroke-linecap="round" stroke-linejoin="round" stroke-width="7"/>
+    <line id="Line_14" data-name="Line 14" y2="36.115" transform="translate(2945.671 538.554)" fill="none" stroke="#cc3d38" stroke-linecap="round" stroke-linejoin="round" stroke-width="7"/>
+    <line id="Line_15" data-name="Line 15" y2="23.253" transform="translate(2962.878 544.985)" fill="none" stroke="#cc3d38" stroke-linecap="round" stroke-linejoin="round" stroke-width="7"/>
+  </g>
+</svg>
